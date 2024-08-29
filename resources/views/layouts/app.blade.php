@@ -39,12 +39,13 @@ use App\Models\User;
   <link href="{{ asset('vendor/quill/quill.bubble.css') }}" rel="stylesheet">
   <link href="{{ asset('vendor/remixicon/remixicon.css') }}" rel="stylesheet">
   <link href="{{ asset('vendor/bs-stepper/bs-stepper.css') }}" rel="stylesheet">
-  @if(in_array($currentRoute, ['admin.users.registered', 'admin.users.student', 'admin.users.employee']))
-<link href="{{ asset('vendor/datatables/datatables.min.css') }}" rel="stylesheet">
-  @endif
-  @if(in_array($currentRoute, ['admin.users.student']))
+
+<script src="{{ asset('vendor/datatables/datatables.min.js') }}"></script>
+
+
+
 <link href="{{ asset('vendor/dropzone/dropzone.css') }}" rel="stylesheet">
-  @endif
+
   @if(in_array($currentRoute, ['account.show']))
 <!-- Croppie css -->
 <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/croppie/2.6.2/croppie.min.css">
@@ -155,13 +156,12 @@ use App\Models\User;
   <script src="{{ asset('vendor/tinymce/tinymce.min.js') }}"></script>
   <script src="{{ asset('vendor/php-email-form/validate.js') }}"></script>
   <script src="{{ asset('vendor/bs-stepper/bs-stepper.js') }}"></script>
-  @if(in_array($currentRoute, ['admin.users.registered', 'admin.users.student', 'admin.users.employee']))
+
   <script src="{{ asset('vendor/datatables/datatables.min.js') }}"></script>
   <script src="{{ asset('js/dropzone.js') }}"></script>
-  @endif
-  @if(in_array($currentRoute, ['admin.users.student']))
+ 
   <script src="{{ asset('vendor/dropzone/dropzone.js') }}"></script>
-  @endif
+ 
   @if(in_array($currentRoute, ['schedule.index']))
   <script src="{{ asset('vendor/schedule/util.js') }}"></script>
   <script src="{{ asset('vendor/schedule/main.js') }}"></script>

@@ -1,4 +1,4 @@
-<div class="card-body pt-4 border border-danger border-opacity-25 border-25 border-top-0 bg-body-tertiary">
+<div class="card-body pt-4 border border-danger border-opacity-25 border-25 border-top-0 bg-body-tertiary registration-form">
         <div id="response">
             @if(session()->has('error'))
                 <div class="alert alert-danger alert-dismissible fade show" role="alert">
@@ -106,7 +106,7 @@
             <hr class="border border-50 opacity-50 mb-0">
 
             <p class="text-center mb-0">
-                <span>Already have an account?</span>
+                <span style="color:rgb(90,90,90)">Already have an account?</span>
                 <a href="{{ route('login') }}">
                     <span class="text-danger fw-semibold">Login instead</span>
                 </a>

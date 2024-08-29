@@ -9,13 +9,24 @@ class UserSessionService
 {
     public static function storeUserPreferences(User $user)
     {
-        if ($user->role === 'Student') {
+        if ($user->type === 'student') {
             $student = Student::where('StudentID', $user->student_id)->first();
             session()->put('student', $student);
-        } elseif ($user->role === 'Employee') {
+            session()->put('panel', 'student');
+        } elseif ($user->type === 'teacher') {
             $employee = Employee::where('EmployeeID', $user->employee_id)->first();
             session()->put('employee', $employee);
+            session()->put('panel', 'teacher');
+        } elseif ($user->type === 'program_head') {
+            $employee = Employee::where('EmployeeID', $user->employee_id)->first();
+            session()->put('employee', $employee);
+            session()->put('panel', 'program_head');
+        } elseif ($user->type === 'admin') {
+            $employee = Employee::where('EmployeeID', $user->employee_id)->first();
+            session()->put('employee', $employee);
+            session()->put('panel', 'admin');
         }
+        
 
         // Fetch and store the current school year and semester settings in the session
         $currentSchoolYearId = SystemSetting::getSetting('current_school_year_id');
@@ -25,6 +36,6 @@ class UserSessionService
 
         // Set the initial theme for the user
         Session::put('theme', 'light'); // You can set the default theme to 'light' or 'dark' as needed
-        Session::put('panel', 'user');
+      
     }
 }

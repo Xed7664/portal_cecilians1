@@ -11,8 +11,14 @@ class Semester extends Model
 
     protected $fillable = ['name'];
 
+    
     public function schoolYear()
+        {
+            return $this->belongsTo(SchoolYear::class, 'school_year_id', 'id');
+        }
+
+    public function grades()
     {
-        return $this->belongsTo(SchoolYear::class);
+        return $this->hasMany(Grade::class);
     }
 }

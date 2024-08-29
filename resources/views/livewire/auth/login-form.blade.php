@@ -18,8 +18,8 @@
     <form wire:submit.prevent="login" class="row g-3 needs-validation" novalidate>
         
         <div class="col-12">
-            <label class="form-label">Email or Username</label>
-            <input wire:model="username" type="text" class="form-control" required>
+            <label class="form-label" style="position:absolute;left:8px">Email or Username</label>
+            <input wire:model="username" type="text" class="form-control" style="margin-top:30px" required>
             @error('login') <div class="invalid-feedback">{{ $message }}</div> @enderror
         </div>
 
@@ -31,9 +31,9 @@
                 </a>
             </div>
             <div class="input-group">
-                <input wire:model="password" type="password" class="form-control toggle-password" required>
-                <button class="btn btn-outline-secondary toggle-password-button" type="button">
-                    <i class="bi bi-eye"></i>
+                <input wire:model="password" type="password" class="form-control toggle-password" id="password" required>
+                <button class="btn btn-outline-secondary toggle-password-button" type="button" onclick="togglePasswordVisibility()">
+                    <i class="bi bi-eye" id="toggle-icon"></i>
                 </button>
                 @error('password') <div class="invalid-feedback">{{ $message }}</div> @enderror
             </div>
@@ -41,7 +41,7 @@
 
         <div class="col-12">
             <div class="form-check">
-                <input wire:model="remember" class="form-check-input" type="checkbox" id="select-personal" data-value="rememberMe" >
+                <input wire:model="remember" class="form-check-input" type="checkbox" id="select-personal" data-value="rememberMe" style="accent-color:red !important">
                 <label class="form-check-label" for="rememberMe">Remember me</label>
             </div>
         </div>
@@ -52,13 +52,6 @@
 
         <hr class="border border-50 opacity-75 mb-0">
 
-        <p class="text-center">
-            <span>New on our platform?</span>
-            <a href="{{ route('registration') }}" tabindex="-1">
-                <span class="text-danger fw-semibold">Create an account</span>
-            </a>
-        </p>
-
         <div class="col-12 mt-1">
             <p class="small mb-0 text-center">- OR -</p>
         </div>
@@ -67,6 +60,26 @@
             <a href="{{ route('login.google') }}" type="button" class="btn btn-outline-danger w-100 fw-semibold">
                 <i class="bx bxl-google"></i> Sign in with Google
             </a>
+
+            <a href="{{ route('registration') }}" type="button" class="btn btn-outline-light w-100 fw-semibold">
+                Sign Up
+            </a>
         </div>
     </form>
 </div>
+
+<script>
+    function togglePasswordVisibility() {
+        const passwordField = document.getElementById('password');
+        const toggleIcon = document.getElementById('toggle-icon');
+        if (passwordField.type === 'password') {
+            passwordField.type = 'text';
+            toggleIcon.classList.remove('bi-eye');
+            toggleIcon.classList.add('bi-eye-slash');
+        } else {
+            passwordField.type = 'password';
+            toggleIcon.classList.remove('bi-eye-slash');
+            toggleIcon.classList.add('bi-eye');
+        }
+    }
+</script>

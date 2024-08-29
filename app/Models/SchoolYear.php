@@ -15,4 +15,9 @@ class SchoolYear extends Model
     {
         return $this->hasMany(Semester::class);
     }
+    public function subjectsEnrolled()
+    {
+        return $this->hasMany(SubjectEnrolled::class, 'school_year_id', 'id');
+    }
+
 }

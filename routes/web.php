@@ -14,11 +14,69 @@ use App\Http\Controllers\Subjects\MiniController;
 use App\Http\Controllers\Subjects\SubjectController;
 use App\Http\Controllers\GradeController;
 use App\Http\Controllers\ProspectusController;
+use App\Http\Controllers\{StudentController, TeacherController, ProgramHeadController, AdminController};
+use App\Http\Controllers\WelcomeController;
+use App\Providers\RouteServiceProvider;
+
+// First Page Route
+Route::get('/welcome', [WelcomeController::class, 'index'])->name('welcome');
+
+// Default route to redirect to the welcome page
+Route::get('/', function () {
+    return redirect()->route('welcome');
+});
+
 // Authentication routes
 Route::get('/auth/login', function () {
+    // Check if the user is already authenticated
+    if (Auth::check()) {
+        return redirect()->route('newsfeed'); // or any other authenticated route
+    }
     return view('auths.login');
 })->name('login');
 
+
+
+// Route::get('/program-head/dashboard', function () {
+//     return view('program-head.dashboard');
+// })->name('program-head.dashboard');
+
+// Route::get('/student/dashboard', function () {
+//     return view('student.dashboard');
+// })->name('student.dashboard');
+
+// Route::get('/teacher/dashboard', function () {
+//     return view('teacher.dashboard');
+// })->name('teacher.dashboard');
+
+// Route::get('/admin/dashboard', function () {
+//     return view('admin.dashboard');
+// })->name('admin.dashboard');
+
+
+
+// Route::get('/admin/dashboard', function () {
+//     return view('dashboard');
+// })->name('admin')->middleware('admin');
+
+// Route::get('/program-head/dashboard', function () {
+//     return view('dashboard');
+// })->name('program_head')->middleware('program_head');
+
+// Route::get('/teacher/dashboard', function () {
+//     return view('dashboard');
+// })->name('teacher')->middleware('teacher');
+
+
+
+
+// Role-specific home routes
+Route::middleware(['auth'])->group(function () {
+    Route::get('/student/dashboard', [StudentController::class, 'index'])->name('student.dashboard');
+    Route::get('/teacher/dashboard', [TeacherController::class, 'index'])->name('teacher.dashboard');
+    Route::get('/program-head/dashboard', [ProgramHeadController::class, 'index'])->name('program_head.dashboard');
+    Route::get('/admin/dashboard', [AdminController::class, 'index'])->name('admin.dashboard');
+});
 Route::get('/auth/registration', [AuthController::class, 'registration'])->name('registration');
 
 Route::get('/auth/verify', [AuthController::class, 'verify'])->name('verify');
@@ -74,8 +132,43 @@ Route::middleware(['auth'])->group(function () {
 
     Route::get('/events/{id}', [EventsController::class, 'show'])->name('events.show');
 
-    //Grades
-    Route::get('/grades', [GradeController::class, 'index'])->name('grade.index');
+            //Grades
+           // Program Head Routes
+            Route::get('/program-head/grades', [GradeController::class, 'programHeadIndex'])->name('program-head.grades.index');
+            Route::get('/program-head/grades/{section}', [GradeController::class, 'programHeadShow'])->name('program-head.grades.show');
+
+            // Teacher Routes
+            Route::get('/teacher/grades', [GradeController::class, 'teacherIndex'])->name('teacher.grades.index');
+            Route::get('/teacher/grades/{section}', [GradeController::class, 'teacherShow'])->name('teacher.grades.show');
+            // Route::post('/teacher/grades/{section}', [GradeController::class, 'update'])->name('teacher.grades.update');
+            Route::get('/teacher/grades/filter', [GradeController::class, 'filter'])->name('teacher.grades.filter');
+            Route::get('/teacher/subject/{subjectEnrolledId}/grades', [GradeController::class, 'teacherShow'])->name('teacher.subject.grades');
+            Route::post('/teacher/grades/{subjectEnrolled}/store-or-update', [GradeController::class, 'storeOrUpdateGrades'])->name('teacher.grades.storeOrUpdate');
+            Route::get('grades/template/{subjectEnrolled}', [GradeController::class, 'downloadTemplate'])->name('teacher.grades.template');
+         
+     
+Route::post('/teacher/grades/mapping', [GradeController::class, 'showMappingForm'])->name('teacher.grades.mapping');
+Route::post('/teacher/grades/mapHeaders', [GradeController::class, 'mapHeaders'])->name('teacher.grades.mapHeaders');
+Route::post('/teacher/grades/import', [GradeController::class, 'importGrades'])->name('teacher.grades.import');
+// routes/web.php
+
+Route::post('/send-grades-notification', [GradesController::class, 'sendGradesNotification']);
+
+     // Route to display the file upload form
+     Route::get('teacher/grades/upload', [GradesController::class, 'showUploadForm'])->name('grades.upload.form');
+     Route::post('teacher/grades/upload', [GradesController::class, 'uploadFile'])->name('grades.upload');
+     Route::post('teacher/grades/map', [GradesController::class, 'mapColumns'])->name('grades.map');
+     Route::put('teacher/grades/{id}', [GradeController::class, 'update'])->name('grades.update');
+            // Student Routes
+            // Route::get('/student/grades', [GradeController::class, 'studentIndex'])->name('student.grades.index');
+            // Route::get('/student/grades/{semester}', [GradeController::class, 'studentShow'])->name('student.grades.show');
+            // Route::get('/student/grades/ajax/{semester}', [GradeController::class, 'getGradesBySemester'])->name('student.grades.ajax');
+            // Route for Grades for students
+    Route::get('/student/grades', [GradeController::class, 'studentIndex'])->name('student.grades.index');
+    Route::get('/student/grades/{studentId}', [GradeController::class, 'showAllGradesForStudent'])->name('student.grades.all');
+    Route::get('/student/grades/request-review/{studentId}', [GradeController::class, 'requestReview'])->name('student.grades.requestReview');
+    Route::post('/student/grades/request-review/{gradeId}', [GradeController::class, 'submitReviewRequest'])->name('student.grades.submitReviewRequest');
+    Route::get('/student/grades/section/{section}', [GradeController::class, 'studentShow'])->name('student.grades.show');
 
      //Prospectus
      Route::get('/prospectus', [ProspectusController::class, 'index'])->name('prospectus.index');
@@ -146,4 +239,21 @@ Route::middleware(['auth'])->group(function () {
 
         Route::get('/analytics/logins', [AdminLoginController::class, 'index'])->name('admin.analytics.login');
     });
+
+
+    //not yet applied
+    // Route::get('admin',function(){
+    //     return view('admin');
+    // })->name('admin')->middleware('admin');
+    
+    // Route::get('proghead',function(){
+    //     return view('proghead');
+    // })->name('proghead')->middleware('proghead');
+    
+    // Route::get('teacher',function(){
+    //     return view('teacher');
+    // })->name('teacher')->middleware('teacher');
+    
+ 
+
 });

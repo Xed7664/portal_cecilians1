@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\Route;
 class RouteServiceProvider extends ServiceProvider
 {
     /**
-     * The path to your application's "home" route.
+     * The path to your application's home route.
      *
      * Typically, users are redirected here after authentication.
      *
@@ -36,5 +36,27 @@ class RouteServiceProvider extends ServiceProvider
             Route::middleware('web')
                 ->group(base_path('routes/web.php'));
         });
+    }
+
+    /**
+     * Get the path for the authenticated user's home based on their type.
+     *
+     * @param \App\Models\User $user
+     * @return string
+     */
+    public static function redirectToHome(\App\Models\User $user)
+    {
+        switch ($user->role) {
+            case 'student':
+                return route('student.dashboard');
+            case 'teacher':
+                return route('teacher.dashboard');
+            case 'program_head':
+                return route('program_head.dashboard');
+            case 'admin':
+                return route('admin.dashboard');
+            default:
+                return route('newsfeed');
+        }
     }
 }

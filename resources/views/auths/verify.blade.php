@@ -3,16 +3,21 @@
 @section('title', 'Email Verification')
 
 @section('content')
-
-<div class="container">
+<style>
+    .container1 {
+        width: 100%;
+        height:100vh;
+        display:flex;
+        justify-content:center;
+        align-items:center;
+    }
+  
+</style>
+<div class="container1">
     <section class="section">
     <div class="container">
         <div class="row justify-content-center">
-            <div class="d-none d-lg-flex col-lg-7 p-0">
-                <div class="d-flex justify-content-center align-items-center">
-                    <img src="{{ asset('img/gif/login.gif') }}" alt="auth-login-cover" class="img-fluid my-5 pt-5">
-                </div>
-            </div>
+          
             <div class="col-lg-5 col-md-6 d-flex flex-column">
                 <div class="d-flex justify-content-center mt-4">
                     <a href="../" class="logo d-flex align-items-center w-auto">

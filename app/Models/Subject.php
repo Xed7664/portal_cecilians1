@@ -13,11 +13,21 @@ class Subject extends Model
 
     public function schoolYear()
     {
-        return $this->belongsTo(SchoolYear::class);
+        return $this->belongsTo(SchoolYear::class, 'school_year_id', 'id');
     }
+    public function yearLevel()
+    {
+        return $this->belongsTo(YearLevel::class, 'year_level_id', 'id');
+    }
+
 
     public function semester()
     {
         return $this->belongsTo(Semester::class);
     }
+      // Define the relationship to the Grade model
+      public function grades()
+      {
+          return $this->hasMany(Grade::class, 'subject_id', 'id');
+      }
 }

@@ -66,4 +66,20 @@ class Kernel extends HttpKernel
         'throttle' => \Illuminate\Routing\Middleware\ThrottleRequests::class,
         'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
     ];
+    protected $routeMiddleware = [
+        // Other middleware...
+        'admin' => \App\Http\Middleware\AdminMiddleware::class,
+        'program_head' => \App\Http\Middleware\ProgramHeadMiddleware::class,
+        'teacher' => \App\Http\Middleware\TeacherMiddleware::class,
+        'redirect_if_authenticated' => \App\Http\Middleware\RedirectIfAuthenticated::class,
+
+    ];
+    protected function schedule(Schedule $schedule)
+{
+    $schedule->command('send:grade-release-notifications')->everyMinute(); // Adjust the frequency as needed
+}
+protected $commands = [
+    \App\Console\Commands\GradeReleaseScheduleCommand::class,
+];
+
 }

@@ -36,4 +36,8 @@ class Student extends Model
     {
         return $this->user !== null;
     }
+    public function subjectsEnrolled()
+    {
+        return $this->hasMany(SubjectEnrolled::class);
+    }
 }
