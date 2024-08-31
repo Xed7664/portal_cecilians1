@@ -35,7 +35,7 @@
                             </div>
                         </div>
 
-                    <p>©2024 •<span> Cecilian College Portal </span>• Alrights Reserved</p>
+                    <p>©2024 •<span> Cecilian' College Portal </span>• Alrights Reserved</p>
                 </div>
              <!-- End of Right Side Column -->
               
