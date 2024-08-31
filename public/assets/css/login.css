@@ -212,3 +212,49 @@ body::after {
 .logo span {
     font-size: 18px !important;
 }
+
+@media (max-width:360px){
+    .right {
+        background: transparent !important;
+        border: 0;
+        width: 100% !important;
+        height: 100vh !important;
+        display: flex !important;
+        justify-content: center !important;
+        align-items: center !important;
+    }
+  
+    .left {
+        display: none !important;
+    }
+
+    .card {
+        width: 95% !important;
+        transform: translate(81px,100px);
+    }
+
+    .row {
+        width: 100% !important;
+    }
+    
+    .footertxt {
+        position: absolute;
+        bottom: 0 !important;
+    }
+
+    .container {
+        position: relative !important;
+    }
+
+    .headertxt {
+        display: block !important;
+        position: absolute;
+        top: 20px;
+    }
+
+    .headertxt p,.headertxt h2 {
+        color: white;
+    }
+    
+   
+}
