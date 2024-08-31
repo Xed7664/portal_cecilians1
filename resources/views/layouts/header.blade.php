@@ -153,8 +153,8 @@
             @if(Auth::user()->hasPermission('access_admin'))
             <li class="px-2 py-25 switch-panel">
               <a class="dropdown-item d-flex align-items-center" href="javascript:void(0);">
-                <i class="ri {{ ($userPanel === 'user') ? 'ri-user-settings-line' : 'ri-user-settings-fill' }}"></i>
-                <span>{!! ($userPanel === 'user') ? 'Switch to <b>Admin Panel</b>' : 'Switch to <b>User Panel</b>' !!}</span>
+                <i class="ri {{ ($userPanel === 'admin') ? 'ri-user-settings-line' : 'ri-user-settings-fill' }}"></i>
+                <span>{!! ($userPanel === 'admin') ? 'Switch to <b>Admin Panel</b>' : 'Switch to <b>User Panel</b>' !!}</span>
               </a>
             </li>
             @endif  
