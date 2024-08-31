@@ -20,10 +20,6 @@
 
              <!-- Right Side Column -->
                 <div class="right">
-                    <div class="headertxt" style="display:none">
-                        <h2><b>St. Cecilia's College Portal</b></h2>
-                        <p>Your Gateway to Success</p>
-                    </div>
                      
                         <div class="col-lg-5 col-md-7 d-flex flex-column justify-content-center"> 
                         
@@ -39,7 +35,7 @@
                             </div>
                         </div>
 
-                    <p class="footertxt">©2024 •<span> Cecilian College Portal </span>• Alrights Reserved</p>
+                    <p>©2024 •<span> Cecilian College Portal </span>• Alrights Reserved</p>
                 </div>
              <!-- End of Right Side Column -->
               
@@ -47,7 +43,8 @@
 
 
 
-        
+           
+
                     </div>
                 </div>
             </div>
