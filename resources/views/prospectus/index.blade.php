@@ -22,7 +22,7 @@
         
     <center>
         <p>No prospectus available.</p>
-        </center>
+    </center>
         <p class="fs-6 text-center"><b>Oops!</b> We couldn't find your prospectus for the selected school year and semester. Try changing the year or semester, or contact support for help.</p>
         <img src="{{ asset('img/svg/no-record.svg') }}" class="img-fluid py-5" alt="Page Not Found">
     @endif
