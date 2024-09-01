@@ -51,12 +51,25 @@ class RegistrationForm extends Component
 
         $isStudent = Student::where('StudentID', $schoolId)->exists();
         $isEmployee = Employee::where('EmployeeID', $schoolId)->exists();
+        $isTeacher = Employee::where('EmployeeID', $schoolId)->exists();
+        $isAdmin = Employee::where('EmployeeID', $schoolId)->exists();
     
         if (!$isStudent && !$isEmployee) {
             return back()->with('error', 'School ID not associated.');
         }
 
-        $userType = $isStudent ? 'student' : 'employee';
+      if ($isStudent) {
+    $userType = 'student';
+} elseif ($isTeacher) {
+    $userType = 'teacher';
+} elseif ($isProgramHead) {
+    $userType = 'program_head';
+} elseif ($isAdmin) {
+    $userType = 'admin';
+} else {
+    $userType = 'employee'; // Default or fallback user type if needed
+}
+
         $userIdField = $isStudent ? 'student_id' : 'employee_id';
 
         $userExists = User::where($userIdField, $schoolId)->exists();

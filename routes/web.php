@@ -159,6 +159,19 @@ Route::post('/send-grades-notification', [GradesController::class, 'sendGradesNo
      Route::post('teacher/grades/upload', [GradesController::class, 'uploadFile'])->name('grades.upload');
      Route::post('teacher/grades/map', [GradesController::class, 'mapColumns'])->name('grades.map');
      Route::put('teacher/grades/{id}', [GradeController::class, 'update'])->name('grades.update');
+   
+     // Route to get semesters for a selected school year
+     Route::get('/api/semesters/{schoolYearId}', [SemesterController::class, 'getSemestersBySchoolYear']);
+
+// Route to get subjects for the selected school year and semester
+Route::get('/teacher/grades/fetch-subjects', [GradeController::class, 'fetchSubjects']);
+
+
+
+    //  Route::middleware(['auth'])->group(function () {
+    //     Route::post('/ajax/set-school-year', [AjaxController::class, 'setSchoolYear'])->name('ajax.setSchoolYear');
+    //     Route::post('/ajax/set-semester', [AjaxController::class, 'setSemester'])->name('ajax.setSemester');
+    // });
             // Student Routes
             // Route::get('/student/grades', [GradeController::class, 'studentIndex'])->name('student.grades.index');
             // Route::get('/student/grades/{semester}', [GradeController::class, 'studentShow'])->name('student.grades.show');

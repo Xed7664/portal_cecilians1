@@ -50,32 +50,34 @@
                                     <h6 class="mt-2">Year Level: {{ $yearLevel->name ?? 'Unknown Year Level' }}</h6>
 
                                     <!-- Grades Table -->
-                                    <table class="table table-bordered table-striped">
-                                        <thead>
-                                            <tr>
-                                                <th>Subject Code</th>
-                                                <th>Description</th>
-                                                <th>Prelim</th>
-                                                <th>Midterm</th>
-                                                <th>Prefinal</th>
-                                                <th>Final</th>
-                                                <th>Remarks</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            @foreach($grades as $grade)
+                                    <div class="table-responsive">
+                                        <table class="table table-bordered table-striped">
+                                            <thead class="table-danger">
                                                 <tr>
-                                                    <td>{{ $grade->subject->subject_code }}</td>
-                                                    <td>{{ $grade->subject->description }}</td>
-                                                    <td>{{ $grade->prelim ?: 'No Grade' }}</td>
-                                                    <td>{{ $grade->midterm ?: 'No Grade' }}</td>
-                                                    <td>{{ $grade->prefinal ?: 'No Grade' }}</td>
-                                                    <td>{{ $grade->final ?: 'No Grade' }}</td>
-                                                    <td>{{ $grade->remarks ?: 'No Remarks' }}</td>
+                                                    <th>Subject Code</th>
+                                                    <th>Description</th>
+                                                    <th>Prelim</th>
+                                                    <th>Midterm</th>
+                                                    <th>Prefinal</th>
+                                                    <th>Final</th>
+                                                    <th>Remarks</th>
                                                 </tr>
-                                            @endforeach
-                                        </tbody>
-                                    </table>
+                                            </thead>
+                                            <tbody>
+                                                @foreach($grades as $grade)
+                                                    <tr>
+                                                        <td>{{ $grade->subject->subject_code }}</td>
+                                                        <td>{{ $grade->subject->description }}</td>
+                                                        <td>{{ $grade->prelim ?: 'No Grade' }}</td>
+                                                        <td>{{ $grade->midterm ?: 'No Grade' }}</td>
+                                                        <td>{{ $grade->prefinal ?: 'No Grade' }}</td>
+                                                        <td>{{ $grade->final ?: 'No Grade' }}</td>
+                                                        <td>{{ $grade->remarks ?: 'No Remarks' }}</td>
+                                                    </tr>
+                                                @endforeach
+                                            </tbody>
+                                        </table>
+                                    </div>
                                 @endforeach
                             @endforeach
                         </div>
@@ -85,4 +87,42 @@
         @endif
     </div>
 </main>
+
+<!-- Inline CSS for responsive and scrollable table -->
+<style>
+    .table-responsive {
+        overflow-x: auto;
+    }
+
+    @media (max-width: 768px) {
+        .table thead {
+            display: none;
+        }
+
+        .table tr {
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        .table td {
+            display: block;
+            text-align: right;
+            font-size: 13px;
+            border-bottom: 1px solid #ddd;
+            position: relative;
+            padding-left: 50%;
+        }
+
+        .table td::before {
+            content: attr(data-label);
+            position: absolute;
+            left: 10px;
+            width: 45%;
+            padding-right: 10px;
+            white-space: nowrap;
+            text-align: left;
+            font-weight: bold;
+        }
+    }
+</style>
 @endsection

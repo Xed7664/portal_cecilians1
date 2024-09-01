@@ -57,4 +57,12 @@ class SemesterController extends Controller
         }
     }
 
+    public function getSemestersBySchoolYear($schoolYearId)
+    {
+        $semesters = Semester::where('school_year_id', $schoolYearId)->get();
+        return response()->json($semesters);
+    }
+    
+
+
 }

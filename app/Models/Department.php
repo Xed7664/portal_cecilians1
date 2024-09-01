@@ -7,7 +7,14 @@ use Illuminate\Database\Eloquent\Model;
 
 class Department extends Model
 {
+    use HasFactory;
+
     protected $fillable = ['name'];
+
+    public function subjects()
+    {
+        return $this->hasMany(Subject::class);
+    }
 
     public function users()
     {
@@ -16,6 +23,6 @@ class Department extends Model
 
     public function employees()
     {
-        return $this->hasMany(Employee::class);
+        return this->hasMany(Employee::class);
     }
 }
