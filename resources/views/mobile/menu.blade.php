@@ -94,7 +94,7 @@ use App\Models\User;
             </div>
 
 
-            @if(Auth::user()->hasPermission('access_admin'))
+            <!-- @if(Auth::user()->hasPermission('access_admin'))
                 <div class="col-xl-3 col-lg-3 col-md-3 mt-0 switch-panel">
                     <div class="card mb-2">
                         <div class="card-body text-center m-0 p-0">
@@ -107,7 +107,7 @@ use App\Models\User;
                         </div>
                     </div>
                 </div>
-            @endif  
+            @endif   -->
             
         </div>
       </div>
