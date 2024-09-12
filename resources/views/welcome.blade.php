@@ -22,13 +22,7 @@
     <link rel="stylesheet" href="landing-template/assets/css/owl.css">
     <link rel="stylesheet" href="landing-template/assets/css/lightbox.css">
     <link rel="stylesheet" href="public/assets/script/main.js">
-<!--
 
-TemplateMo 569 Edu Meeting
-
-https://templatemo.com/tm-569-edu-meeting
-
--->
   </head>
 <style>
   .caption {
@@ -62,7 +56,8 @@ https://templatemo.com/tm-569-edu-meeting
 }
 
 .feature {
-  width: 400px;
+  max-width: 350px;
+  position: relative !important;
 }
 
 .meeting-item .down-content p {
@@ -74,13 +69,6 @@ https://templatemo.com/tm-569-edu-meeting
 }
 
 .thumb img {
-  height: 200px;
-}
-
-.logos img {
-  background-color: white;
-  padding:3px;
-  border-radius:15px;
   height: 200px;
 }
 
@@ -107,7 +95,7 @@ https://templatemo.com/tm-569-edu-meeting
 }
 
 #down-content {
-  width: 300px !important;
+  max-width: 500px !important;
   /* padding-bottom: 10px !important; */
   position: relative !important;
 }
@@ -147,9 +135,35 @@ https://templatemo.com/tm-569-edu-meeting
   margin:0;
 }
 
+section.contact-us .right-info {
+  overflow:hidden !important;
+}
+
+/* .services .owl-nav .owl-next,.services .owl-nav .owl-prev,.our-courses .owl-nav .owl-next,.our-courses .owl-nav .owl-prev {
+  display: none !important;
+} */
+
+/* .gif {
+  width: 900px !important;
+  margin-left: -200px !important;
+} */
 /* .background-header {
   background-color: rgb(143, 0, 0) !important; 
 } */
+
+#courses,.video-overlay,.services, #services {
+  overflow: hidden !important;
+}
+
+#services {
+  flex-wrap: wrap;
+}
+
+.services img {
+  height:200px !important;
+  border: 2px solid white !important;
+  border-radius: 10px !important;
+}
 
 @media (max-width:900px){
   .logos {
@@ -192,7 +206,42 @@ https://templatemo.com/tm-569-edu-meeting
   .gif {
     display:none !important;
   }
+
+  #services img {
+    max-width:350px !important;
+  }
+
+  .feature {
+    width: 500px !important;
+    margin-bottom: -50px !important;
+  }
+  
+  .services {
+    padding: 0 !important;
+    margin: 0 !important;
+    transform:translateY(-100px) !important;
+  }
+
+  #aboutus {
+    padding-top: 200px !important;
+  }
+
+  .nth-feature {
+    padding-bottom: 20px !important;
+  }
  
+}
+
+@media (max-width:360px) {
+  .feature {
+    padding-right: 15px !important;
+  }
+  .logo {
+    margin-left: 0 !important;
+  }
+  .header-area .main-nav .menu-trigger {
+      margin-right: -20px !important;
+  }
 }
 
 </style>
@@ -210,8 +259,6 @@ https://templatemo.com/tm-569-edu-meeting
                     
                       <a href="#" class="logo">
                           Cecilian Portal
-                          <img src="/img/scclogo.png" alt="" style="width:40px">
-                          <img src="/img/bsitlogo1.png" alt="" style="width:40px">
                       </a>
                       
                      
@@ -338,7 +385,7 @@ https://templatemo.com/tm-569-edu-meeting
 
 
   <!-- About Section - Home Page -->
-  <section class="upcoming-meetings" id="aboutus" style="padding-top:250px !important">
+  <section class="upcoming-meetings" id="aboutus">
     <div class="container">
       <div class="row" style="display:flex;justify-content:center">
         <div class="col-lg-12">
@@ -396,7 +443,7 @@ https://templatemo.com/tm-569-edu-meeting
         </div>
        
       
-        <div style="display:flex;justify-content:space-between" id="services">
+        <div style="display:flex;justify-content:center;gap:50px" id="services">
             <div class="col-lg-6 feature">
               <div class="meeting-item">
                 <div class="thumb">
@@ -432,9 +479,7 @@ https://templatemo.com/tm-569-edu-meeting
                 </div>
               </div>
             </div>
-        </div>  
-
-        <div style="display:flex;justify-content:space-between" id="services">
+         
             <div class="col-lg-6 feature">
               <div class="meeting-item">
                 <div class="thumb">
@@ -459,7 +504,7 @@ https://templatemo.com/tm-569-edu-meeting
               </div>
             </div>
 
-            <div class="col-lg-6 feature">
+            <div class="col-lg-6 feature nth-feature">
               <div class="meeting-item">
                 <div class="thumb">
                   <a href="#"><img src="assets/images/viewnewsfeed.jfif" alt=""></a>
@@ -738,7 +783,7 @@ https://templatemo.com/tm-569-edu-meeting
         </div> 
         <div class="col-lg-6 align-self-center">
           <div >
-            <img src="assets/images/scclogo.gif" alt="" class="gif" style="width:900px;margin:-140px 0 -200px -100px">
+            <img src="assets/images/scclogo.gif" alt="" class="gif" style="transform: translateY(-20px)">
           </div>
         </div>
       </div>
@@ -823,7 +868,7 @@ https://templatemo.com/tm-569-edu-meeting
   <!-- Scripts -->
   <!-- Bootstrap core JavaScript -->
     <script src="landing-template/vendor/jquery/jquery.min.js"></script>
-    <script src="landing-template/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <!-- <script src="landing-template/vendor/bootstrap/js/bootstrap.bundle.min.js"></script> -->
 
     <script src="landing-template/assets/js/isotope.min.js"></script>
     <script src="landing-template/assets/js/owl-carousel.js"></script>
@@ -879,16 +924,7 @@ https://templatemo.com/tm-569-edu-meeting
         });
 
 
-        document.addEventListener("DOMContentLoaded", function() {
-        var typed = new Typed(".text11", {
-        strings: ["Welcome to Cecilian's Portal"],
-        typeSpeed: 50,
-        backSpeed: 20,
-        backDelay: 1000,
-        loop: true,
-        showCursor: false,
-        });
-        });
+
     </script>
 </body>
 
