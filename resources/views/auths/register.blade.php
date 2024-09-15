@@ -1,4 +1,3 @@
-
 @extends('layouts.auth')
 
 @section('title', 'Register')
@@ -54,12 +53,13 @@
 
      @media (max-width:900px){
     .rowcon {
-        width: 100% !important;
+            width: 100% !important;
             position: relative;
             display: flex;
             flex-direction: column !important;
             justify-content: center;
             align-items: center;
+            height: auto !important;
     } 
     
     .card-body {
@@ -73,6 +73,12 @@
 
     .container {
         overflow-Y: auto !important; 
+    }
+    .card {
+        border-radius: 0 !important;
+    }
+    .card-header:first-child,.card-body {
+        border-radius: 0 !important;
     }
 } 
 
@@ -97,10 +103,7 @@
                 </div>
              <!-- End of Right Side Column -->
 
-             <div class="headertxt" style="display:none">
-                <h2><b>St. Cecilia's College Portal</b></h2>
-                <p>Your Gateway to Success</p>
-            </div>
+            
               
              <div class="col-lg-5 col-md-7 d-flex flex-column justify-content-center"> 
                 <div class="card mb-3 mx-0 mt-2">
@@ -113,9 +116,7 @@
                     </div>
                     @livewire('auth.registration-form')
                 </div>
-                <div class="footertxt" style="display:none">
-            <p class="footertxt" style="color:rgb(150,150,150) !important">©2024 •<span style="color:rgb(190,190,190) !important"> Cecilian College Portal </span>• Alrights Reserved</p>
-            </div>
+               
             </div>
 
            
