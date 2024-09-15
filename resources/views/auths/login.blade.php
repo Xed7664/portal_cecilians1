@@ -1,4 +1,4 @@
-
+New! Keyboard shortcuts … Drive keyboard shortcuts have been updated to give you first-letters navigation
 @extends('layouts.auth')
 
 @section('title', 'Login')
