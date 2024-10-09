@@ -56,4 +56,10 @@ class Student extends Model
     {
         return $this->belongsTo(Semester::class, 'Semester', 'id');
     }
+    
+    public function enrollments()
+        {
+            return $this->hasMany(SubjectEnrolled::class, 'student_id', 'id');
+        }
+
 }

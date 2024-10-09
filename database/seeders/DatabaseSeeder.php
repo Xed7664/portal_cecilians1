@@ -20,6 +20,7 @@ class DatabaseSeeder extends Seeder
             PortalNotificationSeeder::class,
             StudentSeeder::class,
             SystemSettingsSeeder::class,
+            BsitProspectusSeeder::class,
         ]);
     }
 }
