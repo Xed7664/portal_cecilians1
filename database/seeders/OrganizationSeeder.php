@@ -1,0 +1,22 @@
+<?php
+
+namespace Database\Seeders;
+
+use App\Models\Organization;
+use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use Illuminate\Database\Seeder;
+
+class OrganizationSeeder extends Seeder
+{
+    /**
+     * Run the database seeds.
+     */
+    public function run(): void
+    {
+        // Create the Supreme Student Council organization
+        Organization::create([
+            'name' => 'Supreme Student Council',
+            // Add other fields as needed
+        ]);
+    }
+}
