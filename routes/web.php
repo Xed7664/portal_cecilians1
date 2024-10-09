@@ -14,6 +14,7 @@ use App\Http\Controllers\Subjects\MiniController;
 use App\Http\Controllers\Subjects\SubjectController;
 use App\Http\Controllers\GradeController;
 use App\Http\Controllers\ProspectusController;
+use App\Http\Controllers\EnrollmentController;
 use App\Http\Controllers\{StudentController, TeacherController, ProgramHeadController, AdminController};
 use App\Http\Controllers\WelcomeController;
 use App\Providers\RouteServiceProvider;
@@ -139,11 +140,15 @@ Route::middleware(['auth'])->group(function () {
 
             // Teacher Routes
             Route::get('/teacher/grades', [GradeController::class, 'teacherIndex'])->name('teacher.grades.index');
-            Route::get('/teacher/grades/{section}', [GradeController::class, 'teacherShow'])->name('teacher.grades.show');
+            Route::get('/teacher/subject/grades/{subjectEnrolledId}', [GradeController::class, 'teacherShow'])->name('teacher.subject.grades.show');
+
+            
             // Route::post('/teacher/grades/{section}', [GradeController::class, 'update'])->name('teacher.grades.update');
             Route::get('/teacher/grades/filter', [GradeController::class, 'filter'])->name('teacher.grades.filter');
             Route::get('/teacher/subject/{subjectEnrolledId}/grades', [GradeController::class, 'teacherShow'])->name('teacher.subject.grades');
             Route::post('/teacher/grades/{subjectEnrolled}/store-or-update', [GradeController::class, 'storeOrUpdateGrades'])->name('teacher.grades.storeOrUpdate');
+
+
             Route::get('grades/template/{subjectEnrolled}', [GradeController::class, 'downloadTemplate'])->name('teacher.grades.template');
          
      
@@ -164,7 +169,22 @@ Route::post('/send-grades-notification', [GradesController::class, 'sendGradesNo
      Route::get('/api/semesters/{schoolYearId}', [SemesterController::class, 'getSemestersBySchoolYear']);
 
 // Route to get subjects for the selected school year and semester
-Route::get('/teacher/grades/fetch-subjects', [GradeController::class, 'fetchSubjects']);
+Route::get('/fetch-subjects', [GradeController::class, 'fetchSubjects'])->name('fetch.subjects');
+
+// Route::get('/teacher/departments', [GradeController::class, 'fetchDepartments'])->name('fetch.teacher.departments');
+Route::get('/fetch-teacher-departments', [GradeControllerName::class, 'fetchTeacherDepartments'])
+     ->name('fetch.teacher.departments');
+
+     Route::post('/teacher/grades/submit-student/{subjectEnrolled}', [GradeController::class, 'submitStudent'])->name('teacher.grades.submitStudent');
+
+ Route::post('/grades/{subjectEnrolledId}/autosave', [GradeController::class, 'autoSaveGrade'])->name('grades.autoSave');
+
+
+Route::post('/teacher/grades/submit-all-grades/{subjectId}', [GradeController::class, 'submitAllGrades'])->name('teacher.grades.submitAllGrades');
+
+Route::post('/teacher/grades/{subjectEnrolled}/mark-ready', [GradeController::class, 'markAsReady'])->name('teacher.grades.markReady');
+
+
 
 
 
@@ -182,9 +202,25 @@ Route::get('/teacher/grades/fetch-subjects', [GradeController::class, 'fetchSubj
     Route::get('/student/grades/request-review/{studentId}', [GradeController::class, 'requestReview'])->name('student.grades.requestReview');
     Route::post('/student/grades/request-review/{gradeId}', [GradeController::class, 'submitReviewRequest'])->name('student.grades.submitReviewRequest');
     Route::get('/student/grades/section/{section}', [GradeController::class, 'studentShow'])->name('student.grades.show');
+    Route::get('/student/grades/fetch-latest', [GradeController::class, 'fetchLatestGrades'])->name('student.grades.fetchLatest');
 
      //Prospectus
      Route::get('/prospectus', [ProspectusController::class, 'index'])->name('prospectus.index');
+     //enrollment
+     Route::middleware(['auth', 'student'])->group(function () {
+        Route::get('/enrollment', [EnrollmentController::class, 'create'])->name('enrollment.create');
+        Route::post('/enrollment', [EnrollmentController::class, 'store'])->name('enrollment.store');
+        
+        // For fetching section schedules
+        Route::get('/get-section-schedule', [EnrollmentController::class, 'getSectionSchedule'])->name('get-section-schedule');
+        
+        // For fetching student details (add route name)
+        Route::get('/get-student-details', [EnrollmentController::class, 'getStudentDetails'])->name('student.details'); 
+    });
+    
+    
+
+    
     // Debug page
     Route::get('/debug', function () {
         return view('debug');

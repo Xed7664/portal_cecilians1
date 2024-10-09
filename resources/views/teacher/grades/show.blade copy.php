@@ -3,7 +3,6 @@
 
 @section('content')
 <main id="main" class="main">
-<section class="section profile">
     <div class="pagetitle">
         <h1>Grade Management</h1>
         <nav>
@@ -13,37 +12,9 @@
             </ol>
         </nav>
     </div>
-
-  
-
-
-    <div class="card mb-4">
-                <div class="user-profile-header-banner">
-                    <img src="{{ asset('assets/images/finalhomebg11.png') }}" alt="Banner image" class="rounded-top">
-                </div>
-            <div class="user-profile-header d-flex flex-column flex-sm-row text-sm-start text-center mb-3">
-                    <div class="flex-shrink-0 mt-n2 mx-sm-0 mx-auto">
-                        <img src="{{ asset('img/course/default.png') }}" alt="user image" class="d-block ms-0 ms-sm-4 rounded user-profile-img border-dark" style="width: 120px; height: 120px; object-fit: cover;">
-                    </div>
-                <div class="flex-grow-1 mt-3 mt-sm-5">
-                     <div class="d-flex align-items-md-end align-items-sm-start align-items-center justify-content-md-between      justify-content-start mx-4 flex-md-row flex-column gap-4">
-                        <div class="user-profile-info">
-                            <div class="d-flex justify-content-sm-start justify-content-center">
-                                <h4 class="mb-0">{{ $subject->description }}</h4>
-                            </div>
-                                 <span class="fw-light mt-0">{{ $subject->subject_code }}</b></span>
-                      
-                                <ul class="list-inline mt-2 mb-0 d-flex align-items-center flex-wrap justify-content-sm-start justify-content-center gap-2">
-                                    <li class="list-inline-item d-flex gap-1">
-                                    <i class="bx bxs-school mt-1"></i> 
-                                    <span class="fw-light">Section: {{ $section->name }}</span>
-                                    </li>
-                                </ul>
-                        </div>
-                    
-                     </div>
-                  </div>
-              </div>
+    <div class="container">
+        <h2>{{ $subject->subject_code }} - {{ $subject->description }}</h2>
+        <h4>Section: {{ $section->name }}</h4>
 
         <div class="card">
             <div class="card-body">
@@ -66,47 +37,39 @@
                 <th scope="col">Midterm</th>
                 <th scope="col">Prefinal</th>
                 <th scope="col">Final</th>
-                    <th scope="col">Remarks</th>
-                    <th scope="col">Status</th>
-                    <th scope="col">Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-    @foreach($students as $student)
-    @php
-        $subjectEnrolled = $student->subjectsEnrolled->where('subject_id', $subject->id)->first();
-        $grade = $subjectEnrolled ? $subjectEnrolled->grades()->where('student_id', $student->id)->first() : null;
-    @endphp
-    <tr data-student-id="{{ $student->id }}" data-subject-enrolled-id="{{ $subjectEnrolled->id }}">
-        <!-- Checkbox to select the student row -->
-        <td><input type="checkbox" class="student-checkbox" value="{{ $student->id }}"></td>
+                <th scope="col">Remarks</th>
+                <th scope="col">Status</th>
+                <th scope="col">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach($students as $student)
+            @php
+                $subjectEnrolled = $student->subjectsEnrolled->where('subject_id', $subject->id)->first();
+                $grade = $subjectEnrolled ? $subjectEnrolled->grades()->where('student_id', $student->id)->first() : null;
+            @endphp
+            <tr data-student-id="{{ $student->id }}" class="student-grade-row">
+                 <!-- Checkbox to select student -->
+            <td>
+                <input type="checkbox" class="student-checkbox" value="{{ $student->id }}">
+            </td>
 
-        <!-- Student Information -->
-        <td>{{ $student->StudentID }}</td>
-        <td>{{ $student->FullName }}</td>
-
-        <!-- Grade input fields for each grading period -->
-        <td><input type="number" step="0.1" name="grades[{{ $student->id }}][prelim]" value="{{ $grade->prelim ?? '' }}" class="form-control prelim-input" required></td>
-        <td><input type="number" step="0.1" name="grades[{{ $student->id }}][midterm]" value="{{ $grade->midterm ?? '' }}" class="form-control midterm-input" required></td>
-        <td><input type="number" step="0.1" name="grades[{{ $student->id }}][prefinal]" value="{{ $grade->prefinal ?? '' }}" class="form-control prefinal-input" required></td>
-        <td><input type="number" step="0.1" name="grades[{{ $student->id }}][final]" value="{{ $grade->final ?? '' }}" class="form-control final-input" required></td>
-
-        <!-- Remarks field -->
-        <td><input type="text" name="grades[{{ $student->id }}][remarks]" class="form-control" value="{{ $grade->remarks ?? '' }}" readonly></td>
-
-        <!-- Status column that will be updated -->
-        <td class="status-cell">{{ $grade->status ?? '' }}</td>
-
-        <!-- Button to submit individual student grades -->
-        <td>
-            <button type="button" class="btn btn-sm btn-success submit-student-grade" data-student-id="{{ $student->id }}">Save</button>
-        </td>
-    </tr>
-    @endforeach
-</tbody>
-
-        </table>
-    </form>
+                <td>{{ $student->StudentID }}</td>
+                <td>{{ $student->FullName }}</td>
+                <td><input type="number" step="0.1" name="grades[{{ $student->id }}][prelim]" value="{{ $grade->prelim ?? '' }}" class="form-control prelim-input" required></td>
+                <td><input type="number" step="0.1" name="grades[{{ $student->id }}][midterm]" value="{{ $grade->midterm ?? '' }}" class="form-control midterm-input" required></td>
+                <td><input type="number" step="0.1" name="grades[{{ $student->id }}][prefinal]" value="{{ $grade->prefinal ?? '' }}" class="form-control prefinal-input" required></td>
+                <td><input type="number" step="0.1" name="grades[{{ $student->id }}][final]" value="{{ $grade->final ?? '' }}" class="form-control final-input" required></td>
+                <td><input type="text" name="grades[{{ $student->id }}][remarks]" class="form-control" value="{{ $grade->remarks ?? '' }}" readonly></td>
+                <td>{{ $grade->status ?? 'Draft' }}</td>
+                <td>
+                    <button type="button" class="btn btn-sm btn-success submit-student-grade" data-student-id="{{ $student->id }}">Save</button>
+                </td>
+            </tr>
+            @endforeach
+        </tbody>
+    </table>
+</form>
 
 
                 <button type="button" class="btn btn-primary mt-3" data-bs-toggle="modal" data-bs-target="#confirmSubmitModal">Submit All Grades</button>
@@ -188,102 +151,104 @@
             </div>
         </div>
     <!-- End Modal -->
-    </section>
 </main>
-
 
 <script>
 $(document).ready(function () {
-    // Define the showToast function for notifications
-    function showToast(title, body, isSuccess = true) {
-        $('#toastTitle').text(title);
-        $('#toastBody').html(body); // Use .html to support multiple error lines
 
-        if (isSuccess) {
-            $('#toastMessage').removeClass('bg-danger').addClass('bg-success');
-        } else {
-            $('#toastMessage').removeClass('bg-success').addClass('bg-danger');
-        }
+// Define the showToast function for notifications
+function showToast(title, body, isSuccess = true) {
+    $('#toastTitle').text(title);
+    $('#toastBody').text(body);
 
-        var toastElement = new bootstrap.Toast($('#toastMessage'));
-        toastElement.show();
+    if (isSuccess) {
+        $('#toastMessage').removeClass('bg-danger').addClass('bg-success');
+    } else {
+        $('#toastMessage').removeClass('bg-success').addClass('bg-danger');
     }
 
-    // Save individual student grade (using event delegation to ensure proper handling for dynamic rows)
-    $(document).on('click', '.submit-student-grade', function() {
+    var toastElement = new bootstrap.Toast($('#toastMessage'));
+    toastElement.show();
+}
+
+// Save individual student grade
+$(document).ready(function() {
+    $('.submit-student-grade').on('click', function() {
         const studentId = $(this).data('student-id');
         const row = $(`tr[data-student-id="${studentId}"]`);
 
+        // Fetch values from the input fields
         const prelim = row.find('input[name="grades[' + studentId + '][prelim]"]').val();
         const midterm = row.find('input[name="grades[' + studentId + '][midterm]"]').val();
         const prefinal = row.find('input[name="grades[' + studentId + '][prefinal]"]').val();
         const final = row.find('input[name="grades[' + studentId + '][final]"]').val();
-        const status = row.find('select[name="grades[' + studentId + '][status]"]').val();
-
+        const status = row.find('select[name="grades[' + studentId + '][status]"]').val();  // Fetch status from a dropdown or input
+        
         const formData = {
             student_id: studentId,
             prelim: prelim,
             midterm: midterm,
             prefinal: prefinal,
             final: final,
-            status: status,
-            _token: $('meta[name="csrf-token"]').attr('content')
+            status: status,  // Add status to the request
+            _token: $('meta[name="csrf-token"]').attr('content') // Use CSRF token from meta tag
         };
 
         $.ajax({
-            url: $('#gradesForm').attr('action'), 
+            url: $('#gradesForm').attr('action'), // The form action URL for the request
             type: 'POST',
             data: formData,
             success: function(response) {
                 if (response.message) {
-                    showToast('Success', response.message);
-                    const remarks = final > 3 ? 'Failed' : 'Passed';
-                    row.find('input[name="grades[' + studentId + '][remarks]"]').val(remarks);
-                    row.find('td:eq(8)').text('draft');
+                    showToast('Success', response.message); // Display a success message
+                    location.reload(); 
                 } else {
                     showToast('Success', 'Grade saved successfully');
+                    location.reload(); 
                 }
             },
             error: function(xhr) {
-                let errorMessages = '';
+                // Handle errors (like validation issues or server errors)
                 if (xhr.responseJSON && xhr.responseJSON.errors) {
+                    let errorMessages = '';
                     $.each(xhr.responseJSON.errors, function(key, value) {
                         errorMessages += value + '<br>';
                     });
+                    showToast('Error', errorMessages, false); // Display validation errors
                 } else {
-                    errorMessages = 'An error occurred while saving the grade.';
+                    showToast('Error', 'An error occurred while saving the grade', false);
                 }
-                showToast('Error', errorMessages, false);
             }
         });
     });
-    $(document).on('click', '#confirmSubmitBtn', function () {
+});
+
+
+$(document).on('click', '#confirmSubmitBtn', function () {
     var subjectId = "{{ $subjectEnrolled->id }}";
     var grades = {};
 
+    // Gather grades for each selected student
     $('input.student-checkbox:checked').each(function () {
-        var studentId = $(this).val();
-        var row = $(this).closest('tr'); // Get the row
-
+        var studentId = $(this).val();  // Get the student ID from the checkbox value
+        var row = $(this).closest('tr');  // Get the corresponding table row
+        
+        // Collect the grades for the selected student
         grades[studentId] = {
             prelim: row.find('input[name="grades[' + studentId + '][prelim]"]').val(),
             midterm: row.find('input[name="grades[' + studentId + '][midterm]"]').val(),
             prefinal: row.find('input[name="grades[' + studentId + '][prefinal]"]').val(),
-            final: row.find('input[name="grades[' + studentId + '][final]"]').val(),
-            // Remove status from client-side as it is managed on server
-            subject_enrolled_id: row.data('subject-enrolled-id') // Ensure subject_enrolled_id is sent
+            final: row.find('input[name="grades[' + studentId + '][final]"]').val()
         };
     });
 
-    // Submit only if students are selected
+    // Ensure at least one student is selected
     if (Object.keys(grades).length === 0) {
-        errorMessages = 'Please select at least one student to submit grades.';
-       
-        showToast('Error', errorMessages,false);
+        alert('Please select at least one student to submit grades.');
         return;
-        
     }
-    
+
+    // Submit grades via AJAX
     $.ajax({
         url: '/teacher/grades/submit-all-grades/' + subjectId,
         type: 'POST',
@@ -292,42 +257,15 @@ $(document).ready(function () {
             grades: grades
         },
         success: function (response) {
-            showToast('Success', response.message || 'Grades submitted successfully.');
-
-            // Update rows with selected student grades
-            $('input.student-checkbox:checked').each(function () {
-                var studentId = $(this).val();
-                var row = $(this).closest('tr');
-                var finalGrade = grades[studentId].final;
-                var remarks = finalGrade > 3 ? 'Failed' : 'Passed';
-
-                row.find('input[name="grades[' + studentId + '][remarks]"]').val(remarks);
-                row.find('td.status-cell').text('Reviewing'); // Update status to 'Reviewing'
-            });
+            alert('Grades have been submitted for the selected students.');
         },
-        error: function (xhr) {
-            showToast('Error', 'Error submitting grades.');
-            console.log(xhr.responseText);
+        error: function (xhr, status, error) {
+            alert('Error submitting grades: ' + error);
         }
     });
 });
 
-// Handle the "select all" checkboxes logic
-$('#selectAll').on('click', function() {
-    $('.student-checkbox').prop('checked', this.checked);
 });
-
-$('#gradesTable tbody').on('click', '.student-checkbox', function() {
-    if ($('.student-checkbox:checked').length === $('.student-checkbox').length) {
-        $('#selectAll').prop('checked', true);
-    } else {
-        $('#selectAll').prop('checked', false);
-    }
-});
-
-
-});
-
 
 </script>
 
@@ -491,20 +429,19 @@ $('#gradesTable tbody').on('click', '.student-checkbox', function() {
             searchPlaceholder: "Search.."
         }
     });
-
-// Handle the "select all" checkboxes logic
+// Select all checkboxes when the header checkbox is clicked
 $('#selectAll').on('click', function() {
-    $('.student-checkbox').prop('checked', this.checked);
-});
+        $('.student-checkbox').prop('checked', this.checked);
+    });
 
-$('#gradesTable tbody').on('click', '.student-checkbox', function() {
-    if ($('.student-checkbox:checked').length === $('.student-checkbox').length) {
-        $('#selectAll').prop('checked', true);
-    } else {
-        $('#selectAll').prop('checked', false);
-    }
-});
-
+    // If all checkboxes are selected, check the select-all checkbox; otherwise, uncheck it
+    $('#gradesTable tbody').on('click', '.student-checkbox', function() {
+        if ($('.student-checkbox:checked').length === $('.student-checkbox').length) {
+            $('#selectAll').prop('checked', true);
+        } else {
+            $('#selectAll').prop('checked', false);
+        }
+    });
     table.buttons().container()
         .appendTo($('.dataTables_filter', table.table().container()));
 });

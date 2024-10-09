@@ -71,6 +71,12 @@
           <span class="fw-medium">Grade</span>
         </a>
       </li>
+      <li class="nav-item">
+    <a class="nav-link {{ Route::is('enrollment.create') ? '' : 'collapsed' }}" href="{{ route('enrollment.create') }}">
+        <i class='bx bx-user-plus'></i>
+        <span class="fw-medium">Enrollment</span>
+    </a>
+</li>
 
       <li class="nav-item">
         <a class="nav-link {{ Route::is('prospectus.index') ? '' : 'collapsed' }}" href="{{ route('prospectus.index') }}">
@@ -225,40 +231,7 @@
 
       
       @if($userPanel === 'teacher')
-      <li class="nav-heading">SCHOOL YEAR</li>
-
-<li class="nav-item school_year" data-syid="{{ Session::get('current_school_year_id'); }}" data-semid="{{ Session::get('current_semester_id') }}">
-  <a class="nav-link collapsed" data-bs-target="#forms-nav" data-bs-toggle="collapse" href="#" aria-expanded="false">
-      <i class="bi bi-journal-text"></i>
-      <span class="fw-medium">{{ App\Http\Controllers\SchoolYearController::getCurrentSchoolYearName() }} 
-        ({{ App\Http\Controllers\SemesterController::getCurrentSemesterName() }})</span>
-      <i class="bi bi-chevron-down ms-auto"></i>
-  </a>
-  <ul id="forms-nav" class="nav-content collapse" data-bs-parent="#sidebar-nav" style="">
-      <!-- Semester Start -->
-      @foreach (App\Http\Controllers\SemesterController::getSemesters() as $semester)
-      <li class="semester-select" data-semid="{{ $semester->id }}">
-          <a href="javascript:void(0);" class="{{ $semester->id == Session::get('current_semester_id') ? 'active' : '' }}">
-              <i class="bi bi-circle"></i>
-              <span class="fw-medium">{{ $semester->name }}</span>
-          </a>
-      </li>
-      @endforeach
-      <!-- Semester End -->
-
-      <!-- School Year Start -->
-      <li class="nav-heading">ARCHIVE</li>
-      @foreach (App\Http\Controllers\SchoolYearController::getSchoolYears() as $schoolYear)
-      <li class="year-select" data-syid="{{ $schoolYear->id }}">
-          <a href="javascript:void(0);">
-              <i class="bi bi-circle"></i>
-              <span class="fw-medium">{{ $schoolYear->name }}</span>
-          </a>
-      </li>
-      @endforeach
-      <!-- School Year End -->
-  </ul>
-</li>
+     
 <li class="nav-heading">MENU</li>
       <li class="nav-item">
         <a class="nav-link {{ Route::is('teacher.grades.index') ? '' : 'collapsed' }}" href="{{ route('teacher.grades.index') }}">
@@ -266,12 +239,12 @@
           <span class="fw-medium">Grade</span>
         </a>
       </li>
-      <li class="nav-item">
+      <!-- <li class="nav-item">
         <a class="nav-link {{ Route::is('admin.users.student') ? '' : 'collapsed' }}" href="{{ route('admin.users.student') }}">
             <i class='bx bx-bar-chart'></i>
           <span class="fw-medium">Student</span>
         </a>
-      </li>
+      </li> -->
 
       @endif
     </ul>

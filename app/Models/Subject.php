@@ -47,4 +47,14 @@ class Subject extends Model
         {
             return $this->belongsTo(Department::class);
         }
+        public function subjectEnrolled()
+{
+    return $this->hasMany(SubjectEnrolled::class, 'subject_id', 'id');
+}
+public function sections()
+{
+    return $this->belongsToMany(Section::class, 'section_subject')
+                ->withPivot('section_id', 'subject_id');
+}
+
 }

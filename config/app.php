@@ -186,5 +186,6 @@ return [
         // 'Example' => App\Facades\Example::class,
         'Socialite' => Laravel\Socialite\Facades\Socialite::class,
     ])->toArray(),
+'log' => 'single',  // Ensure logging is set up
 
 ];

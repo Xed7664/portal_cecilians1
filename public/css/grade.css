@@ -1,0 +1,68 @@
+.custom-file-upload {
+    border: 2px dashed #007bff;
+    padding: 20px;
+    text-align: center;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+.custom-file-upload:hover {
+    background-color: #f7f7f7;
+}
+.file-upload-wrapper {
+    display: inline-block;
+}
+.file-upload-wrapper i {
+    font-size: 40px;
+    color: #007bff;
+}
+#fileLabel {
+    font-size: 16px;
+    margin-left: 10px;
+}
+.toast {
+    background-color: #28a745; /* Lighter green for success */
+    color: #f8f9fa; /* Slightly lighter text for better contrast */
+}
+
+.toast-header {
+    color: #212529; /* Darker color for the text */
+}
+
+.toast-header strong {
+    font-weight: bold; /* Make title text bolder */
+    color: #212529; /* Darker for better readability */
+}
+
+.toast-header small {
+    font-weight: bold; /* Bolder small text */
+    color: #343a40; /* Darker small text */
+}
+.btn-close-white {
+    filter: invert(1); /* White close button */
+}
+
+/* Custom styles for confirmation modal */
+.modal-content {
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+.modal-header {
+    background-color: #007bff;
+    color: white;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+}
+
+.modal-footer {
+    border-top: none;
+}
+
+.modal-footer .btn-secondary {
+    background-color: #6c757d;
+}
+
+.modal-footer .btn-primary {
+    background-color: #28a745;
+}

@@ -18,11 +18,12 @@ class Section extends Model
         return $this->belongsToMany(Employee::class, 'employee_section');
     }
 
-    // Relationship with the Subject model
-    public function subjects()
-    {
-        return $this->belongsToMany(Subject::class, 'subject_section', 'section_id', 'subject_id');
-    }
+ 
+    // In Section model
+public function subjects()
+{
+    return $this->belongsToMany(Subject::class, 'section_subject', 'section_id', 'subject_id');
+}
 
     // Relationship with the Employee model specifically for teachers
     public function teachers()
@@ -47,4 +48,5 @@ public function students()
 {
     return $this->hasMany(Student::class);
 }
+
 }
