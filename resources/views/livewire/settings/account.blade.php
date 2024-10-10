@@ -6,26 +6,30 @@
         <div class="tab-pane fade show active" id="pills-home" role="tabpanel" aria-labelledby="home-tab">
             <div class="d-flex align-items-start align-items-sm-center gap-4">
                 @if($avatarReset == true)
-                    <img id="profile-pic" src="{{ asset('img/profile/default-profile.png') }}" alt="user-avatar" class="d-block w-px-100 h-px-100 rounded" id="uploadedAvatar" style="width: 100px; height: 100px; object-fit: cover;">
-                @else
-                    <img id="profile-pic" src="{{ asset('img/profile/' . Auth::user()->avatar) }}" alt="user-avatar" class="d-block w-px-100 h-px-100 rounded" id="uploadedAvatar" style="width: 100px; height: 100px; object-fit: cover;">
-                @endif
-                <div class="button-wrapper">
-                    <label for="upload" class="btn btn-portal me-2 mb-3" tabindex="0">
-                        <span class="d-none d-sm-block small">Upload new photo</span>
-                        <i class="ri ri-image-add-line d-block d-sm-none"></i>
-                        
-                        <input wire:model="avatar" type="file" id="upload" class="account-file-input @error('avatar') is-invalid @enderror" hidden="" accept="image/png, image/jpeg">
-                    </label>
-                        @error('avatar')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @else
-                            <div class="invalid-feedback">Please enter your Bio</div>
-                        @enderror
-                    <button type="button" class="btn bg-light-subtle mb-3" wire:click="resetAvatar">
-                        <i class="bx bx-rotate-left d-block d-sm-none my-25"></i>
-                        <span class="d-none d-sm-block small">Reset</span>
-                    </button>
+        <img id="profile-pic" src="{{ asset('img/profile/default-profile.png') }}" alt="user-avatar" class="d-block w-px-100 h-px-100 rounded" style="width: 100px; height: 100px; object-fit: cover;">
+    @else
+        <img id="profile-pic" src="{{ $user->avatar ? asset('storage/' . Auth::user()->avatar) : asset('img/profile/default-profile.png') }}" alt="user-avatar" class="d-block w-px-100 h-px-100 rounded" style="width: 100px; height: 100px; object-fit: cover;">
+    @endif
+    
+    <div class="button-wrapper">
+        <label for="upload" class="btn btn-portal me-2 mb-3" tabindex="0">
+            <span class="d-none d-sm-block small">Upload new photo</span>
+            <i class="ri ri-image-add-line d-block d-sm-none"></i>
+            
+            <input wire:model="avatar" type="file" id="upload" class="account-file-input @error('avatar') is-invalid @enderror" hidden accept="image/png, image/jpeg">
+        </label>
+
+        @error('avatar')
+            <div class="invalid-feedback">{{ $message }}</div>
+        @else
+            <div class="invalid-feedback">Please enter your Bio</div>
+        @enderror
+
+        <button type="button" class="btn bg-light-subtle mb-3" wire:click="resetAvatar">
+            <i class="bx bx-rotate-left d-block d-sm-none my-25"></i>
+            <span class="d-none d-sm-block small">Reset</span>
+        </button>
+
 
                     <div class="text-muted small">Allowed JPG, GIF or PNG. Max size of 800K</div>
                 </div>
