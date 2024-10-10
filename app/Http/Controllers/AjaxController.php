@@ -1,7 +1,5 @@
 <?php
-
 namespace App\Http\Controllers;
-
 use App\Models\User;
 use App\Models\Post;
 use App\Models\Comment;
@@ -189,7 +187,7 @@ class AjaxController extends Controller
                             } else {
                                 return response()->json(['result' => false, 'message' => 'No image data provided']);
                             }
-                
+        
 
                     case 'scan':
                         $qrData = $request->input('qrcode'); // Extract the QR code data
