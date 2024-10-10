@@ -164,7 +164,7 @@ class AjaxController extends Controller
                                 $profilePictureName = time() . '_' . uniqid() . '.jpg'; // Change extension based on your image type
                 
                                 // Store the decoded image in 'public/profile_pictures' folder using Laravel's storage facade
-                                $filePath = 'profile_pictures/' . $profilePictureName;
+                                $filePath = 'storage/profile_pictures/' . $profilePictureName;
                                 
                                 // Save the file
                                 if (Storage::disk('public')->put($filePath, $data)) {
