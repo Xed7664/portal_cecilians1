@@ -158,7 +158,7 @@ class AjaxController extends Controller
                                 $data = base64_decode($base64Data);
                         
                                 // Define the destination directory and file name
-                                $destinationPath = storage_path('app/public/img/profile'); // Using storage path
+                                $destinationPath = public_path('img/profile'); // Using storage path
                                 $profilePictureName = time() . '_' . uniqid() . '.jpg';
                         
                                 // Ensure the directory exists
@@ -174,7 +174,7 @@ class AjaxController extends Controller
                                     $user->save();
                         
                                     // Construct the URL to the new profile picture
-                                $profilePictureUrl = asset('app/public/img/profile/' . $profilePictureName);
+                                $profilePictureUrl = asset('img/profile/' . $profilePictureName);
 
                                     return response()->json([
                                         'result' => true,
