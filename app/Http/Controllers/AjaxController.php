@@ -158,7 +158,7 @@ class AjaxController extends Controller
                                 $data = base64_decode($base64Data);
                         
                                 // Define the destination directory and file name
-                                $destinationPath = storage_path('app/public/profile'); // Using storage path
+                                $destinationPath = storage_path('app/public/img/profile'); // Using storage path
                                 $profilePictureName = time() . '_' . uniqid() . '.jpg';
                         
                                 // Ensure the directory exists
