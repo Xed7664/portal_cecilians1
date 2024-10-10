@@ -3,6 +3,7 @@
 
 @section('content')
 <main id="main" class="main">
+<section class="section profile">
     <div class="pagetitle">
         <h1>Grade Management</h1>
         <nav>
@@ -13,149 +14,328 @@
         </nav>
     </div>
 
-    <div class="container">
-        <h2>{{ $subject->subject_code }} - {{ $subject->description }}</h2>
-        <h4>Section: {{ $section->name }}</h4>
+  
+
+
+    <div class="card mb-4">
+                <div class="user-profile-header-banner">
+                    <img src="{{ asset('assets/images/finalhomebg11.png') }}" alt="Banner image" class="rounded-top">
+                </div>
+            <div class="user-profile-header d-flex flex-column flex-sm-row text-sm-start text-center mb-3">
+                    <div class="flex-shrink-0 mt-n2 mx-sm-0 mx-auto">
+                        <img src="{{ asset('img/course/default.png') }}" alt="user image" class="d-block ms-0 ms-sm-4 rounded user-profile-img border-dark" style="width: 120px; height: 120px; object-fit: cover;">
+                    </div>
+                <div class="flex-grow-1 mt-3 mt-sm-5">
+                     <div class="d-flex align-items-md-end align-items-sm-start align-items-center justify-content-md-between      justify-content-start mx-4 flex-md-row flex-column gap-4">
+                        <div class="user-profile-info">
+                            <div class="d-flex justify-content-sm-start justify-content-center">
+                                <h4 class="mb-0">{{ $subject->description }}</h4>
+                            </div>
+                                 <span class="fw-light mt-0">{{ $subject->subject_code }}</b></span>
+                      
+                                <ul class="list-inline mt-2 mb-0 d-flex align-items-center flex-wrap justify-content-sm-start justify-content-center gap-2">
+                                    <li class="list-inline-item d-flex gap-1">
+                                    <i class="bx bxs-school mt-1"></i> 
+                                    <span class="fw-light">Section: {{ $section->name }}</span>
+                                    </li>
+                                </ul>
+                        </div>
+                    
+                     </div>
+                  </div>
+              </div>
 
         <div class="card">
             <div class="card-body">
                 <div class="d-flex justify-content-between align-items-center mb-3">
-                    <!-- Left side: Show entries dropdown -->
-
-                    <!-- Right side: Search bar, Export buttons, and Download Template -->
-                    <div class="d-flex align-items-center">
-                        <a href="{{ route('teacher.grades.template', ['subjectEnrolled' => $subjectEnrolled->id]) }}" class="btn btn-sm btn-success">
-                            <i class="fas fa-download"></i> Download Template
-                        </a>
-                    </div>
-                     <!-- Button to trigger sending email notifications -->
-    <form action="{{ url('/send-grades-notification') }}" method="POST">
-        @csrf
-        <button type="submit" class="btn btn-primary">Notify Students</button>
-    </form>
+                    <form action="{{ url('/send-grades-notification') }}" method="POST">
+                        @csrf
+                        <button type="submit" class="btn btn-primary">Notify Students</button>
+                    </form>
                 </div>
-      <div class="card mb-4">
-            <div class="card-header">
-                <h5>Upload Grades</h5>
-            </div>
-            <div class="card-body">
-                @if(session('success'))
-                    <div class="alert alert-success">
-                        {{ session('success') }}
-                    </div>
-                @endif
 
-                <form action="{{ route('teacher.grades.import') }}" method="POST" enctype="multipart/form-data">
-                    @csrf
-                    <div class="mb-3">
-                        <label for="gradesFile" class="form-label">Select Grades File</label>
-                        <input class="form-control" type="file" id="gradesFile" name="file" accept=".xlsx, .xls, .csv" required>
-                    </div>
-                    <button type="submit" class="btn btn-primary">
-                        <i class="fas fa-upload"></i> Upload Grades
-                    </button>
-                </form>
-            </div>
-        </div>
-                <form action="{{ route('teacher.grades.storeOrUpdate', $subjectEnrolled->id) }}" method="POST">
-                    @csrf
-                    <h5 class="card-title"></h5>
-                    <table class="table table-bordered table-hover" id="gradesTable">
-                        <thead class="table-danger">
-                            <tr>
-                                <th scope="col">Student ID</th>
-                                <th scope="col">Student Name</th>
-                                <th scope="col">Prelim</th>
-                                <th scope="col">Midterm</th>
-                                <th scope="col">Prefinal</th>
-                                <th scope="col">Final</th>
-                                <th scope="col">Remarks</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                        @foreach($students as $student)
-                            @php
-                                $subjectEnrolled = $student->subjectsEnrolled->where('subject_id', $subject->id)->first();
-                                $grade = $subjectEnrolled ? $subjectEnrolled->grades()->where('student_id', $student->id)->first() : null;
-                            @endphp
-                            <tr>
-                                <td>{{ $student->StudentID }}</td>
-                                <td>{{ $student->FullName }}</td>
-                                <td>
-                                    <input type="number" step="0.1" name="students[{{ $student->id }}][prelim]" value="{{ $grade->prelim ?? '' }}" min="1" max="5" class="form-control">
-                                </td>
-                                <td>
-                                    <input type="number" step="0.1" name="students[{{ $student->id }}][midterm]" value="{{ $grade->midterm ?? '' }}" min="1" max="5" class="form-control">
-                                </td>
-                                <td>
-                                    <input type="number" step="0.1" name="students[{{ $student->id }}][prefinal]" value="{{ $grade->prefinal ?? '' }}" min="1" max="5" class="form-control">
-                                </td>
-                                <td>
-                                    <input type="number" step="0.1" name="students[{{ $student->id }}][final]" value="{{ $grade->final ?? '' }}" min="1" max="5" class="form-control">
-                                </td>
-                                <td>
-                                    <input type="text" name="students[{{ $student->id }}][remarks]" class="form-control" value="{{ $grade->remarks ?? '' }}" readonly>
-                                </td>
-                            </tr>
-                        @endforeach
-                        </tbody>
-                    </table>
-                    <button type="submit" class="btn btn-primary mt-3">Save Grades</button>
-                </form>       
+                <form id="gradesForm" action="{{ route('teacher.grades.storeOrUpdate', $subjectEnrolled->id) }}" method="POST">
+    @csrf
+    <table class="table table-bordered table-hover" id="gradesTable">
+        <thead class="table-danger">
+            <tr>
+                <th scope="col"><input type="checkbox" id="selectAll"></th>
+                <th scope="col">Student ID</th>
+                <th scope="col">Student Name</th>
+                <th scope="col">Prelim</th>
+                <th scope="col">Midterm</th>
+                <th scope="col">Prefinal</th>
+                <th scope="col">Final</th>
+                    <th scope="col">Remarks</th>
+                    <th scope="col">Status</th>
+                    <th scope="col">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+    @foreach($students as $student)
+    @php
+        $subjectEnrolled = $student->subjectsEnrolled->where('subject_id', $subject->id)->first();
+        $grade = $subjectEnrolled ? $subjectEnrolled->grades()->where('student_id', $student->id)->first() : null;
+    @endphp
+    <tr data-student-id="{{ $student->id }}" data-subject-enrolled-id="{{ $subjectEnrolled->id }}">
+        <!-- Checkbox to select the student row -->
+        <td><input type="checkbox" class="student-checkbox" value="{{ $student->id }}"></td>
 
+        <!-- Student Information -->
+        <td>{{ $student->StudentID }}</td>
+        <td>{{ $student->FullName }}</td>
+
+        <!-- Grade input fields for each grading period -->
+        <td><input type="number" step="0.1" name="grades[{{ $student->id }}][prelim]" value="{{ $grade->prelim ?? '' }}" class="form-control prelim-input" required></td>
+        <td><input type="number" step="0.1" name="grades[{{ $student->id }}][midterm]" value="{{ $grade->midterm ?? '' }}" class="form-control midterm-input" required></td>
+        <td><input type="number" step="0.1" name="grades[{{ $student->id }}][prefinal]" value="{{ $grade->prefinal ?? '' }}" class="form-control prefinal-input" required></td>
+        <td><input type="number" step="0.1" name="grades[{{ $student->id }}][final]" value="{{ $grade->final ?? '' }}" class="form-control final-input" required></td>
+
+        <!-- Remarks field -->
+        <td><input type="text" name="grades[{{ $student->id }}][remarks]" class="form-control" value="{{ $grade->remarks ?? '' }}" readonly></td>
+
+        <!-- Status column that will be updated -->
+        <td class="status-cell">{{ $grade->status ?? '' }}</td>
+
+        <!-- Button to submit individual student grades -->
+        <td>
+            <button type="button" class="btn btn-sm btn-success submit-student-grade" data-student-id="{{ $student->id }}">Save</button>
+        </td>
+    </tr>
+    @endforeach
+</tbody>
+
+        </table>
+    </form>
+
+
+                <button type="button" class="btn btn-primary mt-3" data-bs-toggle="modal" data-bs-target="#confirmSubmitModal">Submit All Grades</button>
             </div>
         </div>
     </div>
 
-    <!-- Start Modal -->
-    <div class="modal fade" id="importGradeModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-        <div class="modal-dialog modal-lg" role="document">
+    <!-- Confirmation Modal -->
+    <div class="modal fade" id="confirmSubmitModal" tabindex="-1" aria-labelledby="confirmSubmitLabel" aria-hidden="true">
+        <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title">Import Student</h5>
+                    <h5 class="modal-title" id="confirmSubmitLabel">Confirm Submission</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <div id="response">
-                        @if(session()->has('error'))
-                            <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                                {{ session('error') }}
-                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                            </div>
-                        @endif
-
-                        @if(session()->has('success'))
-                            <div class="alert alert-success alert-dismissible fade show" role="alert">
-                                {{ session('success') }}
-                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                            </div>
-                        @endif
-                    </div>
-
-                    <form action="#" class="dropzone needsclick" id="dropzone-multi">
-                    <div class="dz-message needsclick">
-                        Drop files here or click to upload
-                        <span class="note needsclick">(This is just a demo dropzone. Selected files are <span class="fw-medium">not</span> actually uploaded.)</span>
-                    </div>
-                    <div class="fallback">
-                        <input name="file" type="file"/>
-                    </div>
-                    </form>
+                    Are you sure you want to submit the grades for review? Once submitted, the program head will review them.
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-portal" id="importBtn" disabled>Upload</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" id="confirmSubmitBtn">Proceed</button>
                 </div>
             </div>
         </div>
     </div>
+
+
+
+
+
+  <!-- Modal -->
+<div class="modal fade" id="importGradeModal" tabindex="-1" aria-labelledby="importGradeModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="importGradeModalLabel">Import Grades</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <!-- Updated File Upload Input -->
+                <form id="gradeUploadForm" enctype="multipart/form-data">
+                    @csrf
+                    <div class="custom-file-upload">
+                        <label for="gradesFile" class="form-label">
+                            <div class="file-upload-wrapper">
+                                <i class="bx bx-cloud-upload"></i>
+                                <span id="fileLabel">Select or Drop File Here</span>
+                                <input class="form-control" type="file" id="gradesFile" name="file" accept=".xlsx, .xls, .csv" required style="display: none;">
+                            </div>
+                            <small class="form-text text-muted">Accepted formats: .xlsx, .xls, .csv</small>
+                        </label>
+                    </div>
+
+                    <div id="progressWrapper" class="progress mt-3" style="display: none;">
+                        <div id="uploadProgress" class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+                    </div>
+                </form>
+                <div id="filePreview" class="mt-3"></div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="submitFileBtn">
+                    <i class="bx bx-upload"></i> Upload Grades
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+        <!-- Toast Notifications (Google-Style) -->
+        <div class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index: 9999">
+            <div id="toastMessage" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+                    <div class="toast-header">
+                        <strong id="toastTitle" class="me-auto" style="color: #212529; font-weight: bold;"></strong>
+                        <small style="color: #343a40; font-weight: bold;">Just now</small>
+                        <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+                    </div>
+                <div class="toast-body" id="toastBody" class="text-white"></div>
+            </div>
+        </div>
     <!-- End Modal -->
+    </section>
 </main>
 
+
 <script>
-   $(document).ready(function () {
-        var table = $('#gradesTable').DataTable({
-            lengthChange: true, // Disable show entries
+$(document).ready(function () {
+    // Define the showToast function for notifications
+    function showToast(title, body, isSuccess = true) {
+        $('#toastTitle').text(title);
+        $('#toastBody').html(body); // Use .html to support multiple error lines
+
+        if (isSuccess) {
+            $('#toastMessage').removeClass('bg-danger').addClass('bg-success');
+        } else {
+            $('#toastMessage').removeClass('bg-success').addClass('bg-danger');
+        }
+
+        var toastElement = new bootstrap.Toast($('#toastMessage'));
+        toastElement.show();
+    }
+
+    // Save individual student grade (using event delegation to ensure proper handling for dynamic rows)
+    $(document).on('click', '.submit-student-grade', function() {
+        const studentId = $(this).data('student-id');
+        const row = $(`tr[data-student-id="${studentId}"]`);
+
+        const prelim = row.find('input[name="grades[' + studentId + '][prelim]"]').val();
+        const midterm = row.find('input[name="grades[' + studentId + '][midterm]"]').val();
+        const prefinal = row.find('input[name="grades[' + studentId + '][prefinal]"]').val();
+        const final = row.find('input[name="grades[' + studentId + '][final]"]').val();
+        const status = row.find('select[name="grades[' + studentId + '][status]"]').val();
+
+        const formData = {
+            student_id: studentId,
+            prelim: prelim,
+            midterm: midterm,
+            prefinal: prefinal,
+            final: final,
+            status: status,
+            _token: $('meta[name="csrf-token"]').attr('content')
+        };
+
+        $.ajax({
+            url: $('#gradesForm').attr('action'), 
+            type: 'POST',
+            data: formData,
+            success: function(response) {
+                if (response.message) {
+                    showToast('Success', response.message);
+                    const remarks = final > 3 ? 'Failed' : 'Passed';
+                    row.find('input[name="grades[' + studentId + '][remarks]"]').val(remarks);
+                    row.find('td:eq(8)').text('draft');
+                } else {
+                    showToast('Success', 'Grade saved successfully');
+                }
+            },
+            error: function(xhr) {
+                let errorMessages = '';
+                if (xhr.responseJSON && xhr.responseJSON.errors) {
+                    $.each(xhr.responseJSON.errors, function(key, value) {
+                        errorMessages += value + '<br>';
+                    });
+                } else {
+                    errorMessages = 'An error occurred while saving the grade.';
+                }
+                showToast('Error', errorMessages, false);
+            }
+        });
+    });
+    $(document).on('click', '#confirmSubmitBtn', function () {
+    var subjectId = "{{ $subjectEnrolled->id }}";
+    var grades = {};
+
+    $('input.student-checkbox:checked').each(function () {
+        var studentId = $(this).val();
+        var row = $(this).closest('tr'); // Get the row
+
+        grades[studentId] = {
+            prelim: row.find('input[name="grades[' + studentId + '][prelim]"]').val(),
+            midterm: row.find('input[name="grades[' + studentId + '][midterm]"]').val(),
+            prefinal: row.find('input[name="grades[' + studentId + '][prefinal]"]').val(),
+            final: row.find('input[name="grades[' + studentId + '][final]"]').val(),
+            // Remove status from client-side as it is managed on server
+            subject_enrolled_id: row.data('subject-enrolled-id') // Ensure subject_enrolled_id is sent
+        };
+    });
+
+    // Submit only if students are selected
+    if (Object.keys(grades).length === 0) {
+        errorMessages = 'Please select at least one student to submit grades.';
+       
+        showToast('Error', errorMessages,false);
+        return;
+        
+    }
+    
+    $.ajax({
+        url: '/teacher/grades/submit-all-grades/' + subjectId,
+        type: 'POST',
+        data: {
+            _token: $('meta[name="csrf-token"]').attr('content'),
+            grades: grades
+        },
+        success: function (response) {
+            showToast('Success', response.message || 'Grades submitted successfully.');
+
+            // Update rows with selected student grades
+            $('input.student-checkbox:checked').each(function () {
+                var studentId = $(this).val();
+                var row = $(this).closest('tr');
+                var finalGrade = grades[studentId].final;
+                var remarks = finalGrade > 3 ? 'Failed' : 'Passed';
+
+                row.find('input[name="grades[' + studentId + '][remarks]"]').val(remarks);
+                row.find('td.status-cell').text('Reviewing'); // Update status to 'Reviewing'
+            });
+        },
+        error: function (xhr) {
+            showToast('Error', 'Error submitting grades.');
+            console.log(xhr.responseText);
+        }
+    });
+});
+
+// Handle the "select all" checkboxes logic
+$('#selectAll').on('click', function() {
+    $('.student-checkbox').prop('checked', this.checked);
+});
+
+$('#gradesTable tbody').on('click', '.student-checkbox', function() {
+    if ($('.student-checkbox:checked').length === $('.student-checkbox').length) {
+        $('#selectAll').prop('checked', true);
+    } else {
+        $('#selectAll').prop('checked', false);
+    }
+});
+
+
+});
+
+
+</script>
+
+
+<script>
+ $(document).ready(function () {
+    var table = $('#gradesTable').DataTable({
+        lengthChange: true, // Enable or disable show entries
         buttons: [
             {
                 extend: "collection",
@@ -192,7 +372,7 @@
                         text: '<i class="bx bx-file me-2" ></i>CSV',
                         className: "dropdown-item",
                         exportOptions: {
-                            columns: [1, 2, 3, 4, 5],
+                            columns: [0, 1, 2, 3, 4, 5, 6],
                             format: {
                                 body: function (e, t, a) {
                                     var s;
@@ -213,7 +393,7 @@
                         text: '<i class="bx bx-spreadsheet me-2"></i>Excel',
                         className: "dropdown-item",
                         exportOptions: {
-                            columns: [1, 2, 3, 4, 5],
+                            columns: [1, 2, 3, 4, 5, 6, 7],
                             format: {
                                 body: function (e, t, a) {
                                     var s;
@@ -234,7 +414,7 @@
                         text: '<i class="bx bxs-file-pdf me-2"></i>Pdf',
                         className: "dropdown-item",
                         exportOptions: {
-                            columns: [1, 2, 3, 4, 5],
+                            columns: [1, 2, 3, 4, 5, 6, 7],
                             format: {
                                 body: function (e, t, a) {
                                     var s;
@@ -271,6 +451,13 @@
                             },
                         },
                     },
+                    {
+                        text: '<i class="bx bxs-file-blank"></i>Template',
+                        className: "dropdown-item",
+                        action: function () {
+                            window.location.href = "{{ route('teacher.grades.template', ['subjectEnrolled' => $subjectEnrolled->id]) }}";
+                        }
+                    }
                 ],
             },
             {
@@ -280,207 +467,130 @@
             },
         ],
         initComplete: function () {
-            console.log("Init complete"); // Log when initialization is complete
+            console.log("Init complete");
             this.api().columns([3, 4, 5]).every(function (colIdx) {
                 var column = this;
-                console.log("Column header:", column.header().innerHTML); // Log the column header
                 var select = $('<select class="form-select"><option value="">Select ' + column.header().innerHTML + '</option>')
                     .appendTo($('.user_' + column.header().innerHTML.toLowerCase()))
                     .on('change', function () {
                         var val = $.fn.dataTable.util.escapeRegex($(this).val());
-                        console.log("Selected value:", val);
                         column.search(val ? '^' + val + '$' : '', true, false).draw();
-
                     });
 
-                var uniqueValues = column.data().unique().sort();
-                console.log("Unique values:", uniqueValues); // Log unique values
-                uniqueValues.each(function (d, j) {
-                    // Check if the value contains HTML, and if so, extract the text content and remove leading/trailing spaces
+                column.data().unique().sort().each(function (d) {
                     if (d.indexOf('>') !== -1) {
                         d = $(d).text().trim();
                     }
-                    console.log("Appending option:", d); // Log the option being appended
                     select.append('<option value="' + d + '">' + d + '</option>');
                 });
             });
         },
         language: {
             lengthMenu: '_MENU_',
-            //info: 'Showing _START_ to _END_ of _TOTAL_ entries',
-            search: "", 
-            searchPlaceholder: "Search.." 
+            search: "",
+            searchPlaceholder: "Search.."
         }
-        
     });
+
+// Handle the "select all" checkboxes logic
+$('#selectAll').on('click', function() {
+    $('.student-checkbox').prop('checked', this.checked);
+});
+
+$('#gradesTable tbody').on('click', '.student-checkbox', function() {
+    if ($('.student-checkbox:checked').length === $('.student-checkbox').length) {
+        $('#selectAll').prop('checked', true);
+    } else {
+        $('#selectAll').prop('checked', false);
+    }
+});
 
     table.buttons().container()
         .appendTo($('.dataTables_filter', table.table().container()));
 });
+
 </script>
 <script>
-var validFiles = []; 
-
 $(document).ready(function () {
-
-    var dropzoneTemplate = `
-  <div class="dz-preview dz-file-preview">
-    <div class="dz-details">
-      <div class="dz-thumbnail">
-        <img data-dz-thumbnail>
-        <span class="dz-nopreview">No preview</span>
-        <div class="dz-success-mark"></div>
-        <div class="dz-error-mark"></div>
-        <div class="dz-error-message"><span data-dz-errormessage></span></div>
-        <div class="progress">
-          <div class="progress-bar progress-bar-primary" role="progressbar" aria-valuemin="0" aria-valuemax="100" data-dz-uploadprogress></div>
-        </div>
-      </div>
-      <div class="dz-filename" data-dz-name></div>
-      <div class "dz-size" data-dz-size></div>
-    </div>
-  </div>`;
-
-  var dropzoneMulti = document.querySelector("#dropzone-multi");
-  if (dropzoneMulti) {
-    new Dropzone(dropzoneMulti, {
-      previewTemplate: dropzoneTemplate,
-      parallelUploads: 1,
-      maxFilesize: 5,
-      addRemoveLinks: true,
-
-      init: function() {
-        var myDropzone = this;
-
-        this.on("success", function(file, response) {
-            checkFile(myDropzone, file);
-        });
-
-        // Import Button Click Event
-        // $('#importBtn').click(function () {
-        // var validFiles = myDropzone.getAcceptedFiles();
-        //     processValidFiles(validFiles);
-        // });
-        $('#importBtn').click(function () {
-            if (hasValidFiles()) {
-                processValidFiles(validFiles);
-            } else {
-                createToast("Error", "No valid files to upload.", "danger");
-            }
-        });
-
-        this.on("removedfile", function (file) {
-            validFiles = validFiles.filter(validFile => validFile !== file);
-
-            toggleUploadButton();
-        });
-
-      }
-
+    // Custom file upload UI
+    $('#gradesFile').on('change', function() {
+        var fileName = $(this).val().split('\\').pop();
+        $('#fileLabel').text(fileName || 'Select or Drop File Here');
     });
-  }
-});
 
-function toggleUploadButton() {
-    var importBtn = document.getElementById('importBtn');
-    if (hasValidFiles()) {
-        importBtn.removeAttribute('disabled');
-    } else {
-        importBtn.setAttribute('disabled', 'disabled');
-    }
-}
-
-function hasValidFiles() {
-    return validFiles.length > 0;
-}
-
-
-
-function processValidFiles(validFiles) {
-    // Disable the button
-    var importBtn = document.getElementById('importBtn');
-    importBtn.setAttribute('disabled', 'disabled');
-
-    // Create a spinner element
-    var spinner = document.createElement('span');
-    spinner.className = 'spinner-border spinner-border-sm me-1';
-    spinner.setAttribute('role', 'status');
-    spinner.setAttribute('aria-hidden', 'true');
-
-    // Create the "Posting" text
-    var postingText = document.createTextNode(' Uploading');
-
-    // Clear the button content and append the spinner and text
-    importBtn.innerHTML = '';
-    importBtn.appendChild(spinner);
-    importBtn.appendChild(postingText);
-
-    if (validFiles.length === 0) {
-        // No valid files to upload
-        // Restore the button to its original state
-        resetButton();
-        return;
+    // Toast notification function
+    function showToast(title, message, success = true) {
+        const toastElement = new bootstrap.Toast(document.getElementById('toastMessage'));
+        $('#toastTitle').text(title);
+        $('#toastBody').text(message);
+        $('#toastMessage').removeClass('bg-success bg-danger').addClass(success ? 'bg-success' : 'bg-danger');
+        toastElement.show();
     }
 
-    // Create a new FormData object to store the valid files
-    var formData = new FormData();
+    // Handle file upload via AJAX
+    $('#submitFileBtn').on('click', function (e) {
+        e.preventDefault();
 
-    // Append each valid file to the FormData object
-    validFiles.forEach(function (file) {
-        formData.append('files[]', file, file.name);
-    });
+        var formData = new FormData();
+        var fileInput = document.getElementById('gradesFile');
+        var file = fileInput.files[0];
 
-    // Get the CSRF token from the meta tag in your Blade layout
-    var csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+        if (!file) {
+            showToast('Error', 'Please select a valid file.', false);
+            return;
+        }
 
-    // Define headers with the CSRF token
-    var headers = new Headers({
-        'X-CSRF-TOKEN': csrfToken,
-    });
+        // Append file to FormData
+        formData.append("file", file);
+        formData.append("_token", "{{ csrf_token() }}");
 
-    // Create a request object with the headers
-    var request = new Request('{{ route('teacher.grades.import') }}', {
-        method: 'POST',
-        body: formData,
-        headers: headers,
-    });
+        // Show progress bar
+        $('#progressWrapper').show();
+        $('#uploadProgress').css('width', '0%').attr('aria-valuenow', 0);
 
-    // Send the request to upload the valid files
-    fetch(request)
-        .then(response => response.json())
-        .then(data => {
-            // Remove the loading spinner and restore the button to its original state
-            resetButton();
-            
-            if (data.result) {
-                // Display success marks for each valid file
-                validFiles.forEach(function (file) {
-                    var filePreview = file.previewElement;
-                    if (filePreview) {
-                        filePreview.querySelector(".dz-success-mark").style.display = "block";
+        // Make AJAX request
+        $.ajax({
+            url: "{{ route('teacher.grades.import') }}",
+            type: "POST",
+            data: formData,
+            contentType: false,
+            processData: false,
+            xhr: function () {
+                var xhr = new window.XMLHttpRequest();
+                xhr.upload.addEventListener("progress", function (evt) {
+                    if (evt.lengthComputable) {
+                        var percentComplete = Math.round((evt.loaded / evt.total) * 100);
+                        $('#uploadProgress').css('width', percentComplete + '%').attr('aria-valuenow', percentComplete);
                     }
-                });
+                }, false);
+                return xhr;
+            },
+            success: function (response) {
+                $('#uploadProgress').removeClass('progress-bar-striped progress-bar-animated').addClass('bg-success');
+                $('#uploadProgress').html('<i class="bx bx-check-circle"></i> File Uploaded Successfully!');
+                
+                // Show success message
+                showToast('Success', 'Grades file imported successfully!');
 
-                createToast("Success", data.message, "success");
-            } else {
-                createToast("Danger", data.message, "danger");
+                // Reset file input
+                $('#gradesFile').val('');
+                $('#fileLabel').text('Select or Drop File Here');
+                
+                // Close modal after short delay
+                setTimeout(() => {
+                    $('#importGradeModal').modal('hide');
+                }, 1500);
+
+                // Reload the grade table
+                $('#gradesTable').load(location.href + ' #gradesTable');
+            },
+            error: function (response) {
+                $('#uploadProgress').addClass('bg-danger');
+                $('#uploadProgress').html('<i class="bx bx-x-circle"></i> Upload Failed');
+                showToast('Error', 'An error occurred during the upload.', false);
             }
-        })
-        .catch(error => {
-            // Handle any errors that occur during the upload
-            createToast("Danger", error.message, "danger");
-            // Restore the button to its original state
-            resetButton();
         });
-}
-
-function resetButton() {
-    var importBtn = document.getElementById('importBtn');
-    importBtn.removeAttribute('disabled');
-    importBtn.innerHTML = 'Upload';
-}
-
-
+    });
+});
 </script>
-
 @endsection

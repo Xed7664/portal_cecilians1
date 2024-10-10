@@ -35,4 +35,5 @@ class SchoolYearController extends Controller
 
         return $schoolYears;
     }
+    
 }

@@ -25,6 +25,17 @@ use App\Models\User;
   <link href="{{ asset('img/favicon.ico') }}" rel="icon">
   <link href="{{ asset('img/apple-touch-icon.png') }}" rel="apple-touch-icon">
 
+ <!-- Include Leaflet CSS and JS -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+
+<!-- Include Leaflet Geosearch for Nominatim -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css" />
+<script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
+<!-- FullCalendar -->
+<link href='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.5/index.global.min.css' rel='stylesheet' />
+<script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.5/index.global.min.js'></script>
+
   <!-- Google Fonts -->
   <link href="https://fonts.gstatic.com" rel="preconnect">
   <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Nunito:300,300i,400,400i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i" rel="stylesheet">
@@ -44,8 +55,10 @@ use App\Models\User;
 
 
 
-<link href="{{ asset('vendor/dropzone/dropzone.css') }}" rel="stylesheet">
 
+<link href="{{ asset('vendor/dropzone/dropzone.css') }}" rel="stylesheet">
+<!-- Font Awesome CDN -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
   @if(in_array($currentRoute, ['account.show']))
 <!-- Croppie css -->
 <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/croppie/2.6.2/croppie.min.css">
@@ -61,7 +74,7 @@ use App\Models\User;
   
   <!-- Template Main CSS File -->
   <link href="{{ asset('css/style.css') }}" rel="stylesheet">
-
+  <link href="{{ asset('css/grade.css') }}" rel="stylesheet">
 
   
 
@@ -166,7 +179,8 @@ use App\Models\User;
   <script src="{{ asset('vendor/schedule/util.js') }}"></script>
   <script src="{{ asset('vendor/schedule/main.js') }}"></script>
   @endif
-
+   <!-- Scripts -->
+ 
   @livewireScripts
 
   <!-- Template Main JS File -->

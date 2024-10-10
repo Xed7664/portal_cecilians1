@@ -49,5 +49,10 @@ class SubjectEnrolled extends Model
         {
             return $this->belongsTo(YearLevel::class, 'year_level_id', 'id');
         }
+        // Define the relationship to the Department model
+    public function department()
+    {
+        return $this->belongsTo(Department::class);
+    }
     
 }

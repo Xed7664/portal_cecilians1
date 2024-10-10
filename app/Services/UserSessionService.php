@@ -3,7 +3,7 @@
 namespace App\Services;
 
 use Illuminate\Support\Facades\Session;
-use App\Models\{Employee, Student, User, SystemSetting};
+use App\Models\{Employee, Student, SubjectEnrolled, SystemSetting, User};
 
 class UserSessionService
 {
@@ -13,7 +13,13 @@ class UserSessionService
             $student = Student::where('StudentID', $user->student_id)->first();
             session()->put('student', $student);
             session()->put('panel', 'student');
-        } elseif ($user->type === 'teacher') {
+            
+            // Fetch the latest school year and semester based on student's latest enrollment
+            $latestEnrollment = SubjectEnrolled::where('student_id', $student->id)
+                ->orderBy('school_year_id', 'desc')
+                ->first();
+           
+         } elseif ($user->type === 'teacher') {
             $employee = Employee::where('EmployeeID', $user->employee_id)->first();
             session()->put('employee', $employee);
             session()->put('panel', 'teacher');
@@ -26,16 +32,14 @@ class UserSessionService
             session()->put('employee', $employee);
             session()->put('panel', 'admin');
         }
-        
 
-        // Fetch and store the current school year and semester settings in the session
-        $currentSchoolYearId = SystemSetting::getSetting('current_school_year_id');
-        $currentSemesterId = SystemSetting::getSetting('current_semester_id');
+        $currentSchoolYearId = $latestEnrollment->school_year_id ?? SystemSetting::getSetting('current_school_year_id');
+        $currentSemesterId = $latestEnrollment->semester_id ?? SystemSetting::getSetting('current_semester_id');
+
         Session::put('current_school_year_id', $currentSchoolYearId);
         Session::put('current_semester_id', $currentSemesterId);
 
         // Set the initial theme for the user
-        Session::put('theme', 'light'); // You can set the default theme to 'light' or 'dark' as needed
-      
+        Session::put('theme', 'light'); // Adjust if needed
     }
 }
