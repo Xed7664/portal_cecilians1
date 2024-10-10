@@ -31,21 +31,31 @@ use App\Models\User;
                         </div>
                     </div>
                     <div class="flex-grow-1 text-start">
-                        @if (Auth::user()->type == 'student' && Auth::user()->student)
-                            <span class="fw-medium d-block text-portal">{{ Auth::user()->student->FullName }}</span>
-                            @if ($currentPosition != null)
-                            <small class="text-muted">{{ $currentPosition->name }}</small>
-                            @else
-                            <small class="text-muted">{{ Auth::user()->student->Course }}</small>
-                            @endif
-                        @elseif (Auth::user()->type == 'employee' && Auth::user()->employee)
-                            <span class="fw-medium d-block text-portal">{{ Auth::user()->employee->FullName }}</span>
-                            @if ($currentPosition != null)
-                            <small class="text-muted">{{ $currentPosition }}</small>
-                            @else
-                            <small class="text-muted"></small>
-                            @endif
-                        @endif
+                    @if (Auth::user()->type == 'student' && Auth::user()->student)
+                      <span class="fw-medium d-block text-portal">{{ Auth::user()->student->FullName }}</span>
+                      @if ($currentPosition != null)
+                          <small class="text-muted">{{ $currentPosition->name }}</small>
+                      @else
+                          <small class="text-muted">{{ Auth::user()->student->Course }}</small>
+                      @endif
+
+                  @elseif (Auth::user()->type == 'program_head' && Auth::user()->employee)
+                      <span class="fw-medium d-block text-portal">{{ Auth::user()->employee->FullName }}</span>
+                      @if ($currentPosition != null)
+                          <small class="text-muted">{{ $currentPosition->name }}</small>
+                      @else
+                          <small class="text-muted">Program Head</small>
+                      @endif
+
+                  @elseif (Auth::user()->type == 'teacher' && Auth::user()->employee)
+                      <span class="fw-medium d-block text-portal">{{ Auth::user()->employee->FullName }}</span>
+                      <small class="text-muted">Teacher</small> <!-- Adjust this based on your requirements -->
+
+                  @elseif (Auth::user()->type == 'admin' && Auth::user()->employee)
+                      <span class="fw-medium d-block text-portal">{{ Auth::user()->employee->FullName }}</span>
+                      <small class="text-muted">Admin</small> <!-- Adjust this based on your requirements -->
+                  @endif
+
                     </div>
                 </div>
             </a>
