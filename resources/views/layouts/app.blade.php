@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-
 @php
 use App\Models\User;
     $userTheme = session('theme');
