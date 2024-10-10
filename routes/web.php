@@ -1,5 +1,4 @@
 <?php
-
 use App\Http\Controllers\{SearchController, ScheduleController, EventsController, CalendarController, AccountSettingsController, AjaxController, AuthController, PostController, ProfileController, UserController};
 use App\Livewire\Posts\{SingleFull};
 use App\Http\Controllers\Admin\UserController as AdminUserController;
