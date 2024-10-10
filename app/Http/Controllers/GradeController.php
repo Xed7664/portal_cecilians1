@@ -1,7 +1,5 @@
 <?php
-
 namespace App\Http\Controllers;
-
 use Illuminate\Http\Request;
 use App\Models\{YearLevel, Section, Grade, Employee, Semester, SchoolYear, Department, Subject,SubjectEnrolled,Student};
 use Illuminate\Support\Facades\Auth;
