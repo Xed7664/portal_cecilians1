@@ -8,7 +8,7 @@
                 @if($avatarReset == true)
                     <img id="profile-pic" src="{{ asset('img/profile/default-profile.png') }}" alt="user-avatar" class="d-block w-px-100 h-px-100 rounded" id="uploadedAvatar" style="width: 100px; height: 100px; object-fit: cover;">
                 @else
-                    <img id="profile-pic" src="{{ asset('storage/' . Auth::user()->avatar) }}" alt="user-avatar" class="d-block w-px-100 h-px-100 rounded" id="uploadedAvatar" style="width: 100px; height: 100px; object-fit: cover;">
+                    <img id="profile-pic" src="{{ asset('storage/profile_pictures' . Auth::user()->avatar) }}" alt="user-avatar" class="d-block w-px-100 h-px-100 rounded" id="uploadedAvatar" style="width: 100px; height: 100px; object-fit: cover;">
                 @endif
                 <div class="button-wrapper">
                     <label for="upload" class="btn btn-portal me-2 mb-3" tabindex="0">
