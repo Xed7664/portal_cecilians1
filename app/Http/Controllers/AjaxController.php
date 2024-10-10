@@ -174,8 +174,8 @@ class AjaxController extends Controller
                                     $user->save();
                         
                                     // Construct the URL to the new profile picture
-                                    $profilePictureUrl = asset('storage/profile/' . $profilePictureName); // Correct URL
-                        
+                                $profilePictureUrl = url('img/profile/' . $profilePictureName);
+
                                     return response()->json([
                                         'result' => true,
                                         'message' => 'Image uploaded successfully',
