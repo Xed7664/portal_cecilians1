@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\{YearLevel, Section, Grade, Employee, Semester, SchoolYear, Department, Subject,SubjectEnrolled,Student};
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use App\Imports\GradesImport;
 use App\Events\GradeUpdated;
 use Illuminate\Support\Facades\Event;
@@ -511,82 +512,119 @@ public function submitSelectedGrades(Request $request)
     // }
     
     
-    // For Students
-    public function studentIndex() {
+      // For Students
+      public function studentIndex(Request $request) {
         $user = Auth::user();
+        
         if ($user->type === 'student') {
-            // Determine the earliest semester and school year from the subjects_enrolled table
-            $earliestEnrollment = SubjectEnrolled::with('semester', 'schoolYear', 'section', 'yearLevel')
-                ->where('student_id', $user->student->id) // Ensure we only get enrollments for the logged-in student
-                ->orderBy('semester_id', 'asc')
-                ->orderBy('school_year_id', 'asc')
-                ->orderBy('section_id', 'asc')
-                ->orderBy('year_level_id', 'asc')
+            // Get the requested school year and semester from the request or session
+            $schoolYearId = $request->input('school_year_id', Session::get('current_school_year_id'));
+            $semesterId = $request->input('semester_id', Session::get('current_semester_id'));
+    
+            // Ensure we're fetching the latest enrollment if no specific school year is requested
+            $latestEnrollment = SubjectEnrolled::with('semester', 'schoolYear', 'section', 'yearLevel')
+                ->where('student_id', $user->student->id)
+                ->orderBy('school_year_id', 'desc')
                 ->first();
-
-            if (!$earliestEnrollment) {
-                // If no enrollments are found, return an empty result
+    
+            if (!$latestEnrollment) {
                 return view('student.grades.index', [
-                    'enrollments' => collect(), // Return an empty collection
+                    'enrollments' => collect(),
                     'hasGrades' => false
                 ]);
             }
-
-            // Filter enrollments based on the earliest semester, section, and year level
+    
+            // Fetch all enrollments for the selected school year and semester
             $enrollments = SubjectEnrolled::with(['subject', 'semester', 'schoolYear', 'section', 'yearLevel'])
-                ->where('student_id', $user->student->id) // Ensure we only get enrollments for the logged-in student
-                ->whereHas('semester', function ($query) use ($earliestEnrollment) {
-                    $query->where('id', $earliestEnrollment->semester_id);
-                })
-                ->whereHas('section', function ($query) use ($earliestEnrollment) {
-                    $query->where('id', $earliestEnrollment->section_id);
-                })
-                ->where('year_level_id', $earliestEnrollment->year_level_id)
-                ->whereHas('schoolYear', function ($query) use ($earliestEnrollment) {
-                    $query->where('id', $earliestEnrollment->school_year_id);
-                })
+                ->where('student_id', $user->student->id)
+                ->where('school_year_id', $schoolYearId)
+                ->where('semester_id', $semesterId)
                 ->get();
-
+    
             $hasGrades = $enrollments->isNotEmpty();
-
+    
             return view('student.grades.index', [
                 'enrollments' => $enrollments,
-                'hasGrades' => $hasGrades
+                'hasGrades' => $hasGrades,
+                'selectedSchoolYear' => $schoolYearId,
+                'selectedSemester' => $semesterId
             ]);
         }
-
-        // Redirect to a different page if the user is not a student
+    
         return redirect()->route('newsfeed');
     }
+    
+
 
     
-    public function showAllGradesForStudent($studentId)
-    {
-        // Fetch all grades for the current student, including subject enrollment details
-        $grades = Grade::with(['subject', 'subjectEnrolled', 'subjectEnrolled.semester', 'subjectEnrolled.schoolYear', 'subjectEnrolled.section', 'subjectEnrolled.yearLevel'])
-            ->where('student_id', $studentId)
-            ->get()
-            ->groupBy(function ($grade) {
-                return $grade->subjectEnrolled->schoolYear->id; // Group by school year ID
-            })
-            ->map(function ($group) {
-                return $group->groupBy(function ($grade) {
-                    return $grade->subjectEnrolled->semester->id; // Group by semester ID within each school year
-                })->map(function ($semesterGroup) {
+    public function showAllGradesForStudent(Request $request, $studentId)
+{
+    $schoolYears = SchoolYear::orderBy('name', 'desc')->get();
+    
+    // Fetch unique semester names (2nd and 1st) ordered by name desc
+    $semesters = Semester::whereIn('name', ['2nd Semester', '1st Semester'])
+                         ->orderBy('name', 'desc')
+                         ->distinct()
+                         ->pluck('name');
+
+    return view('student.grades.show', [
+        'schoolYears' => $schoolYears,
+        'semesters' => $semesters,
+        'studentId' => $studentId,
+    ]);
+}
+
+public function filterGrades(Request $request, $studentId)
+{
+    $query = Grade::with([
+        'subject',
+        'subjectEnrolled.semester',
+        'subjectEnrolled.schoolYear',
+        'subjectEnrolled.section',
+        'subjectEnrolled.yearLevel'
+    ])->where('student_id', $studentId);
+
+    if ($request->has('school_year_id') && $request->school_year_id) {
+        $query->whereHas('subjectEnrolled', function($q) use ($request) {
+            $q->where('school_year_id', $request->school_year_id);
+        });
+    }
+
+    if ($request->has('semester_name') && $request->semester_name) {
+        $query->whereHas('subjectEnrolled.semester', function($q) use ($request) {
+            $q->where('name', $request->semester_name);
+        });
+    }
+
+    $grades = $query->get()
+        ->sortByDesc(function ($grade) {
+            return $grade->subjectEnrolled->schoolYear->name;
+        })
+        ->groupBy(function ($grade) {
+            return $grade->subjectEnrolled->schoolYear->id;
+        })
+        ->map(function ($schoolYearGroup) {
+            return $schoolYearGroup->sortByDesc(function ($grade) {
+                    return $grade->subjectEnrolled->semester->name;
+                })
+                ->groupBy(function ($grade) {
+                    return $grade->subjectEnrolled->semester->id;
+                })
+                ->map(function ($semesterGroup) {
                     return $semesterGroup->groupBy(function ($grade) {
-                        return $grade->subjectEnrolled->section->id; // Group by section ID within each semester
+                        return $grade->subjectEnrolled->section->id;
                     })->map(function ($sectionGroup) {
                         return $sectionGroup->groupBy(function ($grade) {
-                            return $grade->subjectEnrolled->yearLevel->id; // Group by year level ID within each section
+                            return $grade->subjectEnrolled->yearLevel->id;
                         });
                     });
                 });
-            });
-    
-        return view('student.grades.show', [
-            'groupedGrades' => $grades,
-        ]);
-    }
+        });
+
+    return view('student.grades.partials.grade_table', ['groupedGrades' => $grades]);
+}
+
+
     public function requestReview($studentId)
 {
 // Fetch all enrollments for the student
