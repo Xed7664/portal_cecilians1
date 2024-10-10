@@ -149,44 +149,43 @@ class AjaxController extends Controller
                             return response()->json(['result' => false, 'message' => 'No file uploaded']);
                         }
 
-                        case 'upload':
-                            if ($request->has('data.profile_picture')) {
-                                $base64Image = $request->input('data.profile_picture');
-                                
-                                // Extract the base64 data and remove the data URI prefix
-                                $base64Data = substr($base64Image, strpos($base64Image, ',') + 1);
-                                $data = base64_decode($base64Data);
-                        
-                                // Define the destination directory and file name
-                                $destinationPath = public_path('img/profile'); // Using storage path
-                                $profilePictureName = time() . '_' . uniqid() . '.jpg';
-                        
-                                // Ensure the directory exists
-                                if (!file_exists($destinationPath)) {
-                                    mkdir($destinationPath, 0755, true); // Create the directory if it doesn't exist
-                                }
-                        
-                                // Save the decoded data as a file
-                                if (file_put_contents($destinationPath . '/' . $profilePictureName, $data)) {
-                                    // Update the user's profile picture path in your database
-                                    $user = Auth::user();
-                                    $user->avatar = $profilePictureName;
-                                    $user->save();
-                        
-                                    // Construct the URL to the new profile picture
-                                $profilePictureUrl = asset('img/profile/' . $profilePictureName);
+                    case 'upload':
+            if ($request->has('data.profile_picture')) {
+                $base64Image = $request->input('data.profile_picture');
 
-                                    return response()->json([
-                                        'result' => true,
-                                        'message' => 'Image uploaded successfully',
-                                        'profile_picture_url' => $profilePictureUrl,
-                                    ]);
-                                } else {
-                                    return response()->json(['result' => false, 'message' => 'Failed to save the image']);
-                                }
-                            } else {
-                                return response()->json(['result' => false, 'message' => 'No image data provided']);
-                            }
+                // Extract the base64 data and remove the prefix (e.g., 'data:image/png;base64,')
+                $base64Data = substr($base64Image, strpos($base64Image, ',') + 1);
+
+                // Decode the base64 data
+                $data = base64_decode($base64Data);
+
+                // Generate a unique file name
+                $profilePictureName = time() . '_' . uniqid() . '.jpg'; // Change extension based on your image type
+
+                // Store the decoded image in 'public/profile_pictures' folder using Laravel's storage facade
+                $filePath = 'profile_pictures/' . $profilePictureName;
+                
+                // Save the file
+                if (Storage::disk('public')->put($filePath, $data)) {
+                    // Update user's profile picture path in the database
+                    $user = Auth::user();
+                    $user->avatar = $filePath;  // Store relative path
+                    $user->save();
+
+                    // Construct the full URL to the uploaded profile picture
+                    $profilePictureUrl = Storage::url($filePath);  // Get the URL for public access
+
+                    return response()->json([
+                        'result' => true,
+                        'message' => 'Image uploaded successfully',
+                        'profile_picture_url' => $profilePictureUrl, // Return the new profile picture URL
+                    ]);
+                } else {
+                    return response()->json(['result' => false, 'message' => 'Failed to save the image']);
+                }
+            } else {
+                return response()->json(['result' => false, 'message' => 'No image data provided']);
+            }
                         
 
                     case 'scan':
