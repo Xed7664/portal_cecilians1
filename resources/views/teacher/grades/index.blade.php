@@ -7,7 +7,7 @@
     <section class="section profile">
         <div class="row">
             <div class="col-12">
-                <div class="card mb-4">
+                <div class="card mb-4 px-4 py-3">
                     <!-- Nav Tabs -->
                     <ul class="nav nav-tabs nav-tabs-bordered border-top pt-3 border-light-subtle border-opacity-10 border-1" role="tablist">
                         <li class="nav-item" role="presentation">
@@ -58,7 +58,7 @@
                                             <label for="semester_id" class="form-label">Semester</label>
                                             <select name="semester_id" id="semester_id" class="form-control">
                                                 <option value="">Select Semester</option>
-                                                @foreach($semesters as $semester)
+                                                @foreach($semesters->unique('name') as $semester)
                                                     <option value="{{ $semester->id }}" {{ ($selectedSemesterId == $semester->id) ? 'selected' : '' }}>
                                                         {{ $semester->name }}
                                                     </option>
@@ -96,7 +96,7 @@
                             </div>
 
                             <!-- Subjects Content -->
-                            <div class="row" id="subjects-container">
+                            <div class="row g-4" id="subjects-container">
                                 <div id="loading-spinner" class="d-none text-center">
                                     <div class="spinner-border text-primary" role="status">
                                         <span class="visually-hidden">Loading...</span>
@@ -153,17 +153,66 @@
         </div>
     </section>
 </main>
-<!-- Optional additional CSS to style the department cards -->
+
+<!-- Optional additional CSS to style the department and subject cards -->
 <style>
+    /* Department Card Styling */
     .department-card {
         background-color: #64B5F6;
         transition: transform 0.2s ease-in-out;
     }
+    
     .department-card:hover {
         transform: scale(1.05);
         background-color: #64B5F6;
     }
+
+    /* Subject Card Styling */
+    .subject-card {
+        border-radius: 10px;
+        transition: transform 0.2s ease-in-out;
+        overflow: hidden;
+        border: 1px solid #D3D3D3; /* Light border added */
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Smooth shadow */
+    }
+
+    .subject-card:hover {
+        transform: scale(1.05);
+        border-color: #64B5F6; /* Change border color on hover */
+    }
+
+    /* Subject Card Header */
+    .subject-card-header {
+        padding: 15px;
+        text-align: center;
+        font-weight: bold;
+        font-size: 1.2rem;
+        border-bottom: 3px solid #1565C0;
+    }
+
+    /* Card Body */
+    .subject-card .card-body {
+        padding: 20px;
+        text-align: center;
+        background-color: #F5F5F5;
+    }
+
+    /* View Grades Button */
+    .btn-view-grades {
+        background-color: #64B5F6;
+        color: white;
+        border-radius: 20px;
+        padding: 10px 20px;
+        font-weight: bold;
+        text-transform: uppercase;
+        transition: background-color 0.3s;
+    }
+
+    .btn-view-grades:hover {
+        background-color: #1565C0;
+    }
 </style>
+
 
 <script>
     document.addEventListener('DOMContentLoaded', function () {
@@ -257,18 +306,38 @@
                 return;
             }
 
-            paginatedSubjects.forEach(subject => {
-                subjectsContainer.innerHTML += `
-                    <div class="col-md-4">
-                        <div class="card mb-3 shadow-sm">
-                            <div class="card-body">
-                                <h5 class="card-title">${subject.subject.department.code}-${subject.subject.subject_code} - ${subject.section.name}</h5>
-                                <p class="card-text">${subject.subject.description}</p>
-                                <a href="/teacher/subject/grades/${subject.id}" class="btn btn-primary">View Grades</a>
-                            </div>
-                        </div>
-                    </div>`;
-            });
+         
+    const departmentColors = {
+        'BSIT': '#4CAF50',   // Green for BSIT
+        'BSBA': '#FF9800',   // Orange for BSBA
+        'BEED': '#03A9F4',   // Light Blue for BEED
+        // Add more departments and colors here
+    };
+
+    paginatedSubjects.forEach(subject => {
+        // Get the color for the current subject's department
+        const departmentColor = departmentColors[subject.subject.department.code] || '#607D8B'; // Default color if department not in map
+
+        subjectsContainer.innerHTML += `
+            <div class="col-md-4">
+                <div class="card mb-3 shadow-sm subject-card" style="border-left: 5px solid ${departmentColor}; background-color: #f9f9f9; border-radius: 8px;">
+                    <div class="card-header text-white" style="background-color: ${departmentColor}; border-radius: 8px 8px 0 0; padding: 10px;">
+                        <h5 class="card-title mb-0" style="font-size: 1.2rem; font-weight: bold;">
+                            ${subject.subject.department.code} - ${subject.subject.subject_code} - ${subject.section.name}
+                        </h5>
+                    </div>
+                    <div class="card-body" style="padding: 15px;">
+                        <p class="card-text" style="font-size: 1rem; color: #555;">
+                            ${subject.subject.description}
+                        </p>
+                        <a href="/teacher/subject/grades/${subject.id}" class="btn btn-primary btn-view-grades" style="background-color: ${departmentColor}; border: none;">
+                            View Grades
+                        </a>
+                    </div>
+                </div>
+            </div>`;
+    });
+
 
             updatePagination(filteredSubjects.length);
         }

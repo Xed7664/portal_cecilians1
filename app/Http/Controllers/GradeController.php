@@ -76,7 +76,7 @@ class GradeController extends Controller
 
         // Retrieve dropdown data
         $schoolYears = SchoolYear::all();
-        $semesters = Semester::all();
+        $semesters = Semester::select('id', 'name')->distinct()->get();
         $departments = Department::all();
         $sections = Section::all();
 

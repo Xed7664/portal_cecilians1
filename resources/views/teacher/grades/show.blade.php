@@ -45,73 +45,107 @@
                   </div>
               </div>
 
-        <div class="card">
-            <div class="card-body">
-                <div class="d-flex justify-content-between align-items-center mb-3">
-                    <form action="{{ url('/send-grades-notification') }}" method="POST">
-                        @csrf
-                        <button type="submit" class="btn btn-primary">Notify Students</button>
-                    </form>
-                </div>
+              <div class="card-body">
+    <!-- Notification Button -->
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <form action="{{ url('/send-grades-notification') }}" method="POST">
+            @csrf
+            <button type="submit" class="btn btn-primary notify-btn">
+                <i class="fas fa-bell"></i> Notify Students
+            </button>
+        </form>
+    </div>
 
-                <form id="gradesForm" action="{{ route('teacher.grades.storeOrUpdate', $subjectEnrolled->id) }}" method="POST">
-    @csrf
-    <table class="table table-bordered table-hover" id="gradesTable">
-        <thead class="table-danger">
-            <tr>
-                <th scope="col"><input type="checkbox" id="selectAll"></th>
-                <th scope="col">Student ID</th>
-                <th scope="col">Student Name</th>
-                <th scope="col">Prelim</th>
-                <th scope="col">Midterm</th>
-                <th scope="col">Prefinal</th>
-                <th scope="col">Final</th>
-                    <th scope="col">Remarks</th>
-                    <th scope="col">Status</th>
-                    <th scope="col">Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-    @foreach($students as $student)
-    @php
-        $subjectEnrolled = $student->subjectsEnrolled->where('subject_id', $subject->id)->first();
-        $grade = $subjectEnrolled ? $subjectEnrolled->grades()->where('student_id', $student->id)->first() : null;
-    @endphp
-    <tr data-student-id="{{ $student->id }}" data-subject-enrolled-id="{{ $subjectEnrolled->id }}">
-        <!-- Checkbox to select the student row -->
-        <td><input type="checkbox" class="student-checkbox" value="{{ $student->id }}"></td>
-
-        <!-- Student Information -->
-        <td>{{ $student->StudentID }}</td>
-        <td>{{ $student->FullName }}</td>
-
-        <!-- Grade input fields for each grading period -->
-        <td><input type="number" step="0.1" name="grades[{{ $student->id }}][prelim]" value="{{ $grade->prelim ?? '' }}" class="form-control prelim-input" required></td>
-        <td><input type="number" step="0.1" name="grades[{{ $student->id }}][midterm]" value="{{ $grade->midterm ?? '' }}" class="form-control midterm-input" required></td>
-        <td><input type="number" step="0.1" name="grades[{{ $student->id }}][prefinal]" value="{{ $grade->prefinal ?? '' }}" class="form-control prefinal-input" required></td>
-        <td><input type="number" step="0.1" name="grades[{{ $student->id }}][final]" value="{{ $grade->final ?? '' }}" class="form-control final-input" required></td>
-
-        <!-- Remarks field -->
-        <td><input type="text" name="grades[{{ $student->id }}][remarks]" class="form-control" value="{{ $grade->remarks ?? '' }}" readonly></td>
-
-        <!-- Status column that will be updated -->
-        <td class="status-cell">{{ $grade->status ?? '' }}</td>
-
-        <!-- Button to submit individual student grades -->
-        <td>
-            <button type="button" class="btn btn-sm btn-success submit-student-grade" data-student-id="{{ $student->id }}">Save</button>
-        </td>
-    </tr>
-    @endforeach
-</tbody>
-
-        </table>
+    <!-- Grades Form -->
+    <form id="gradesForm" action="{{ route('teacher.grades.storeOrUpdate', $subjectEnrolled->id) }}" method="POST">
+        @csrf
+        <!-- Add Bootstrap's table-responsive class -->
+        <div class="table-responsive">
+            <table class="table table-bordered table-hover" id="gradesTable">
+                <thead class="table-danger">
+                    <tr>
+                        <th scope="col"><input type="checkbox" id="selectAll"></th>
+                        <th scope="col">Student ID</th>
+                        <th scope="col">Student Name</th>
+                        <th scope="col">Prelim</th>
+                        <th scope="col">Midterm</th>
+                        <th scope="col">Prefinal</th>
+                        <th scope="col">Final</th>
+                        <th scope="col">Remarks</th>
+                        <th scope="col">Status</th>
+                        <th scope="col">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach($students as $student)
+                    @php
+                        $subjectEnrolled = $student->subjectsEnrolled->where('subject_id', $subject->id)->first();
+                        $grade = $subjectEnrolled ? $subjectEnrolled->grades()->where('student_id', $student->id)->first() : null;
+                    @endphp
+                    <tr data-student-id="{{ $student->id }}" data-subject-enrolled-id="{{ $subjectEnrolled->id }}">
+                        <td><input type="checkbox" class="student-checkbox" value="{{ $student->id }}"></td>
+                        <td>{{ Str::limit($student->StudentID, 6, '...') }}</td>
+                        <td>{{ $student->FullName }}</td>
+                        <td><input type="number" step="0.1" name="grades[{{ $student->id }}][prelim]" value="{{ $grade->prelim ?? '' }}" class="form-control grade-input" required></td>
+                        <td><input type="number" step="0.1" name="grades[{{ $student->id }}][midterm]" value="{{ $grade->midterm ?? '' }}" class="form-control grade-input" required></td>
+                        <td><input type="number" step="0.1" name="grades[{{ $student->id }}][prefinal]" value="{{ $grade->prefinal ?? '' }}" class="form-control grade-input" required></td>
+                        <td><input type="number" step="0.1" name="grades[{{ $student->id }}][final]" value="{{ $grade->final ?? '' }}" class="form-control grade-input" required></td>
+                        <td><input type="text" name="grades[{{ $student->id }}][remarks]" class="form-control" value="{{ $grade->remarks ?? '' }}" readonly></td>
+                        <td class="status-cell">{{ $grade->status ?? '' }}</td>
+                        <td>
+                            <div class="d-flex gap-2">
+                                <button type="button" class="btn btn-sm btn-success submit-student-grade "style="background-color: #b22222; color: white;"  data-student-id="{{ $student->id }}">Save</button>
+                                <button type="button" class="btn btn-sm" style="background-color: #4682b4; color: white;" data-bs-toggle="modal" data-bs-target="#studentModal{{ $student->id }}">Details</button>
+                            </div>
+                        </td>
+                    </tr>
+                       <!-- Modal for Detailed Grade Input -->
+                       <div class="modal fade" id="studentModal{{ $student->id }}" tabindex="-1" aria-labelledby="studentModalLabel{{ $student->id }}" aria-hidden="true">
+                            <div class="modal-dialog modal-lg">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="studentModalLabel{{ $student->id }}">Grades for {{ $student->FullName }}</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <p><strong>Student ID:</strong> {{ $student->StudentID }}</p>
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <label for="prelim">Prelim:</label>
+                                                <input type="number" step="0.1" name="modal_grades[{{ $student->id }}][prelim]" value="{{ $grade->prelim ?? '' }}" class="form-control grade-input">
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label for="midterm">Midterm:</label>
+                                                <input type="number" step="0.1" name="modal_grades[{{ $student->id }}][midterm]" value="{{ $grade->midterm ?? '' }}" class="form-control grade-input">
+                                            </div>
+                                            <div class="col-md-6 mt-3">
+                                                <label for="prefinal">Prefinal:</label>
+                                                <input type="number" step="0.1" name="modal_grades[{{ $student->id }}][prefinal]" value="{{ $grade->prefinal ?? '' }}" class="form-control grade-input">
+                                            </div>
+                                            <div class="col-md-6 mt-3">
+                                                <label for="final">Final:</label>
+                                                <input type="number" step="0.1" name="modal_grades[{{ $student->id }}][final]" value="{{ $grade->final ?? '' }}" class="form-control grade-input">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                        <button type="button" class="btn btn-primary">Save Changes</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
     </form>
 
 
-                <button type="button" class="btn btn-primary mt-3" data-bs-toggle="modal" data-bs-target="#confirmSubmitModal">Submit All Grades</button>
-            </div>
-        </div>
+            <!-- Submit All Grades Button -->
+    <button type="button" class="btn btn-primary mt-3" style="background-color: #871616; color: white;" data-bs-toggle="modal" data-bs-target="#confirmSubmitModal">Submit All Grades</button>
+</div>
+
     </div>
 
     <!-- Confirmation Modal -->
@@ -191,6 +225,122 @@
     </section>
 </main>
 
+<style>
+/* Grade input adjustment */
+.grade-input {
+    width: 70px; /* Adjust input width */
+    max-width: 100%; /* Ensure inputs are responsive */
+}
+
+/* Responsive table adjustments */
+@media (max-width: 768px) {
+    .table th, .table td {
+        font-size: 0.8rem;
+        padding: 8px;
+    }
+
+    .grade-input {
+        width: 70px;
+    }
+
+    /* Enable horizontal scrolling */
+    .table-responsive {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch; /* Smooth scrolling on mobile */
+    }
+}
+
+/* Extra small screens */
+@media (max-width: 576px) {
+    .table th, .table td {
+        font-size: 0.7rem;
+        padding: 6px;
+    }
+
+    .grade-input {
+        width: 70px;
+    }
+}
+
+/* Scrollbar customization for larger screens */
+@media (min-width: 768px) {
+    .table-responsive {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch; /* Smooth scrolling on mobile */
+    }
+    /* WebKit-based browsers (Chrome, Safari) */
+    .table-responsive::-webkit-scrollbar {
+        height: 6px; /* Reduce scrollbar thickness */
+    }
+    
+    .table-responsive::-webkit-scrollbar-thumb {
+        background-color: rgba(135, 22, 22, 0.6); /* Subtle scrollbar color */
+        border-radius: 10px; /* Round scrollbar edges */
+    }
+
+    .table-responsive::-webkit-scrollbar-track {
+        background-color: rgba(0, 0, 0, 0.1); /* Track color */
+    }
+
+    /* For Firefox */
+    .table-responsive {
+        scrollbar-width: thin; /* Makes the scrollbar thinner */
+        scrollbar-color: rgba(135, 22, 22, 0.6) rgba(0, 0, 0, 0.1); /* Thumb and track colors */
+    }
+}
+
+/* Button styles */
+.btn-primary {
+    background-color: #871616;
+    border-color: #871616;
+}
+
+.btn-primary:hover {
+    background-color: #6d1212;
+    border-color: #6d1212;
+}
+
+.notify-btn {
+    background-color: #871616;
+    color: white;
+    font-weight: bold;
+    border-radius: 10px;
+    padding: 6px 12px;
+    font-size: 0.875rem;
+    display: inline-flex;
+    align-items: center;
+    box-shadow: 0px 3px 7px rgba(0, 0, 0, 0.1);
+    transition: background-color 0.3s, transform 0.3s;
+}
+
+.notify-btn i {
+    margin-right: 6px;
+    font-size: 1rem;
+}
+
+.notify-btn:hover {
+    background-color: #6d1212;
+    transform: scale(1.05);
+}
+
+.notify-btn:focus {
+    outline: none;
+    box-shadow: 0 0 8px rgba(135, 22, 22, 0.7);
+}
+
+</style>
+<script>
+    // Conditional coloring for grade inputs (Failing grades)
+    document.querySelectorAll('.grade-input').forEach(input => {
+        input.addEventListener('input', function() {
+            if (parseFloat(this.value) > 3) {
+                this.style.backgroundColor = '#f8d7da'; // Red for failing grades
+            } else {
+                this.style.backgroundColor = ''; // Reset for passing grades
+            }
+        });
+    });
+</script>
 
 <script>
 $(document).ready(function () {
