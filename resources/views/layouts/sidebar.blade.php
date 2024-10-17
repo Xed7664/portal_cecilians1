@@ -214,7 +214,12 @@
 
       </li>
 
-      
+      <li class="nav-item">
+        <a class="nav-link collapsed" href="#">
+          <i class="bi bi-book"></i>
+          <span>Subjects</span>
+        </a>
+      </li>
 
       <li class="nav-item">
         <a class="nav-link {{ request()->routeIs(['admin.users.registered', 'admin.users.student', 'admin.users.employee']) ? '' : 'collapsed' }}" data-bs-target="#analytics-nav" data-bs-toggle="collapse" href="#">
