@@ -12,7 +12,7 @@ class SubjectEnrolled extends Model
     protected $table = 'subjects_enrolled';
 
     protected $fillable = [
-        'student_id', 'subject_id', 'section_id', 'semester_id', 'school_year_id', 'teacher_id', 'year_level_id',
+        'student_id', 'subject_id', 'section_id', 'schedule_id','semester_id', 'school_year_id', 'teacher_id', 'year_level_id',
     ];
 
     public function student()
@@ -54,5 +54,8 @@ class SubjectEnrolled extends Model
     {
         return $this->belongsTo(Department::class);
     }
-    
+    public function schedule()
+    {
+        return $this->belongsTo(Schedule::class);
+    }
 }

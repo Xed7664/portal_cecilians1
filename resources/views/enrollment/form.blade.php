@@ -5,7 +5,7 @@
 <main id="main" class="main">
     <!-- Page title -->
     <div class="pagetitle">
-        <h1>Online Enrollment</h1>
+        <h1>Onlines Enrollment</h1>
         <nav>
             <ol class="breadcrumb">
                 <li class="breadcrumb-item"><a href="{{ route('newsfeed') }}">Home</a></li>

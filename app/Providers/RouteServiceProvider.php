@@ -44,19 +44,5 @@ class RouteServiceProvider extends ServiceProvider
      * @param \App\Models\User $user
      * @return string
      */
-    public static function redirectToHome(\App\Models\User $user)
-    {
-        switch ($user->role) {
-            case 'student':
-                return route('student.dashboard');
-            case 'teacher':
-                return route('teacher.dashboard');
-            case 'program_head':
-                return route('program_head.dashboard');
-            case 'admin':
-                return route('admin.dashboard');
-            default:
-                return route('newsfeed');
-        }
-    }
+   
 }

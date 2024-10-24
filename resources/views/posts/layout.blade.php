@@ -18,11 +18,7 @@
             <div class="col-lg-5 d-none d-sm-block">
 
                 <div class="sticky-top z-0" style="top: 70px;">
-
-                    @livewire('posts.sidebar.trending-hashtags')
-                    
-                    @livewire('posts.sidebar.who-to-follow')
-                    
+                    @yield('content_sidebar')
                 </div>
                 
             </div>
@@ -31,9 +27,5 @@
         </div>
     </section>
 
-
-
 </main>
-
-
 @endsection

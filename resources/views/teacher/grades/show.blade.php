@@ -18,32 +18,33 @@
 
 
     <div class="card mb-4">
-                <div class="user-profile-header-banner">
-                    <img src="{{ asset('assets/images/finalhomebg11.png') }}" alt="Banner image" class="rounded-top">
-                </div>
-            <div class="user-profile-header d-flex flex-column flex-sm-row text-sm-start text-center mb-3">
-                    <div class="flex-shrink-0 mt-n2 mx-sm-0 mx-auto">
-                        <img src="{{ asset('img/course/default.png') }}" alt="user image" class="d-block ms-0 ms-sm-4 rounded user-profile-img border-dark" style="width: 120px; height: 120px; object-fit: cover;">
+    <div class="user-profile-header-banner">
+        <img src="{{ asset('assets/images/finalhomebg11.png') }}" alt="Banner image" class="rounded-top">
+    </div>
+
+    <div class="user-profile-header d-flex flex-column flex-sm-row text-sm-start text-center mb-3">
+        <div class="flex-shrink-0 mt-n2 mx-sm-0 mx-auto">
+            <img src="{{ asset('img/course/default.png') }}" alt="user image" class="d-block ms-0 ms-sm-4 rounded user-profile-img border-dark" style="width: 120px; height: 120px; object-fit: cover;">
+        </div>
+
+        <div class="flex-grow-1 mt-3 mt-sm-5">
+            <div class="d-flex align-items-md-end align-items-sm-start align-items-center justify-content-md-between justify-content-start mx-4 flex-md-row flex-column gap-4">
+                <div class="user-profile-info">
+                    <div class="d-flex justify-content-sm-start justify-content-center">
+                        <h4 class="mb-0">{{ $schedule->subject->description }}</h4>
                     </div>
-                <div class="flex-grow-1 mt-3 mt-sm-5">
-                     <div class="d-flex align-items-md-end align-items-sm-start align-items-center justify-content-md-between      justify-content-start mx-4 flex-md-row flex-column gap-4">
-                        <div class="user-profile-info">
-                            <div class="d-flex justify-content-sm-start justify-content-center">
-                                <h4 class="mb-0">{{ $subject->description }}</h4>
-                            </div>
-                                 <span class="fw-light mt-0">{{ $subject->subject_code }}</b></span>
-                      
-                                <ul class="list-inline mt-2 mb-0 d-flex align-items-center flex-wrap justify-content-sm-start justify-content-center gap-2">
-                                    <li class="list-inline-item d-flex gap-1">
-                                    <i class="bx bxs-school mt-1"></i> 
-                                    <span class="fw-light">Section: {{ $section->name }}</span>
-                                    </li>
-                                </ul>
-                        </div>
-                    
-                     </div>
-                  </div>
-              </div>
+                    <span class="fw-light mt-0">{{ $schedule->subject->subject_code }}</span>
+
+                    <ul class="list-inline mt-2 mb-0 d-flex align-items-center flex-wrap justify-content-sm-start justify-content-center gap-2">
+                        <li class="list-inline-item d-flex gap-1">
+                            <i class="bx bxs-school mt-1"></i>
+                            <span class="fw-light">Section: {{ $section->name }}</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
 
               <div class="card-body">
     <!-- Notification Button -->
@@ -77,22 +78,26 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach($students as $student)
-                    @php
-                        $subjectEnrolled = $student->subjectsEnrolled->where('subject_id', $subject->id)->first();
-                        $grade = $subjectEnrolled ? $subjectEnrolled->grades()->where('student_id', $student->id)->first() : null;
-                    @endphp
-                    <tr data-student-id="{{ $student->id }}" data-subject-enrolled-id="{{ $subjectEnrolled->id }}">
-                        <td><input type="checkbox" class="student-checkbox" value="{{ $student->id }}"></td>
-                        <td>{{ Str::limit($student->StudentID, 6, '...') }}</td>
-                        <td>{{ $student->FullName }}</td>
-                        <td><input type="number" step="0.1" name="grades[{{ $student->id }}][prelim]" value="{{ $grade->prelim ?? '' }}" class="form-control grade-input" required></td>
-                        <td><input type="number" step="0.1" name="grades[{{ $student->id }}][midterm]" value="{{ $grade->midterm ?? '' }}" class="form-control grade-input" required></td>
-                        <td><input type="number" step="0.1" name="grades[{{ $student->id }}][prefinal]" value="{{ $grade->prefinal ?? '' }}" class="form-control grade-input" required></td>
-                        <td><input type="number" step="0.1" name="grades[{{ $student->id }}][final]" value="{{ $grade->final ?? '' }}" class="form-control grade-input" required></td>
-                        <td><input type="text" name="grades[{{ $student->id }}][remarks]" class="form-control" value="{{ $grade->remarks ?? '' }}" readonly></td>
-                        <td class="status-cell">{{ $grade->status ?? '' }}</td>
-                        <td>
+    @foreach($students as $student)
+        @php
+            // Find the subjectEnrolled using the schedule's subject_id, section, and other filters
+            $subjectEnrolled = $student->subjectsEnrolled->where('schedule_id', $schedule->id)->first();
+
+            // Fetch the grades for the student, linked by schedule
+            $grade = $subjectEnrolled ? $subjectEnrolled->grades()->where('student_id', $student->id)->first() : null;
+        @endphp
+
+        <tr data-student-id="{{ $student->id }}" data-subject-enrolled-id="{{ $subjectEnrolled->id }}">
+            <td><input type="checkbox" class="student-checkbox" value="{{ $student->id }}"></td>
+            <td>{{ Str::limit($student->StudentID, 6, '...') }}</td>
+            <td>{{ $student->FullName }}</td>
+            <td><input type="number" step="0.1" name="grades[{{ $student->id }}][prelim]" value="{{ $grade->prelim ?? '' }}" class="form-control grade-input" required></td>
+            <td><input type="number" step="0.1" name="grades[{{ $student->id }}][midterm]" value="{{ $grade->midterm ?? '' }}" class="form-control grade-input" required></td>
+            <td><input type="number" step="0.1" name="grades[{{ $student->id }}][prefinal]" value="{{ $grade->prefinal ?? '' }}" class="form-control grade-input" required></td>
+            <td><input type="number" step="0.1" name="grades[{{ $student->id }}][final]" value="{{ $grade->final ?? '' }}" class="form-control grade-input" required></td>
+            <td><input type="text" name="grades[{{ $student->id }}][remarks]" class="form-control" value="{{ $grade->remarks ?? '' }}" readonly></td>
+            <td class="status-cell">{{ $grade->status ?? '' }}</td>
+             <td>
                             <div class="d-flex gap-2">
                                 <button type="button" class="btn btn-sm btn-success submit-student-grade "style="background-color: #b22222; color: white;"  data-student-id="{{ $student->id }}">Save</button>
                                 <button type="button" class="btn btn-sm" style="background-color: #4682b4; color: white;" data-bs-toggle="modal" data-bs-target="#studentModal{{ $student->id }}">Details</button>

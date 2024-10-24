@@ -282,33 +282,30 @@ section.contact-us .right-info {
   </header>
   <!-- ***** Header Area End ***** -->
 
-  <!-- ***** Main Banner Area Start ***** -->
-  <section class="section main-banner" id="top" data-section="section1">
+<!-- ***** Main Banner Area Start ***** -->
+<section class="section main-banner" id="top" data-section="section1">
 
-
-      <!-- <video autoplay muted loop id="bg-video"> 
-          <source src="assets/images/course-video.mp4" type="video/mp4" />
-      </video> -->
-
-      <div class="video-overlay header-text">
-          <div class="container">
+    <div class="video-overlay header-text">
+        <div class="container">
             <div class="row">
-              <div class="col-lg-12">
-                <div class="caption">
-              <h6>Hello Students</h6>
-              <!-- <h2 data-aos="fade-up" data-aos-delay="100"><span class="text11"></span></h2> -->
-              <h2>Welcome to Cecilian's Portal</h2>
-              <p>The College Student Portal is your digital companion throughout your academic journey. Designed to streamline your experience and enhance your academic success, our portal offers a comprehensive array of tools and resources tailored specifically to meet the needs of today's college students. From managing your courses and assignments to accessing campus services and staying informed about events and opportunities, the College Student Portal is your go-to destination for everything you need to thrive in college. Join us as we embark on this journey together and unlock the full potential of your college experience.</p>
-              <div class="main-button-red">
-                  <a href="{{ route('login') }}">Signin</a>
-                  <a href="{{ route('registration') }}" class="button2">Create an Account</a>
-              </div>
-          </div>
-              </div>
+                <div class="col-lg-12">
+                    <div class="caption">
+                        <h6>Hello Students</h6>
+                        <h2>Welcome to Cecilian's Portal</h2>
+                        <p>The College Student Portal is your digital companion throughout your academic journey...</p>
+                        <div class="main-button-red">
+                            <a href="{{ route('login') }}">Signin</a>
+                            <a href="{{ route('registration') }}" class="button2">Create an Account</a>
+                            <!-- Link to Admission Form -->
+                            <a href="{{ route('admission.tracker') }}"class="button2">Admission Tracker</a>
+                        </div>
+                    </div>
+                </div>
             </div>
-          </div>
-      </div>
-  </section>
+        </div>
+    </div>
+</section>
+
   <!-- ***** Main Banner Area End ***** -->
 
   <section class="services">

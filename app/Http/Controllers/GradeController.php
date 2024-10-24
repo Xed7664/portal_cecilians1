@@ -66,36 +66,39 @@ class GradeController extends Controller
 
 
 
-   public function teacherIndex(Request $request)
-{
-    $user = Auth::user();
-
-    if ($user->type === 'teacher') {
-        // Get the teacher's employee ID
-        $teacherId = $user->employee->id;
-
-        // Retrieve dropdown data
-        $schoolYears = SchoolYear::all();
-        $semesters = Semester::select('id', 'name')->distinct()->get();
-        $departments = Department::all();
-        $sections = Section::all();
-
-        // Retrieve filter values from request or session
-        $selectedDepartmentId = $request->get('department_id', session('selectedDepartmentId'));
-        $selectedSectionId = $request->get('section_id', session('selectedSectionId'));
-        $selectedSchoolYearId = $request->get('school_year_id', session('selectedSchoolYearId', session('current_school_year_id')));
-        $selectedSemesterId = $request->get('semester_id', session('selectedSemesterId', session('current_semester_id')));
-
-        // Fetch departments handled by the teacher
-        $departmentsHandled = Department::whereHas('subjects', function ($query) use ($teacherId) {
-            $query->where('teacher_id', $teacherId);
-        })->get();
-
-        // Fetch unique subjects based on the selected filters
-        $subjectsEnrolled = SubjectEnrolled::with(['subject.department', 'section', 'schoolYear', 'semester'])
-            ->where('teacher_id', $teacherId)
+    public function teacherIndex(Request $request)
+    {
+        $user = Auth::user();
+    
+        if ($user->type === 'teacher') {
+            // Get the teacher's employee ID
+            $teacherId = $user->employee->id;
+    
+            // Retrieve dropdown data
+            $schoolYears = SchoolYear::all();
+            $semesters = Semester::select('id', 'name')->distinct()->get();
+            $departments = Department::all();
+            $sections = Section::all();
+    
+            // Retrieve filter values from request or session
+            $selectedDepartmentId = $request->get('department_id', session('selectedDepartmentId'));
+            $selectedSectionId = $request->get('section_id', session('selectedSectionId'));
+            $selectedSchoolYearId = $request->get('school_year_id', session('selectedSchoolYearId', session('current_school_year_id')));
+            $selectedSemesterId = $request->get('semester_id', session('selectedSemesterId', session('current_semester_id')));
+    
+            // Fetch departments handled by the teacher
+            $departmentsHandled = Department::whereHas('subjects', function ($query) use ($teacherId) {
+                $query->whereHas('schedules', function ($subQuery) use ($teacherId) {
+                    $subQuery->where('teacher_id', $teacherId);
+                });
+            })->get();
+    
+            $subjectsEnrolled = SubjectEnrolled::with(['schedule.subject.department', 'section', 'schoolYear', 'semester'])
+            ->whereHas('schedule', function ($query) use ($teacherId) {
+                $query->where('teacher_id', $teacherId);
+            })
             ->when($selectedDepartmentId, function ($query) use ($selectedDepartmentId) {
-                $query->whereHas('subject', function ($subQuery) use ($selectedDepartmentId) {
+                $query->whereHas('schedule.subject', function ($subQuery) use ($selectedDepartmentId) {
                     $subQuery->where('department_id', $selectedDepartmentId);
                 });
             })
@@ -110,22 +113,21 @@ class GradeController extends Controller
             })
             ->get()
             ->unique(function ($subjectEnrolled) {
-                return $subjectEnrolled->subject->id; // Use subject ID to ensure uniqueness
+                // Access the subject via the schedule relationship
+                return $subjectEnrolled->schedule->subject->id;
             });
-
-        return view('teacher.grades.index', compact(
-            'schoolYears', 'semesters', 'departments', 'sections', 'subjectsEnrolled', 
-            'selectedDepartmentId', 'selectedSectionId', 'selectedSchoolYearId', 'selectedSemesterId', 'departmentsHandled'
-        ));
-    }
-
-    return redirect()->route('newsfeed');
-}
-
-
+        
     
- 
-public function fetchSubjects(Request $request)
+            return view('teacher.grades.index', compact(
+                'schoolYears', 'semesters', 'departments', 'sections', 'subjectsEnrolled', 
+                'selectedDepartmentId', 'selectedSectionId', 'selectedSchoolYearId', 'selectedSemesterId', 'departmentsHandled'
+            ));
+        }
+    
+        return redirect()->route('newsfeed');
+    }
+    
+    public function fetchSubjects(Request $request)
 {
     // Store the selected filters in the session
     session([
@@ -135,25 +137,35 @@ public function fetchSubjects(Request $request)
         'selectedSectionId' => $request->section_id,
     ]);
 
-    $query = SubjectEnrolled::with('subject.department', 'section')
-        ->where('teacher_id', Auth::user()->employee->id)
+    // Build the query based on the schedules table, accessing subjects via schedule
+    $query = SubjectEnrolled::with('schedule.subject.department', 'schedule.section')
+        ->whereHas('schedule', function ($query) {
+            $query->where('teacher_id', Auth::user()->employee->id);
+        })
         ->where('school_year_id', $request->school_year_id)
         ->where('semester_id', $request->semester_id);
 
+    // Filter by department if selected
     if ($request->department_id) {
-        $query->whereHas('subject.department', function ($q) use ($request) {
+        $query->whereHas('schedule.subject.department', function ($q) use ($request) {
             $q->where('id', $request->department_id);
         });
     }
 
+    // Filter by section if selected
     if ($request->section_id) {
-        $query->where('section_id', $request->section_id);
+        $query->whereHas('schedule', function ($q) use ($request) {
+            $q->where('section_id', $request->section_id);
+        });
     }
 
+    // Execute the query and get the results
     $subjectsEnrolled = $query->get();
 
+    // Return as JSON
     return response()->json($subjectsEnrolled);
 }
+
 
 public function fetchTeacherDepartments()
 {
@@ -169,43 +181,45 @@ public function fetchTeacherDepartments()
 }
 
 
+public function teacherShow($subjectEnrolledId)
+{
+    $user = Auth::user();
 
-
-    public function teacherShow($subjectEnrolledId)
-    {
-        $user = Auth::user();
-    
-        // Ensure the authenticated user is a teacher
-        if ($user->type !== 'teacher') {
-            abort(403, 'Unauthorized action.');
-        }
-    
-        // Find the enrolled subject or fail with a 404
-        $subjectEnrolled = SubjectEnrolled::with(['subject', 'section'])->findOrFail($subjectEnrolledId);
-    
-        // Ensure the teacher matches the teacher assigned to this enrolled subject
-        if ($subjectEnrolled->teacher_id !== $user->employee->id) {
-            abort(403, 'Unauthorized action.');
-        }
-    
-        // Fetch the students enrolled in this subject and section
-        $students = Student::join('subjects_enrolled', 'students.id', '=', 'subjects_enrolled.student_id')
-            ->where('subjects_enrolled.subject_id', $subjectEnrolled->subject_id)
-            ->where('subjects_enrolled.section_id', $subjectEnrolled->section_id)
-            ->where('subjects_enrolled.semester_id', $subjectEnrolled->semester_id)
-            ->where('subjects_enrolled.school_year_id', $subjectEnrolled->school_year_id)
-            ->select('students.id', 'students.StudentID', 'students.FullName')
-            ->get();
-    
-        // Return the view with the required data
-        return view('teacher.grades.show', [
-            'subjectEnrolled' => $subjectEnrolled,
-            'subject' => $subjectEnrolled->subject,
-            'section' => $subjectEnrolled->section,
-            'students' => $students
-        ]);
+    // Ensure the authenticated user is a teacher
+    if ($user->type !== 'teacher') {
+        abort(403, 'Unauthorized action.');
     }
-    
+
+    // Find the enrolled subject, now using schedule_id, or fail with a 404
+    $subjectEnrolled = SubjectEnrolled::with(['schedule', 'section'])
+        ->whereHas('schedule', function ($query) use ($user) {
+            $query->where('teacher_id', $user->employee->id);
+        })
+        ->findOrFail($subjectEnrolledId);
+
+    // Ensure the teacher matches the teacher assigned to this schedule
+    if ($subjectEnrolled->schedule->teacher_id !== $user->employee->id) {
+        abort(403, 'Unauthorized action.');
+    }
+
+    // Fetch the students enrolled in this schedule, section, semester, and school year
+    $students = Student::join('subjects_enrolled', 'students.id', '=', 'subjects_enrolled.student_id')
+        ->where('subjects_enrolled.schedule_id', $subjectEnrolled->schedule_id)
+        ->where('subjects_enrolled.section_id', $subjectEnrolled->section_id)
+        ->where('subjects_enrolled.semester_id', $subjectEnrolled->semester_id)
+        ->where('subjects_enrolled.school_year_id', $subjectEnrolled->school_year_id)
+        ->select('students.id', 'students.StudentID', 'students.FullName')
+        ->get();
+
+    // Return the view with the required data
+    return view('teacher.grades.show', [
+        'subjectEnrolled' => $subjectEnrolled,
+        'schedule' => $subjectEnrolled->schedule,
+        'section' => $subjectEnrolled->section,
+        'students' => $students
+    ]);
+}
+   
     
 
     
@@ -230,13 +244,15 @@ public function storeOrUpdateGrades(Request $request, $subjectEnrolledId)
 
         $studentId = $request->student_id;
 
-        // Get the initial SubjectEnrolled record (the teacher's own record)
+        // Get the initial SubjectEnrolled record, now using schedule_id
         $initialSubjectEnrolled = SubjectEnrolled::where('id', $subjectEnrolledId)
-            ->where('teacher_id', $user->employee->id)
+            ->whereHas('schedule', function ($query) use ($user) {
+                $query->where('teacher_id', $user->employee->id);
+            })
             ->firstOrFail();
 
-        // Find the SubjectEnrolled record for the specific student in the same subject, section, semester, and school year
-        $subjectEnrolled = SubjectEnrolled::where('subject_id', $initialSubjectEnrolled->subject_id)
+        // Find the SubjectEnrolled record for the specific student in the same schedule, section, semester, and school year
+        $subjectEnrolled = SubjectEnrolled::where('schedule_id', $initialSubjectEnrolled->schedule_id)
             ->where('section_id', $initialSubjectEnrolled->section_id)
             ->where('semester_id', $initialSubjectEnrolled->semester_id)
             ->where('school_year_id', $initialSubjectEnrolled->school_year_id)
@@ -271,6 +287,7 @@ public function storeOrUpdateGrades(Request $request, $subjectEnrolledId)
 
     return response()->json(['message' => 'Unauthorized'], 403);
 }
+
 
 
 public function importGrades(Request $request)

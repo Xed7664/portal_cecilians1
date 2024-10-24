@@ -57,5 +57,9 @@ class Subject extends Model
     return $this->belongsToMany(Section::class, 'section_subject')
                 ->withPivot('section_id', 'subject_id');
 }
-
+   // A subject can have many schedules
+   public function schedules()
+   {
+       return $this->hasMany(Schedule::class);
+   }
 }
