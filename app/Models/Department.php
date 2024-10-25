@@ -21,4 +21,8 @@ class Department extends Model
     public function subjects(){
         return $this->hasMany(Subject::class);
     }
+    public function prospectus()
+    {
+        return $this->hasMany(SubjectsProspectus::class);
+    }
 }

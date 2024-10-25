@@ -1,0 +1,74 @@
+* {
+    box-sizing: border-box;
+    font-family: "Poppins";
+    font-size: 10px;
+}
+
+main {
+    max-width: 800px;
+    margin: 0 auto;
+    background-color: rgb(245, 245, 245);
+    padding: 30px;
+    padding-bottom: 40px;
+}
+
+.condition {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: start;
+    flex-wrap: wrap;
+    margin-bottom: -10px;
+}
+
+.condition div {
+    line-height: 4px;
+}
+
+.condition div div:last-child {
+    display: flex;
+    flex-direction: column;
+}
+
+.payable {
+    display: flex;
+    gap: 50px;
+    flex-wrap: wrap;
+}
+
+.payable div {
+    line-height: 5px;
+}
+
+.payable div:first-child {
+    padding-left: 50px;
+}
+
+.part-b {
+    line-height: 15px;
+}
+
+.part-b p {
+    margin-bottom: -10px;
+}
+
+.part-b span {
+    padding-left: 10px;
+}
+
+.abc {
+    padding-left: 50px;
+    margin: 0;
+}
+
+.applicant-name p {
+    float: right;
+    border-top: 1px solid;
+}
+
+.separator {
+    width: 100%;
+    border: 1px solid;
+    border-style: dashed;
+    margin-top: 50px;
+}

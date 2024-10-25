@@ -3,7 +3,11 @@
 namespace App\Providers;
 
 use Illuminate\Auth\Events\Registered;
+use Illuminate\Auth\Events\AdmissionApproved;
+use Illuminate\Auth\Events\AdmissionSubmitted;
 use Illuminate\Auth\Listeners\SendEmailVerificationNotification;
+use Illuminate\Auth\Listeners\SendAdmissionApprovedEmail;
+use Illuminate\Auth\Listeners\SendAdmissionSubmittedEmail;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
 use Illuminate\Support\Facades\Event;
 
@@ -17,6 +21,12 @@ class EventServiceProvider extends ServiceProvider
     protected $listen = [
         Registered::class => [
             SendEmailVerificationNotification::class,
+        ],
+        AdmissionApproved::class => [
+            SendAdmissionApprovedEmail::class,
+        ],
+        AdmissionSubmitted::class => [
+            SendAdmissionSubmittedEmail::class,
         ],
     ];
 

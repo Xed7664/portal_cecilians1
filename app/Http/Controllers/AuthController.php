@@ -10,23 +10,29 @@ use App\Services\UserSessionService; // Import the UserSessionService
 
 class AuthController extends Controller
 {
-    function login(Request $request)
+    public function login(Request $request)
     {
         // Validate the login credentials
         $credentials = $request->only('email', 'password');
-
+    
         if (Auth::attempt($credentials)) {
             $user = Auth::user();
-
+    
             // Store user preferences in the session
             UserSessionService::storeUserPreferences($user);
-
-            // Redirect to the dashboard or an appropriate page based on user role
+    
+            // Check if the user is a student and if pre-enrollment is not completed
+            if ($user->type === 'student' && !session('pre_enrollment_completed')) {
+                return redirect()->route('pre-enrollment.form'); // Redirect to the pre-enrollment page
+            }
+    
+            // Otherwise, proceed with the normal login flow
             return redirect()->intended($this->redirectTo($user));
         } else {
             return redirect()->back()->withErrors(['email' => 'Invalid credentials']);
         }
     }
+    
 
     function registration()
     {
@@ -50,26 +56,6 @@ class AuthController extends Controller
         Session::flush();
         Auth::logout();
         return redirect(route('login'));
-    }
-
-    // Method to determine where to redirect users based on their role
-    public function redirectToDashboard()
-    {
-        $user = Auth::user();
-    
-        // Check the user's role and redirect accordingly
-        switch ($user->type) {
-            case 'program_head':
-                return redirect()->route('program-head.dashboard');
-            case 'student':
-                return redirect()->route('student.dashboard');
-            case 'teacher':
-                return redirect()->route('teacher.dashboard');
-            case 'admin':
-                return redirect()->route('admin.dashboard');
-            default:
-                return redirect()->route('login'); // Default redirection if no match
-        }
     }
     
 }

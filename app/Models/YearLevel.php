@@ -19,6 +19,12 @@ class YearLevel extends Model
      {
          return $this->hasMany(SubjectEnrolled::class, 'year_level_id', 'id');
      }
+        // YearLevel.php
+    public function schedules()
+    {
+        return $this->hasMany(Schedule::class, 'year_level_id');
+    }
+
 }
 
 

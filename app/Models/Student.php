@@ -4,28 +4,29 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Notifications\Notifiable; 
 
 class Student extends Model
 {
     use HasFactory;
-
+    use Notifiable;
     protected $table = 'students';
 
     protected $fillable = [
         'StudentID', 'FullName', 'Birthday', 'Gender', 'Address', 'Status',
         'Semester', 'YearLevel', 'Section', 'Major', 'Course', 'Scholarship', 'SchoolYear',
-        'BirthPlace', 'Religion', 'Citizenship', 'Type',
+        'BirthPlace', 'Religion', 'Citizenship', 'Type','father_name','father_occupation','mother_occupation' , 'mother_name','previous_school','previous_school_adress' , 'contact','admission_status','admission_date','pre_enrollment_completed'
     ];
 
     protected $hidden = [
         'Scholarship'
     ];
 
-    // Define the relationship with User
     public function user()
     {
-        return $this->hasOne(User::class, 'student_id', 'StudentID');
+        return $this->belongsTo(User::class, 'StudentID', 'student_id');
     }
+    
 
     // Check if the student is registered
     public function isRegistered()

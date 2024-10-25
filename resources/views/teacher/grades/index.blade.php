@@ -215,168 +215,167 @@
 
 
 <script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const filtersForm = document.getElementById('filters-form');
-        const subjectsContainer = document.getElementById('subjects-container');
-        const loadingSpinner = document.getElementById('loading-spinner');
-        const searchInput = document.createElement('input');
-        const paginationContainer = document.createElement('nav');
-        let cache = {};
-        let currentPage = 1;
-        const itemsPerPage = 3;
-        let filteredSubjects = [];
+  document.addEventListener('DOMContentLoaded', function () {
+    const filtersForm = document.getElementById('filters-form');
+    const subjectsContainer = document.getElementById('subjects-container');
+    const loadingSpinner = document.getElementById('loading-spinner');
+    const searchInput = document.createElement('input');
+    const paginationContainer = document.createElement('nav');
+    let cache = {};
+    let currentPage = 1;
+    const itemsPerPage = 3;
+    let filteredSubjects = [];
 
-        searchInput.type = 'text';
-        searchInput.className = 'form-control mb-3';
-        searchInput.placeholder = 'Search subjects...';
-        subjectsContainer.before(searchInput);
+    searchInput.type = 'text';
+    searchInput.className = 'form-control mb-3';
+    searchInput.placeholder = 'Search subjects...';
+    subjectsContainer.before(searchInput);
 
-        paginationContainer.className = 'd-flex justify-content-center mt-3';
-        subjectsContainer.after(paginationContainer);
+    paginationContainer.className = 'd-flex justify-content-center mt-3';
+    subjectsContainer.after(paginationContainer);
 
-        searchInput.addEventListener('input', () => {
-            const searchTerm = searchInput.value.toLowerCase();
-            if (searchTerm) {
-                filteredSubjects = cache.subjects.filter(subject =>
-                    subject.subject.subject_code.toLowerCase().includes(searchTerm) ||
-                    subject.subject.description.toLowerCase().includes(searchTerm)
-                );
-            } else {
-                filteredSubjects = cache.subjects;
-            }
-            renderSubjects(currentPage);
-        });
+    searchInput.addEventListener('input', () => {
+        const searchTerm = searchInput.value.toLowerCase();
+        if (searchTerm) {
+            filteredSubjects = cache.subjects.filter(subject =>
+                subject.schedule.subject.subject_code.toLowerCase().includes(searchTerm) ||
+                subject.schedule.subject.description.toLowerCase().includes(searchTerm)
+            );
+        } else {
+            filteredSubjects = cache.subjects;
+        }
+        renderSubjects(currentPage);
+    });
 
-        function debounce(func, delay) {
-            let timeout;
-            return function (...args) {
-                clearTimeout(timeout);
-                timeout = setTimeout(() => func.apply(this, args), delay);
-            };
+    function debounce(func, delay) {
+        let timeout;
+        return function (...args) {
+            clearTimeout(timeout);
+            timeout = setTimeout(() => func.apply(this, args), delay);
+        };
+    }
+
+    const fetchSubjects = debounce(function () {
+        const schoolYearId = document.getElementById('school_year_id').value;
+        const semesterId = document.getElementById('semester_id').value;
+        const departmentId = document.getElementById('department').value;
+        const sectionId = document.getElementById('section').value;
+
+        if (!schoolYearId) {
+            displayEmptyMessage('Please select a school year to begin.');
+            return;
         }
 
-        const fetchSubjects = debounce(function () {
-            const schoolYearId = document.getElementById('school_year_id').value;
-            const semesterId = document.getElementById('semester_id').value;
-            const departmentId = document.getElementById('department').value;
-            const sectionId = document.getElementById('section').value;
+        const formData = new FormData(filtersForm);
+        const params = new URLSearchParams(formData).toString();
 
-            if (!schoolYearId) {
-                displayEmptyMessage('Please select a school year to begin.');
-                return;
-            }
+        loadingSpinner.classList.remove('d-none');
 
-            const formData = new FormData(filtersForm);
-            const params = new URLSearchParams(formData).toString();
+        if (cache[params]) {
+            cache.subjects = cache[params];
+            filteredSubjects = cache.subjects;
+            renderSubjects(currentPage);
+            loadingSpinner.classList.add('d-none');
+            return;
+        }
 
-            loadingSpinner.classList.remove('d-none');
-
-            if (cache[params]) {
-                cache.subjects = cache[params];
+        fetch(`{{ route('fetch.subjects') }}?${params}`)
+            .then(response => response.json())
+            .then(data => {
+                cache[params] = data;
+                cache.subjects = data;
                 filteredSubjects = cache.subjects;
                 renderSubjects(currentPage);
                 loadingSpinner.classList.add('d-none');
-                return;
-            }
+            })
+            .catch(error => {
+                console.error('Error fetching subjects:', error);
+                displayEmptyMessage('An error occurred while fetching subjects. Please try again.');
+                loadingSpinner.classList.add('d-none');
+            });
+    }, 300);
 
-            fetch(`{{ route('fetch.subjects') }}?${params}`)
-                .then(response => response.json())
-                .then(data => {
-                    cache[params] = data;
-                    cache.subjects = data;
-                    filteredSubjects = cache.subjects;
-                    renderSubjects(currentPage);
-                    loadingSpinner.classList.add('d-none');
-                })
-                .catch(error => {
-                    console.error('Error fetching subjects:', error);
-                    displayEmptyMessage('An error occurred while fetching subjects. Please try again.');
-                    loadingSpinner.classList.add('d-none');
-                });
-        }, 300);
+    function renderSubjects(page) {
+        subjectsContainer.innerHTML = '';
+        const startIndex = (page - 1) * itemsPerPage;
+        const endIndex = startIndex + itemsPerPage;
+        const paginatedSubjects = filteredSubjects.slice(startIndex, endIndex);
 
-        function renderSubjects(page) {
-            subjectsContainer.innerHTML = '';
-            const startIndex = (page - 1) * itemsPerPage;
-            const endIndex = startIndex + itemsPerPage;
-            const paginatedSubjects = filteredSubjects.slice(startIndex, endIndex);
-
-            if (paginatedSubjects.length === 0) {
-                displayEmptyMessage('No subjects found.');
-                return;
-            }
-
-         
-    const departmentColors = {
-        'BSIT': '#4CAF50',   // Green for BSIT
-        'BSBA': '#FF9800',   // Orange for BSBA
-        'BEED': '#03A9F4',   // Light Blue for BEED
-        // Add more departments and colors here
-    };
-
-    paginatedSubjects.forEach(subject => {
-        // Get the color for the current subject's department
-        const departmentColor = departmentColors[subject.subject.department.code] || '#607D8B'; // Default color if department not in map
-
-        subjectsContainer.innerHTML += `
-            <div class="col-md-4">
-                <div class="card mb-3 shadow-sm subject-card" style="border-left: 5px solid ${departmentColor}; background-color: #f9f9f9; border-radius: 8px;">
-                    <div class="card-header text-white" style="background-color: ${departmentColor}; border-radius: 8px 8px 0 0; padding: 10px;">
-                        <h5 class="card-title mb-0" style="font-size: 1.2rem; font-weight: bold;">
-                            ${subject.subject.department.code} - ${subject.subject.subject_code} - ${subject.section.name}
-                        </h5>
-                    </div>
-                    <div class="card-body" style="padding: 15px;">
-                        <p class="card-text" style="font-size: 1rem; color: #555;">
-                            ${subject.subject.description}
-                        </p>
-                        <a href="/teacher/subject/grades/${subject.id}" class="btn btn-primary btn-view-grades" style="background-color: ${departmentColor}; border: none;">
-                            View Grades
-                        </a>
-                    </div>
-                </div>
-            </div>`;
-    });
-
-
-            updatePagination(filteredSubjects.length);
+        if (paginatedSubjects.length === 0) {
+            displayEmptyMessage('No subjects found.');
+            return;
         }
 
-        function updatePagination(totalItems) {
-            paginationContainer.innerHTML = '';
-            const totalPages = Math.ceil(totalItems / itemsPerPage);
+        const departmentColors = {
+            'BSIT': '#4CAF50',   // Green for BSIT
+            'BSBA': '#FF9800',   // Orange for BSBA
+            'BEED': '#03A9F4',   // Light Blue for BEED
+            // Add more departments and colors here
+        };
 
-            for (let i = 1; i <= totalPages; i++) {
-                const pageLink = document.createElement('button');
-                pageLink.textContent = i;
-                pageLink.className = 'btn btn-secondary mx-1';
-                if (i === currentPage) pageLink.classList.add('active');
+        paginatedSubjects.forEach(subjectEnrolled => {
+            // Get the color for the current subject's department
+            const departmentColor = departmentColors[subjectEnrolled.schedule.subject.department.code] || '#607D8B'; // Default color if department not in map
 
-                pageLink.addEventListener('click', () => {
-                    currentPage = i;
-                    renderSubjects(currentPage);
-                });
-
-                paginationContainer.appendChild(pageLink);
-            }
-        }
-
-        function displayEmptyMessage(message) {
-            subjectsContainer.innerHTML = `
-                <section class="section error-404 min-vh-100 d-flex flex-column align-items-center justify-content-center">
-                    <div class="col-12 text-center">
-                        <p class="fs-6 text-center"><b>${message}</b></p>
-                        <img src="{{ asset('img/svg/no-record.svg') }}" class="img-fluid py-5" alt="No Records Found">
+            subjectsContainer.innerHTML += `
+                <div class="col-md-4">
+                    <div class="card mb-3 shadow-sm subject-card" style="border-left: 5px solid ${departmentColor}; background-color: #f9f9f9; border-radius: 8px;">
+                        <div class="card-header text-white" style="background-color: ${departmentColor}; border-radius: 8px 8px 0 0; padding: 10px;">
+                            <h5 class="card-title mb-0" style="font-size: 1.2rem; font-weight: bold;">
+                                ${subjectEnrolled.schedule.subject.department.code} - ${subjectEnrolled.schedule.subject.subject_code} - ${subjectEnrolled.schedule.section.name}
+                            </h5>
+                        </div>
+                        <div class="card-body" style="padding: 15px;">
+                            <p class="card-text" style="font-size: 1rem; color: #555;">
+                                ${subjectEnrolled.schedule.subject.description}
+                            </p>
+                            <a href="/teacher/subject/grades/${subjectEnrolled.id}" class="btn btn-primary btn-view-grades" style="background-color: ${departmentColor}; border: none;">
+                                View Grades
+                            </a>
+                        </div>
                     </div>
-                </section>`;
-        }
-
-        ['school_year_id', 'semester_id', 'department', 'section'].forEach(id => {
-            document.getElementById(id).addEventListener('change', fetchSubjects);
+                </div>`;
         });
 
-        fetchSubjects();
+        updatePagination(filteredSubjects.length);
+    }
+
+    function updatePagination(totalItems) {
+        paginationContainer.innerHTML = '';
+        const totalPages = Math.ceil(totalItems / itemsPerPage);
+
+        for (let i = 1; i <= totalPages; i++) {
+            const pageLink = document.createElement('button');
+            pageLink.textContent = i;
+            pageLink.className = 'btn btn-secondary mx-1';
+            if (i === currentPage) pageLink.classList.add('active');
+
+            pageLink.addEventListener('click', () => {
+                currentPage = i;
+                renderSubjects(currentPage);
+            });
+
+            paginationContainer.appendChild(pageLink);
+        }
+    }
+
+    function displayEmptyMessage(message) {
+        subjectsContainer.innerHTML = `
+            <section class="section error-404 min-vh-100 d-flex flex-column align-items-center justify-content-center">
+                <div class="col-12 text-center">
+                    <p class="fs-6 text-center"><b>${message}</b></p>
+                    <img src="{{ asset('img/svg/no-record.svg') }}" class="img-fluid py-5" alt="No Records Found">
+                </div>
+            </section>`;
+    }
+
+    ['school_year_id', 'semester_id', 'department', 'section'].forEach(id => {
+        document.getElementById(id).addEventListener('change', fetchSubjects);
     });
+
+    fetchSubjects();
+});
+
 </script>
 
 @endsection

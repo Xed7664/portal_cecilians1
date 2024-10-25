@@ -13,10 +13,63 @@ class PostController extends Controller
     {
         // Fetch trending hashtags
         $trendingHashtags = $this->getTrendingHashtags();
-
-        return view('posts.index', ['trendingHashtags' => $trendingHashtags]);
+       
+        // Assuming the authenticated user is a student
+        $student = auth()->user()->student;
+        
+        // Set dynamic status for the enrollment flow based on the student's data
+        $student->isAdmissionComplete = $this->checkAdmissionStatus($student);  // Example function to check status
+        $student->isDocumentSubmitted = $this->checkDocumentSubmission($student);  // Check document submission status
+        $student->isEnrolled = $this->checkEnrollmentStatus($student);  // Check enrollment status
+        $student->isScheduleAssigned = $this->checkScheduleStatus($student);  // Check if the schedule is assigned
+        $student->isPaymentComplete = $this->checkPaymentStatus($student);  // Check payment completion
+        $student->isConfirmed = $this->checkConfirmationStatus($student);  // Final confirmation
+    
+        // Return the view with both the trending hashtags and student data
+        return view('posts.index', [
+            'trendingHashtags' => $trendingHashtags,
+            'student' => $student // Pass student data to the view
+        ]);
     }
-
+    
+    
+    // Example methods for each step (these would contain your logic)
+    private function checkAdmissionStatus($student)
+    {
+        // Check if the admission process is complete (this logic depends on your database setup)
+        return $student->admission_status === 'complete';  // Example
+    }
+    
+    private function checkDocumentSubmission($student)
+    {
+        // Check if documents have been submitted
+        return $student->documents_submitted === true;  // Example field
+    }
+    
+    private function checkEnrollmentStatus($student)
+    {
+        // Check if the student is officially enrolled
+        return $student->is_enrolled;  // Example field
+    }
+    
+    private function checkScheduleStatus($student)
+    {
+        // Check if the schedule has been assigned
+        return $student->schedule_assigned === true;  // Example field
+    }
+    
+    private function checkPaymentStatus($student)
+    {
+        // Check if payment has been completed
+        return $student->payment_status === 'completed';  // Example field
+    }
+    
+    private function checkConfirmationStatus($student)
+    {
+        // Check if enrollment confirmation is done
+        return $student->is_confirmed === true;  // Example field
+    }
+    
      // Helper function to merge and sort multiple collections
      private function mergeAndSort($collections, $sortBy)
      {

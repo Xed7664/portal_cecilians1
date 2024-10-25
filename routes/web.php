@@ -20,6 +20,8 @@ use App\Http\Controllers\EnrollmentController;
 use App\Http\Controllers\{StudentController, TeacherController, ProgramHeadController, AdminController};
 use App\Http\Controllers\WelcomeController;
 use App\Providers\RouteServiceProvider;
+use App\Http\Controllers\AdmissionController;
+use App\Http\Controllers\PreEnrollmentController;
 
 // First Page Route
 Route::get('/welcome', [WelcomeController::class, 'index'])->name('welcome');
@@ -31,12 +33,29 @@ Route::get('/', function () {
 
 // Authentication routes
 Route::get('/auth/login', function () {
-    // Check if the user is already authenticated
-    if (Auth::check()) {
-        return redirect()->route('newsfeed'); // or any other authenticated route
-    }
+    // Just show the login view
     return view('auths.login');
 })->name('login');
+
+Route::middleware('auth')->group(function() {
+    Route::get('/pre-enrollment', [PreEnrollmentController::class, 'showForm'])->name('pre-enrollment.form');
+    // routes/web.php
+Route::get('/pre-enrollment/preview', [PreEnrollmentController::class, 'preview'])->name('pre-enrollment.preview');
+Route::post('/pre-enrollment/submit', [PreEnrollmentController::class, 'submitPreEnrollment'])->name('pre-enrollment.submit');
+
+
+    Route::get('/pre-enrollment/dashboard', [PreEnrollmentController::class, 'previewForm'])->name('pre-enrollment.dashboard');
+});
+Route::get('/get-schedules', [PreEnrollmentController::class, 'getSchedules'])->name('get-schedules');
+Route::get('/enrollment-status', [PreEnrollmentController::class, 'showStatus'])->name('enrollment.enrollment-status');
+// web.php
+Route::get('admission', [AdmissionController::class, 'showAdmissionForm'])->name('admission.form');
+Route::post('admission', [AdmissionController::class, 'submitAdmission'])->name('admission.submit');
+Route::get('admission-status', [AdmissionController::class, 'showStatusForm'])->name('admission.status.form');
+Route::post('admission-status', [AdmissionController::class, 'checkStatus'])->name('admission.status.check');
+Route::get('admission/tracker', [AdmissionController::class, 'showTracker'])->name('admission.tracker');
+Route::post('admission/tracker', [AdmissionController::class, 'trackAdmission']);
+
 
 
 // Role-specific home routes
@@ -176,14 +195,7 @@ Route::post('/teacher/grades/{subjectEnrolled}/mark-ready', [GradeController::cl
 
 
 
-    //  Route::middleware(['auth'])->group(function () {
-    //     Route::post('/ajax/set-school-year', [AjaxController::class, 'setSchoolYear'])->name('ajax.setSchoolYear');
-    //     Route::post('/ajax/set-semester', [AjaxController::class, 'setSemester'])->name('ajax.setSemester');
-    // });
-            // Student Routes
-            // Route::get('/student/grades', [GradeController::class, 'studentIndex'])->name('student.grades.index');
-            // Route::get('/student/grades/{semester}', [GradeController::class, 'studentShow'])->name('student.grades.show');
-            // Route::get('/student/grades/ajax/{semester}', [GradeController::class, 'getGradesBySemester'])->name('student.grades.ajax');
+
              // Route for Grades for students
     Route::get('/student/grades', [GradeController::class, 'studentIndex'])->name('student.grades.index');
     Route::get('/student/grades/{studentId}', [GradeController::class, 'showAllGradesForStudent'])->name('student.grades.all');
@@ -261,6 +273,7 @@ Route::post('/teacher/grades/{subjectEnrolled}/mark-ready', [GradeController::cl
         return view('livewire');
     });
 
+
     // Admin routes
     Route::prefix('admin/user')->group(function () {
         Route::get('/registered', [AdminUserController::class, 'index'])->name('admin.users.registered');
@@ -285,6 +298,11 @@ Route::post('/teacher/grades/{subjectEnrolled}/mark-ready', [GradeController::cl
         // Admin analytics
 
         Route::get('/analytics/logins', [AdminLoginController::class, 'index'])->name('admin.analytics.login');
+        Route::get('admin/admission/{id}/review', [AdmissionController::class, 'reviewAdmission'])->name('admin.admission.review');
+Route::post('admin/admission/{id}/approve', [AdmissionController::class, 'approveAdmission'])->name('admin.admission.approve');
+Route::post('admin/admissions/{id}/reject', [AdmissionController::class, 'rejectAdmission'])->name('admin.admissions.reject');
+// In web.php (new route)
+Route::get('admin/admissions', [AdmissionController::class, 'index'])->name('admin.admissions.index');
     });
 
 
