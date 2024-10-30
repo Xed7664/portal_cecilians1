@@ -13,22 +13,51 @@ class PostController extends Controller
     {
         // Fetch trending hashtags
         $trendingHashtags = $this->getTrendingHashtags();
-       
-        // Assuming the authenticated user is a student
-        $student = auth()->user()->student;
-        
-        // Set dynamic status for the enrollment flow based on the student's data
-        $student->isAdmissionComplete = $this->checkAdmissionStatus($student);  // Example function to check status
-        $student->isDocumentSubmitted = $this->checkDocumentSubmission($student);  // Check document submission status
-        $student->isEnrolled = $this->checkEnrollmentStatus($student);  // Check enrollment status
-        $student->isScheduleAssigned = $this->checkScheduleStatus($student);  // Check if the schedule is assigned
-        $student->isPaymentComplete = $this->checkPaymentStatus($student);  // Check payment completion
-        $student->isConfirmed = $this->checkConfirmationStatus($student);  // Final confirmation
     
-        // Return the view with both the trending hashtags and student data
+        // Check the type of the authenticated user and handle each type accordingly
+        $user = auth()->user();
+    
+        // Handle based on user type
+        if ($user->type === 'student') {
+            $student = $user->student;
+    
+            if ($student) {
+                // Set dynamic status for the enrollment flow based on the student's data
+                $student->isAdmissionComplete = $this->checkAdmissionStatus($student);
+                $student->isDocumentSubmitted = $this->checkDocumentSubmission($student);
+                $student->isEnrolled = $this->checkEnrollmentStatus($student);
+                $student->isScheduleAssigned = $this->checkScheduleStatus($student);
+                $student->isPaymentComplete = $this->checkPaymentStatus($student);
+                $student->isConfirmed = $this->checkConfirmationStatus($student);
+            }
+    
+            return view('posts.index', [
+                'trendingHashtags' => $trendingHashtags,
+                'student' => $student
+            ]);
+        } elseif ($user->type === 'teacher') {
+            $teacher = $user->employee;
+            return view('posts.index', [
+                'trendingHashtags' => $trendingHashtags,
+                'teacher' => $teacher
+            ]);
+        } elseif ($user->type === 'program_head') {
+            $programHead = $user->employee;
+            return view('posts.index', [
+                'trendingHashtags' => $trendingHashtags,
+                'programHead' => $programHead
+            ]);
+        } elseif ($user->type === 'admin') {
+            $admin = $user->employee;
+            return view('posts.index', [
+                'trendingHashtags' => $trendingHashtags,
+                'admin' => $admin
+            ]);
+        }
+    
+        // Default view if user type is not matched
         return view('posts.index', [
             'trendingHashtags' => $trendingHashtags,
-            'student' => $student // Pass student data to the view
         ]);
     }
     

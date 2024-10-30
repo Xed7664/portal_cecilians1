@@ -1,4 +1,4 @@
-    {{-- resources/views/pre-enrollment/form.blade.php --}}
+{{-- resources/views/pre-enrollment/form.blade.php --}}
     @extends('layouts.app')
 
     @section('title', 'Pre-Enrollment')
@@ -17,7 +17,7 @@
         </div><!-- End Page Title -->
         <div class="container">
             <!-- Progress Bar -->
-            <div class="progress mb-4">
+            <div class="progress mb-4" style="height: 50px">
                 <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="width: 12%" id="progressBar">
                     Step 1 of 3
                 </div>

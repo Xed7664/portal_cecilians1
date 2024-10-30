@@ -91,8 +91,8 @@
                 <p>(<span> </span>) Irregular</p>
             </div>
             <div>
-                <p>Year<span class="span-year">:<span class="u-year">4th</span></span></p>
-                <p>Program<span class="span-program">:<span class="u-program">BSIT</span></span></p>
+                <p>Year<span class="span-year">:<span class="u-year">{{ $program }}</span></span></p>
+                <p>Program<span class="span-program">:<span class="u-program">{{ $yearLevel }}</span></span></p>
             </div>
         </div>
         <!-- end of academic-stat -->
@@ -104,7 +104,7 @@
                     <tr>
                         <td><b>Name:</b></td>
                         <td>Aniñon</td>
-                        <td>Mark Eliezon</td>
+                        <td>{{ $student->FullName }}</td>
                         <td>Ugsimar</td>
                         <td></td>
                         <td><b>Mobile No:</b> <span>09506832656</span></td>
@@ -116,10 +116,10 @@
                         <td>Middle Name</td>
                     </tr>
                     <tr>
-                        <td><b>Date of Birth:</b><span> 2000</span></td>
+                        <td><b>Date of Birth:</b><span> {{ $student->Birthday }}</span></td>
                         <td><b>Month:</b> <span>December</span></td>
                         <td><b>Day:</b> <span>12</span></td>
-                        <td><b>Sex:</b> <span>Male</span></td>
+                        <td><b>Sex:</b> <span> {{ $student->Gender }}</span></td>
                         <td><b>Religion:</b> <span>Catholic</span></td>
                         <td><b>Status:</b> <span>Single</span></td>
                     </tr>
