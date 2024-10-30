@@ -45,7 +45,10 @@ class Student extends Model
     {
         return $this->belongsTo(Department::class, 'Course', 'id');
     }
-
+    public function program()
+    {
+        return $this->belongsTo(Department::class, 'program_id'); // Adjust 'program_id' if needed
+    }
     // Define the relationship with the Section (if needed)
     public function section()
     {

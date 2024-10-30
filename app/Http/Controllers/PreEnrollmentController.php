@@ -17,6 +17,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Notifications\Notifiable;
 use App\Mail\PreEnrollmentConfirmation;
 use Illuminate\Support\Facades\Mail;
+use Barryvdh\DomPDF\Facade\Pdf; // Import the Pdf facade here
 
 class PreEnrollmentController extends Controller
 {
@@ -152,49 +153,70 @@ public function submitPreEnrollment(Request $request)
         'previous_school_adress' => $request->input('prevschooladdress'),
         'contact' => $request->input('contact'),
     ]);
+      // Fetch the selected program and year level
+      $selectedProgram = Department::find($request->input('program'));  // Fetch program by ID
+      $selectedYearLevel = $request->input('year_level');  // Get year level directly from request
+  
+      // Fetch the chosen schedule based on the selected schedule ID
+      $schedule = Schedule::find($request->input('schedule'));
+     // Retrieve the semester and school year based on the selected schedule
+     $semester = Semester::find($schedule->semester_id); // Fetch semester model
+     $schoolYear = SchoolYear::find($schedule->school_year_id); // Fetch school year model
+      // Find the corresponding prospectus using the schedule's subject, program, and year level
+      $prospectus = SubjectsProspectus::where('program_id', $schedule->program_id)
+                      ->where('year_level_id', $schedule->year_level_id)
+                      ->where('subject_id', $schedule->subject_id)
+                      ->first();
+  
+      if (!$prospectus) {
+          // Handle the case where no prospectus entry exists for the selected schedule
+          return redirect()->back()->with('error', 'No prospectus entry found for the selected schedule.');
+      }
+  
+      // Insert into subjects_enrolled with the prospectus_id based on the chosen schedule
+      DB::table('subjects_enrolled')->insert([
+          'student_id' => $student->id,
+          'subject_id' => $schedule->subject_id,
+          'section_id' => $schedule->section_id,
+          'schedule_id' => $schedule->id,
+          'semester_id' => $schedule->semester_id,
+          'school_year_id' => $schedule->school_year_id,
+          'year_level_id' => $schedule->year_level_id,
+          'prospectus_id' => $prospectus->id, // Include prospectus_id based on schedule
+          'created_at' => now(),
+          'updated_at' => now(),
+      ]);
+  
+      // Generate a unique reference code for the pre-enrollment
+      $enrollmentReferenceCode = 'REF' . strtoupper(uniqid());
+      $pdf = Pdf::loadView('pdf.pre_enrollment', [
+        'student' => $student,
+        'referenceCode' => $enrollmentReferenceCode,
+        'program' => $selectedProgram->name,
+        'yearLevel' => $selectedYearLevel,
+        'semester' => $semester->name,
+        'schoolYear' => $schoolYear->name,
+    ])
+    ->setPaper([0, 0, 612, 1008], 'portrait') // Approx 8.5 x 13 inches
+    ->setOption('margin-top', 5)
+    ->setOption('margin-right', 5)
+    ->setOption('margin-bottom', 5)
+    ->setOption('margin-left', 5);
 
-    // Fetch the chosen schedule based on the selected schedule ID
-    $schedule = Schedule::find($request->input('schedule'));
-
-    // Find the corresponding prospectus using the schedule's subject, program, and year level
-    $prospectus = SubjectsProspectus::where('program_id', $schedule->program_id)
-                    ->where('year_level_id', $schedule->year_level_id)
-                    ->where('subject_id', $schedule->subject_id)
-                    ->first();
-
-    if (!$prospectus) {
-        // Handle the case where no prospectus entry exists for the selected schedule
-        return redirect()->back()->with('error', 'No prospectus entry found for the selected schedule.');
-    }
-
-    // Insert into subjects_enrolled with the prospectus_id based on the chosen schedule
-    DB::table('subjects_enrolled')->insert([
-        'student_id' => $student->id,
-        'subject_id' => $schedule->subject_id,
-        'section_id' => $schedule->section_id,
-        'schedule_id' => $schedule->id,
-        'semester_id' => $schedule->semester_id,
-        'school_year_id' => $schedule->school_year_id,
-        'year_level_id' => $schedule->year_level_id,
-        'prospectus_id' => $prospectus->id, // Include prospectus_id based on schedule
-        'created_at' => now(),
-        'updated_at' => now(),
-    ]);
-
-    // Generate a unique reference code for the pre-enrollment
-    $enrollmentReferenceCode = 'REF' . strtoupper(uniqid());
-
-    // Notify the student (user) about the pre-enrollment
-    $notification = new PreEnrollmentSubmittedNotification($enrollmentReferenceCode);
-    $student->user->notify($notification); // Notify the related user
-
-    // Store the notification manually in portal_notifications and user_portal_notifications
-    $notification->storeInPortalNotifications($student);
-
-    // Redirect with a success message
-    return redirect()->route('pre-enrollment.form')->with('success', 'Pre-enrollment details have been successfully updated.');
-}
-
+  
+      // Send email with PDF attachment
+      Mail::to($student->user->email)->send(new PreEnrollmentConfirmation($student, $enrollmentReferenceCode, $pdf));
+  
+      // Notify the student (user) about the pre-enrollment
+      $notification = new PreEnrollmentSubmittedNotification($enrollmentReferenceCode);
+      $student->user->notify($notification); // Notify the related user
+  
+      // Store the notification manually in portal_notifications and user_portal_notifications
+      $notification->storeInPortalNotifications($student);
+  
+      // Redirect with a success message
+      return redirect()->route('pre-enrollment.form')->with('success', 'Pre-enrollment details have been successfully updated.');
+  }
 
 public function preview(Request $request)  
 {
@@ -243,8 +265,7 @@ public function preview(Request $request)
         'selectedStatus',
         'selectedBirthPlace',
         'selectedAddress',
-        'selectedProgram',
-        'selectedYearLevel',
+        
         'selectedSemester',
         'selectedSchoolYear',
         'selectedGender',
