@@ -16,6 +16,12 @@ class Schedule extends Model
         return $this->belongsTo(Subject::class);
     }
 
+    
+    // Define the inverse relationship with Department
+    public function department()
+    {
+        return $this->belongsTo(Department::class, 'program_id');
+    }
     // A schedule belongs to one teacher (employee)
     public function teacher()
     {
@@ -55,4 +61,9 @@ class Schedule extends Model
     {
         return $this->hasMany(SubjectEnrolled::class, 'schedule_id');
     }
+    public function schedule()
+{
+    return $this->hasOne(Schedule::class, 'subject_id');
+}
+
 }

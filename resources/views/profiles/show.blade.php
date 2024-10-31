@@ -41,29 +41,29 @@
               </li>
               @if($user->type === 'student')
                 <li class="d-flex align-items-center mb-3">
-                  <i class="bx bxs-school"></i>
-                  <span class="fw-medium mx-2">Degree Program:</span> 
-                  <span class="fw-light">{{ $user->student->Course }}</span>
+                    <i class="bx bxs-school"></i>
+                    <span class="fw-medium mx-2">Degree Program:</span> 
+                    <span class="fw-light">{{ Auth::user()->program_code }}</span>
                 </li>
                 <li class="d-flex align-items-center mb-3">
-                  <i class="bx bx-book-content"></i>
-                  <span class="fw-medium mx-2">Year Level:</span> 
-                  <span class="fw-light">{{ $user->student->YearLevel }}</span>
+                    <i class="bx bx-book-content"></i>
+                    <span class="fw-medium mx-2">Year Level:</span> 
+                    <span class="fw-light">{{ $user->student->yearLevel->name ?? 'No Year Level' }}</span>
                 </li>
                 <li class="d-flex align-items-center mb-3">
-                  <i class="bx bx-label"></i>
-                  <span class="fw-medium mx-2">Section:</span> 
-                  <span class="fw-light">{{ $user->student->Section ?? 'No Section' }}</span>
+                    <i class="bx bx-label"></i>
+                    <span class="fw-medium mx-2">Section:</span> 
+                    <span class="fw-light">{{ $user->student->section->name ?? 'No Section' }}</span>
                 </li>
                 <li class="d-flex align-items-center mb-3">
-                  <i class="bx bx-user-check"></i>
-                  <span class="fw-medium mx-2">Major:</span> 
-                  <span class="fw-light">{{ $user->student->Major ?? 'No Major' }}</span>
+                    <i class="bx bx-user-check"></i>
+                    <span class="fw-medium mx-2">Major:</span> 
+                    <span class="fw-light">{{ $user->student->Major ?? 'No Major' }}</span>
                 </li>
                 <li class="d-flex align-items-center mb-3">
                   <i class="bx bx-infinite"></i>
                   <span class="fw-medium mx-2">Status:</span> 
-                  <span class="fw-light">{{ $user->student->Status ?? 'No Major' }}</span>
+                  <span class="fw-light">{{ $user->student->Status ?? 'No Status' }}</span>
                 </li>
               @endif
             </ul>

@@ -25,11 +25,6 @@ class SubjectEnrolled extends Model
         return $this->belongsTo(Subject::class, 'subject_id');
     }
 
-    public function semester()
-    {
-        return $this->belongsTo(Semester::class, 'semester_id', 'id');
-    }
-
     public function schoolYear()
         {
             return $this->belongsTo(SchoolYear::class, 'school_year_id', 'id');
@@ -50,12 +45,19 @@ class SubjectEnrolled extends Model
             return $this->belongsTo(YearLevel::class, 'year_level_id', 'id');
         }
         // Define the relationship to the Department model
-    public function department()
-    {
-        return $this->belongsTo(Department::class);
-    }
-    public function schedule()
-    {
-        return $this->belongsTo(Schedule::class);
-    }
+        public function department()
+        {
+            return $this->hasOneThrough(Department::class, Schedule::class, 'id', 'id', 'schedule_id', 'program_id');
+        }
+        
+        public function semester()
+        {
+            return $this->hasOneThrough(Semester::class, Schedule::class, 'id', 'id', 'schedule_id', 'semester_id');
+        }
+        
+        public function schedule()
+        {
+            return $this->belongsTo(Schedule::class, 'schedule_id');
+        }
+        
 }

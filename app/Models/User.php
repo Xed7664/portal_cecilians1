@@ -292,5 +292,9 @@ class User extends Authenticatable implements MustVerifyEmail
             ->whereNull('read_at')
             ->count();
     }
-
+    public function getProgramCodeAttribute()
+    {
+        return $this->student?->program?->code;
+    }
+    
 }

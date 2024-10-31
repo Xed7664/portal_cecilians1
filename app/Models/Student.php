@@ -40,20 +40,20 @@ class Student extends Model
         return $this->hasMany(SubjectEnrolled::class);
     }
 
-    // Define the relationship with Department
-    public function department()
-    {
-        return $this->belongsTo(Department::class, 'Course', 'id');
-    }
     public function program()
     {
-        return $this->belongsTo(Department::class, 'program_id'); // Adjust 'program_id' if needed
+        return $this->belongsTo(Department::class, 'program_id','id'); // Adjust 'program_id' if needed
     }
-    // Define the relationship with the Section (if needed)
     public function section()
     {
-        return $this->belongsTo(Section::class, 'Section', 'id');
+        return $this->belongsTo(Section::class, 'section_id', 'id');
     }
+    
+    public function yearLevel()
+    {
+        return $this->belongsTo(YearLevel::class, 'year_level_id', 'id');
+    }
+    
 
     // You can also add a relationship for Semester if needed
     public function semester()

@@ -307,34 +307,34 @@
         }
 
         const departmentColors = {
-            'BSIT': '#4CAF50',   // Green for BSIT
-            'BSBA': '#FF9800',   // Orange for BSBA
-            'BEED': '#03A9F4',   // Light Blue for BEED
-            // Add more departments and colors here
-        };
+    'BSIT': '#4CAF50',   // Green for BSIT
+    'BSBA': '#FF9800',   // Orange for BSBA
+    'BEED': '#03A9F4',   // Light Blue for BEED
+    // Add more departments and colors here
+};
 
-        paginatedSubjects.forEach(subjectEnrolled => {
-            // Get the color for the current subject's department
-            const departmentColor = departmentColors[subjectEnrolled.schedule.subject.department.code] || '#607D8B'; // Default color if department not in map
+paginatedSubjects.forEach(subjectEnrolled => {
+    // Access the department code from schedule.program
+    const departmentColor = departmentColors[subjectEnrolled.schedule.program.code] || '#607D8B'; // Default color if department not in map
 
-            subjectsContainer.innerHTML += `
-                <div class="col-md-4">
-                    <div class="card mb-3 shadow-sm subject-card" style="border-left: 5px solid ${departmentColor}; background-color: #f9f9f9; border-radius: 8px;">
-                        <div class="card-header text-white" style="background-color: ${departmentColor}; border-radius: 8px 8px 0 0; padding: 10px;">
-                            <h5 class="card-title mb-0" style="font-size: 1.2rem; font-weight: bold;">
-                                ${subjectEnrolled.schedule.subject.department.code} - ${subjectEnrolled.schedule.subject.subject_code} - ${subjectEnrolled.schedule.section.name}
-                            </h5>
-                        </div>
-                        <div class="card-body" style="padding: 15px;">
-                            <p class="card-text" style="font-size: 1rem; color: #555;">
-                                ${subjectEnrolled.schedule.subject.description}
-                            </p>
-                            <a href="/teacher/subject/grades/${subjectEnrolled.id}" class="btn btn-primary btn-view-grades" style="background-color: ${departmentColor}; border: none;">
-                                View Grades
-                            </a>
-                        </div>
-                    </div>
-                </div>`;
+    subjectsContainer.innerHTML += `
+        <div class="col-md-4">
+            <div class="card mb-3 shadow-sm subject-card" style="border-left: 5px solid ${departmentColor}; background-color: #f9f9f9; border-radius: 8px;">
+                <div class="card-header text-white" style="background-color: ${departmentColor}; border-radius: 8px 8px 0 0; padding: 10px;">
+                    <h5 class="card-title mb-0" style="font-size: 1.2rem; font-weight: bold;">
+                        ${subjectEnrolled.schedule.program.code} - ${subjectEnrolled.schedule.subject.subject_code} - ${subjectEnrolled.schedule.section.name}
+                    </h5>
+                </div>
+                <div class="card-body" style="padding: 15px;">
+                    <p class="card-text" style="font-size: 1rem; color: #555;">
+                        ${subjectEnrolled.schedule.subject.description}
+                    </p>
+                    <a href="/teacher/subject/grades/${subjectEnrolled.id}" class="btn btn-primary btn-view-grades" style="background-color: ${departmentColor}; border: none;">
+                        View Grades
+                    </a>
+                </div>
+            </div>
+        </div>`;
         });
 
         updatePagination(filteredSubjects.length);
