@@ -81,7 +81,7 @@
                       @if ($currentPosition != null)
                           <small class="text-muted">{{ $currentPosition->name }}</small>
                       @else
-                          <small class="text-muted">{{ Auth::user()->student->Course }}</small>
+                         <small class="text-muted">{{ Auth::user()->program_code }}</small>
                       @endif
 
                   @elseif (Auth::user()->type == 'program_head' && Auth::user()->employee)

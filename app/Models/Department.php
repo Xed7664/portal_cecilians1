@@ -25,4 +25,9 @@ class Department extends Model
     {
         return $this->hasMany(SubjectsProspectus::class);
     }
+    public function schedules()
+    {
+        return $this->hasMany(Schedule::class, 'program_id', 'id');
+    }
+    
 }

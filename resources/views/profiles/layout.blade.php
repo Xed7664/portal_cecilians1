@@ -32,7 +32,7 @@
                         @if($user->type === 'student')
                         <li class="list-inline-item d-flex gap-1">
                           <i class="bx bxs-school mt-1"></i> 
-                          <span class="fw-light"><b>{{ $user->student->Course }}</b> Department</span>
+                          <span class="fw-light"><b>{{ Auth::user()->program_code }}</b> Department</span>
                         </li>
                         @else
                         <li class="list-inline-item d-flex gap-1">
