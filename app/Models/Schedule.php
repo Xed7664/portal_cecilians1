@@ -8,25 +8,13 @@ class Schedule extends Model
 {
     use HasFactory;
 
-    // Define relationships
-
-    // A schedule belongs to one subject
-    public function subject()
-    {
-        return $this->belongsTo(Subject::class);
-    }
-
     
     // Define the inverse relationship with Department
     public function department()
     {
         return $this->belongsTo(Department::class, 'program_id');
     }
-    // A schedule belongs to one teacher (employee)
-    public function teacher()
-    {
-        return $this->belongsTo(Employee::class, 'teacher_id');
-    }
+
 
     // A schedule belongs to one section
     public function section()
@@ -61,9 +49,16 @@ class Schedule extends Model
     {
         return $this->hasMany(SubjectEnrolled::class, 'schedule_id');
     }
-    public function schedule()
+ // In Schedule.php
+public function subject()
 {
-    return $this->hasOne(Schedule::class, 'subject_id');
+    return $this->belongsTo(Subject::class);
 }
+
+public function teacher()
+{
+    return $this->belongsTo(Employee::class, 'teacher_id');
+}
+
 
 }

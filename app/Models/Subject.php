@@ -57,10 +57,11 @@ class Subject extends Model
     return $this->belongsToMany(Section::class, 'section_subject')
                 ->withPivot('section_id', 'subject_id');
 }
-// In the Subject model
-public function schedule()
+// In Subject.php
+public function schedules()
 {
-    return $this->hasOne(Schedule::class, 'subject_id');
+    return $this->hasMany(Schedule::class);
 }
+
 
 }
