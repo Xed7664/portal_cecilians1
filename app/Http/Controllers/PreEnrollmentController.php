@@ -108,10 +108,13 @@ private function getUncompletedSubjects($student)
         ->where('semester_id', $currentSemester->id)
         ->whereDoesntHave('subject.schedules.enrollments', function ($query) use ($student) {
             $query->where('student_id', $student->id)
-                  ->whereNotNull('final_grade'); // Ensure final grade is set
+                  ->whereHas('grades', function ($subQuery) {
+                      $subQuery->whereNotNull('final'); // Ensure final grade is set
+                  });
         })
         ->get();
 }
+
 public function submitPreEnrollment(Request $request)
 {
     // Validate incoming request data
