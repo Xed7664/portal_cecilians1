@@ -18,11 +18,15 @@ class UserController extends Controller
 {
     public function index()
     {
-        // Logic for registered users
-        $data = User::get();
-        return view('admin.users.registered', ['userType' => 'registered', 'data' => $data]);
+        // Eager load the related student, program, and year level data
+        $data = User::with('student.program', 'student.yearLevel')->get();
+    
+        return view('admin.users.registered', [
+            'userType' => 'registered',
+            'data' => $data
+        ]);
     }
-
+    
 
 
 }

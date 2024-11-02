@@ -68,7 +68,9 @@ use App\Models\User;
 
 
 
+@if(in_array($currentRoute, ['admin.users.student']))
 <link href="{{ asset('vendor/dropzone/dropzone.css') }}" rel="stylesheet">
+  @endif
 <!-- Font Awesome CDN -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
   @if(in_array($currentRoute, ['account.show']))
@@ -183,9 +185,11 @@ use App\Models\User;
   <script src="{{ asset('vendor/bs-stepper/bs-stepper.js') }}"></script>
 
   <script src="{{ asset('vendor/datatables/datatables.min.js') }}"></script>
-  <script src="{{ asset('js/dropzone.js') }}"></script>
  
+  @if(in_array($currentRoute, ['admin.users.student']))
   <script src="{{ asset('vendor/dropzone/dropzone.js') }}"></script>
+  <script src="{{ asset('js/dropzone.js') }}"></script>
+  @endif
  
   @if(in_array($currentRoute, ['schedule.index']))
   <script src="{{ asset('vendor/schedule/util.js') }}"></script>

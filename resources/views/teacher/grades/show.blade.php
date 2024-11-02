@@ -14,9 +14,6 @@
         </nav>
     </div>
 
-  
-
-
     <div class="card mb-4">
     <div class="user-profile-header-banner">
         <img src="{{ asset('assets/images/finalhomebg11.png') }}" alt="Banner image" class="rounded-top">
@@ -61,7 +58,7 @@
     <form id="gradesForm" action="{{ route('teacher.grades.storeOrUpdate', $subjectEnrolled->id) }}" method="POST">
         @csrf
         <!-- Add Bootstrap's table-responsive class -->
-        <div class="table-responsive">
+        <div class="table-responsive"  style="padding-bottom: 50px;">
             <table class="table table-bordered table-hover" id="gradesTable">
                 <thead class="table-danger">
                     <tr>

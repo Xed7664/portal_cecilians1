@@ -6,18 +6,30 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 use Carbon\Exceptions\InvalidFormatException;
-use App\Models\{User, Student, Subject, SubjectEnrolled, SchoolYear, Semester};
+use App\Models\{
+    User,
+    Student,
+    Subject,
+    SubjectEnrolled,
+    SchoolYear,
+    Semester,
+    Schedule,
+    Department,
+    YearLevel,
+    Section
+};
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use Illuminate\Support\Facades\Validator;
+
 
 class StudentController extends Controller
 {
     public function index()
     {
-        $data = Student::all();
+        $data = Student::with('program')->get(); // Load the program relationship
         return view('admin.users.student', ['userType' => 'student', 'data' => $data]);
     }
-
+    
     public function checkFile(Request $request)
     {
         // Check if files were uploaded
@@ -333,10 +345,48 @@ class StudentController extends Controller
 
                                 // Check if the gender value exists in the map, if not, keep the original value
                                 $gender = isset($genderMap[$gender]) ? $genderMap[$gender] : $gender;
+                                // Mapping arrays for data normalization
+                                $semesterMap = [
+                                    '1st Semester' => '1st',
+                                    '2nd Semester' => '2nd',
+                                    'Summer Semester' => 'Summer',
+                                    '1st' => '1st',
+                                    '2nd' => '2nd',
+                                    'Summer' => 'Summer',
+                                ];
+                                $sectionMap = [
+                                    '2A' => 'A',
+                                    '2B' => 'B',
+                                    // Add other mappings as needed
+                                ];
 
+                                $programMap = [
+                                    'BSIT' => 'BSIT',
+                                    'BSBA' => 'BSBA',
+                                    // Continue mapping for other programs if necessary
+                                ];
+
+                                // Normalize values from the file for Semester and Section
+                                $semesterName = $semesterMap[$rowData[41]] ?? $rowData[41];
+                                $sectionName = $sectionMap[$rowData[43]] ?? $rowData[43];
+                                $programCode = $programMap[$rowData[45]] ?? $rowData[45];
+
+                                // Look up or create school year, semester, and other FK records
+                                $schoolYearModel = SchoolYear::firstOrCreate(['name' => $rowData[46]]);
+                                $semesterModel = Semester::firstOrCreate(['name' => $semesterName, 'school_year_id' => $schoolYearModel->id]);
+                                $yearLevelModel = YearLevel::firstOrCreate(['name' => $rowData[42]]);
+                                $sectionModel = Section::firstOrCreate(['name' => $sectionName]);
+                                $programModel = Department::firstOrCreate(['code'=>$programCode]);
+
+                                if ($programModel === null) {
+                                    // Handle missing program if necessary
+                                    $programModel = new Department(['code' => $programCode]); // Example placeholder
+                                }
+
+                                // Check if the student already exists
                                 if ($currentStudent) {
-                                    // Update the existing Student record
-                                    $parts = explode(', ', $rowData[1]); // Split the name into parts at the comma and space
+                                    // Update existing student
+                                    $parts = explode(', ', $rowData[1]);
                                     $formattedName = ucfirst(strtolower($parts[0])) . ', ' . ucwords(strtolower($parts[1]));
 
                                     $currentStudent->FullName = $formattedName;
@@ -344,24 +394,24 @@ class StudentController extends Controller
                                     $currentStudent->Gender = $gender;
                                     $currentStudent->Address = $rowData[18];
                                     $currentStudent->Status = $rowData[39];
-                                    $currentStudent->Semester = $rowData[41];
-                                    $currentStudent->YearLevel = $rowData[42];
-                                    $currentStudent->Section = $rowData[43];
+                                    $currentStudent->semester_id = $semesterModel->id;
+                                    $currentStudent->year_level_id = $yearLevelModel->id;
+                                    $currentStudent->section_id = $sectionModel->id;
+                                    $currentStudent->program_id = $programModel->id;
                                     $currentStudent->Major = $rowData[44];
-                                    $currentStudent->Course = $course;
                                     $currentStudent->Scholarship = $rowData[49];
-                                    $currentStudent->SchoolYear = $rowData[46];
+                                    $currentStudent->school_year_id = $schoolYearModel->id;
                                     $currentStudent->BirthPlace = $rowData[14];
                                     $currentStudent->Religion = $rowData[16];
                                     $currentStudent->Citizenship = $rowData[17];
                                     $currentStudent->Type = $rowData[47];
                                     $currentStudent->save();
                                 } else {
-                                    // Create a new Student record
+                                    // Create new student
                                     $currentStudent = new Student();
                                     $currentStudent->StudentID = $rowData[0];
 
-                                    $parts = explode(', ', $rowData[1]); // Split the name into parts at the comma and space
+                                    $parts = explode(', ', $rowData[1]);
                                     $formattedName = ucfirst(strtolower($parts[0])) . ', ' . ucwords(strtolower($parts[1]));
 
                                     $currentStudent->FullName = $formattedName;
@@ -369,13 +419,13 @@ class StudentController extends Controller
                                     $currentStudent->Gender = $gender;
                                     $currentStudent->Address = $rowData[18];
                                     $currentStudent->Status = $rowData[39];
-                                    $currentStudent->Semester = $rowData[41];
-                                    $currentStudent->YearLevel = $rowData[42];
-                                    $currentStudent->Section = $rowData[43];
+                                    $currentStudent->semester_id = $semesterModel->id;
+                                    $currentStudent->year_level_id = $yearLevelModel->id;
+                                    $currentStudent->section_id = $sectionModel->id;
+                                    $currentStudent->program_id = $programModel->id;
                                     $currentStudent->Major = $rowData[44];
-                                    $currentStudent->Course = $course;
                                     $currentStudent->Scholarship = $rowData[49];
-                                    $currentStudent->SchoolYear = $rowData[46];
+                                    $currentStudent->school_year_id = $schoolYearModel->id;
                                     $currentStudent->BirthPlace = $rowData[14];
                                     $currentStudent->Religion = $rowData[16];
                                     $currentStudent->Citizenship = $rowData[17];
@@ -383,105 +433,88 @@ class StudentController extends Controller
                                     $currentStudent->save();
                                 }
 
-                                // Check if school year and semester information is available
-                                if (!empty($rowData[42]) && !empty($rowData[41])) {
-                                    // Check if a school year with the given name already exists
-                                    $schoolYearModel = SchoolYear::firstOrNew(['name' => $rowData[46]]);
+                                // Debug output to verify mappings
+                                $debug = [
+                                    'school_year' => $schoolYearModel,
+                                    'semester' => $semesterModel,
+                                    'year_level' => $yearLevelModel,
+                                    'section' => $sectionModel,
+                                    'program' => $programModel
+                                ];
+
+                                // Uncomment for debugging
+                                // dd($debug);
+
+
+                            }elseif ($currentStudent) {
+                              // Check if a subject with the same attributes already exists
+                                    $existingSubject = Subject::where([
+                                        'subject_code' => $rowData[3],
+                                    ])->first();
                                     
-                                    // Save the school year if it's new
-                                    if ($schoolYearModel->isDirty()) {
-                                        $schoolYearModel->save();
-                                    }
-
-                                    // Check if a semester with the given name already exists
-                                    $semesterModel = Semester::firstOrNew(['name' => $rowData[41], 'school_year_id' => $schoolYearModel->id]);
-                                    
-                                    // Associate the semester with the school year
-                                    $semesterModel->schoolYear()->associate($schoolYearModel);
-
-                                    // Save the semester if it's new
-                                    if ($semesterModel->isDirty()) {
-                                        $semesterModel->save();
-                                    }
-                                }
-
-                                $debug = array(
-                                    'school_year:' => $schoolYearModel,
-                                    'semester' => $semesterModel
-                                );
-
-                                //dd($debug);
-
-                            } elseif ($currentStudent) {
-                                
-                                // Check if a subject with the same attributes already exists
-                                $existingSubject = Subject::where([
-                                    'subject_code' => $rowData[3],
-                                    'day' => $rowData[6],
-                                    'time' => $rowData[7],
-                                    'instructor_name' => $rowData[9],
-                                    'room_name' => $rowData[5],
-                                    'school_year_id' => $schoolYearModel->id,
-                                    'semester_id' => $semesterModel->id,
-                                ])->first();
-
-                                //dd($existingSubject);
-
                                 if (!$existingSubject) {
                                     $subject = new Subject();
                                 } else {
                                     $subject = $existingSubject;
                                 }
-                                   
-                                    // Check if day or time is "TBA"
-                                    $dayIsTBA = $rowData[6] === 'TBA' || $rowData[6] === null;
-                                    $timeIsTBA = $rowData[7] === 'TBA' || $rowData[7] === null;
-
-                                    if ($dayIsTBA || $timeIsTBA) {
-                                        // If day or time is "TBA", record the subject and set corrected_day and corrected_time as empty
-                                        //$subject = new Subject();
-                                        $subject->subject_code = $rowData[3]; // Assuming the subject code is in the 4th column
-                                        $subject->description = $rowData[4]; // Assuming the description is in the 5th column
-                                        $subject->room_name = $rowData[5]; // Assuming room_name is in the 6th column
-                                        $subject->day = $dayIsTBA ? 'TBA' : $rowData[6]; // Assuming day is in the 7th column 
-                                        $subject->corrected_day = $dayIsTBA ? '' : $correctedDay;
-                                        $subject->time = $timeIsTBA ? 'TBA' : $rowData[7]; // Assuming time is in the 8th column
-                                        $subject->corrected_time = $timeIsTBA ? '' : $correctedTime;
-                                        $subject->units = $rowData[8]; // Assuming units is in the 9th column
-                                        $subject->instructor_name = $rowData[9]; // Assuming instructor_name is in the 10th column
-                                        $subject->amount = empty($rowData[10]) ? 0 : $rowData[10]; // Assuming amount is in the 11th column
-                                        $subject->school_year_id = $schoolYearModel->id; // Assuming amount is in the 11th column
-                                        $subject->semester_id = $semesterModel->id; // Assuming amount is in the 11th column
-                                
-                                        $subject->schoolYear()->associate($schoolYearModel); // Set $schoolYearModel
-                                        $subject->semester()->associate($semesterModel); // Set $semesterModel
-                                        $subject->save(); // Save the new Subject record
-                                
-                                        continue; // Skip the rest of the processing for this row
-                                    }
-                                    
-                                    // Split the originalDay based on commas
-                                    $originalDays = explode(',', strtoupper(str_replace(' ', '', $rowData[6])));
-
-                                    // Initialize an array to store corrected days
-                                    $correctedDays = [];
-
-                                    // Map and fix each part
-                                    foreach ($originalDays as $originalDay) {
-                                        // Check if the original day is in the correction map
-                                        if (isset($dayCorrectionMap[$originalDay])) {
-                                            // Map and fix the day
-                                            $correctedDays[] = $dayCorrectionMap[$originalDay];
-                                        } else {
-                                            // If not found in the map, use the original day
-                                            $correctedDays[] = $originalDay;
-                                        }
-                                    }
-
-                                    // Join the corrected days back into a comma-separated string
-                                    $correctedDay = implode(',', $correctedDays);
-
-                                    // Correcting sa Time
+                            
+                              
+                            
+                                // Check if a schedule with the same attributes already exists
+                                $dayIsTBA = $rowData[6] === 'TBA' || $rowData[6] === null;
+                                $timeIsTBA = $rowData[7] === 'TBA' || $rowData[7] === null;
+                                $existingSchedule = Schedule::where([
+                                    'subject_id' => $subject->id,
+                                    'program_id' => $programModel->id,
+                                    'year_level_id' => $yearLevelModel->id,
+                                    'section_id' => $sectionModel->id,
+                                    'teacher_id' => $teacherModel->id ?? null,
+                                    'semester_id' => $semesterModel->id,
+                                    'school_year_id' => $schoolYearModel->id,
+                                    'room' => $rowData[5],
+                                    'days' => $dayIsTBA ? 'TBA' : $rowData[6],
+                                    'time' => $timeIsTBA ? 'TBA' : $rowData[7],
+                                ])->first();
+                            
+                                if (!$existingSchedule) {
+                                    $schedule = new Schedule();
+                                } else {
+                                    $schedule = $existingSchedule;
+                                }
+                            
+                                if ($dayIsTBA || $timeIsTBA) {
+                                      // Update or create the subject record
+                                    $subject->subject_code = $rowData[3]; // Assuming the subject code is in the 4th column
+                                    $subject->description = !empty($rowData[4]) ? $rowData[4] : 'No Description Provided';
+                                    $subject->units = $rowData[8]; // Assuming units is in the 9th column
+                                    $subject->amount = empty($rowData[10]) ? 0 : $rowData[10]; // Assuming amount is in the 11th column
+                                    $subject->save();
+                                    // Update or create the schedule record
+                                    $schedule->subject_id = $subject->id;
+                                    $schedule->program_id = $programModel->id;
+                                    $schedule->year_level_id = $yearLevelModel->id;
+                                    $schedule->section_id = $sectionModel->id;
+                                    $schedule->teacher_id = $teacherModel->id ?? null;
+                                    $schedule->semester_id = $semesterModel->id;
+                                    $schedule->school_year_id = $schoolYearModel->id;
+                                    $schedule->room = $rowData[5];
+                                    $schedule->days = $dayIsTBA ? 'TBA' : $rowData[6];
+                                    $schedule->corrected_day = $dayIsTBA ? '' : $correctedDay;
+                                    $schedule->time = $timeIsTBA ? 'TBA' : $rowData[7];
+                                    $schedule->corrected_time = $timeIsTBA ? '' : $correctedTime;
+                                    $schedule->save();
+                            
+                                    continue; // Skip the rest of the processing for this row
+                                }
+                            
+                                // Correct days
+                                $originalDays = explode(',', strtoupper(str_replace(' ', '', $rowData[6])));
+                                $correctedDays = array_map(function ($originalDay) use ($dayCorrectionMap) {
+                                    return $dayCorrectionMap[$originalDay] ?? $originalDay;
+                                }, $originalDays);
+                                $correctedDay = implode(',', $correctedDays);
+                            
+                                // Correcting sa Time
 
                                     // Assuming time is in the 8th column
                                     $rawTimeRanges = $rowData[7];
@@ -542,28 +575,6 @@ class StudentController extends Controller
 
                                     $timeRanges = explode(',', $rawTimeRanges);
 
-                                    // Remove extra hyphens from each time range
-                                    // $timeRanges = array_map(function ($timeRange) {
-                                    //     // Count the number of hyphens in the time range
-                                    //     $hyphenCount = substr_count($timeRange, '-');
-
-                                    //     // Check if there are multiple hyphens
-                                    //     if ($hyphenCount > 1) {
-                                    //         \Log::info("Multiple hyphen found. Count: $hyphenCount, Raw: $timeRange");
-
-                                    //         // Replace multiple hyphens with a single hyphen
-                                    //         $fixedTimeRange = preg_replace('/-+/', '-', $timeRange);
-
-                                    //         // Log the fixed time range
-                                    //         \Log::info("Fixed time range: $fixedTimeRange");
-
-                                    //         return $fixedTimeRange;
-                                    //     }
-
-                                    //     // If there are not multiple hyphens, return the original time range
-                                    //     return $timeRange;
-                                    // }, $timeRanges);
-
                                     // Filter out invalid time ranges
                                     $timeRanges = array_filter($timeRanges, function ($timeRange) {
                                         // Count the number of hyphens in the time range
@@ -584,10 +595,6 @@ class StudentController extends Controller
                                             $timeRangeParts = explode('-', $rawTimeRange);
 
                                             list($startTime, $endTime) = $timeRangeParts;
-
-                                            // Trim extra spaces from start and end of time strings
-                                            // $startTime = trim($startTime);
-                                            // $endTime = trim($endTime);
 
                                             // Additional cleaning if needed, e.g., removing non-breaking spaces
                                             $startTime = str_replace("\xc2\xa0", ' ', $startTime);
@@ -659,56 +666,50 @@ class StudentController extends Controller
                                     }
                                 
                                     // Join the formatted time ranges back into a comma-separated string
-                                    $correctedTime = implode(', ', $formattedTimeRanges);                                
-
-                                    // Create a new Subject record
-                                    //$subject = new Subject();
-                                    $subject->subject_code = $rowData[3]; // Assuming the subject code is in the 4th column
-                                    $subject->description = $rowData[4]; // Assuming the description is in the 5th column
-                                    $subject->room_name = $rowData[5]; // Assuming room_name is in the 6th column
-                                    $subject->day = $rowData[6]; // Assuming day is in the 7th column 
-                                    $subject->corrected_day = $correctedDay;
-                                    $subject->time = $rowData[7]; // Assuming time is in the 8th column
-                                    $subject->corrected_time = $correctedTime;
-                                    $subject->units = $rowData[8]; // Assuming units is in the 9th column
-                                    $subject->instructor_name = $rowData[9]; // Assuming instructor_name is in the 10th column
-                                    $subject->amount = empty($rowData[10]) ? 0 : $rowData[10]; // Assuming amount is in the 11th column
-                                    $subject->school_year_id = $schoolYearModel->id; // Assuming amount is in the 11th column
-                                    $subject->semester_id = $semesterModel->id; // Assuming amount is in the 11th column
-
-                                    $subject->schoolYear()->associate($schoolYearModel); // Set $schoolYearModel
-                                    $subject->semester()->associate($semesterModel); // Set $semesterModel
-                                    $subject->save(); // Save the new Subject record
-                                //  } else {
-                                //      $subject = $existingSubject;
-
-                                //     $subject->subject_code = $rowData[3]; // Update with the new value
-                                //     $subject->description = $rowData[4]; // Update with the new value
-                                //     $subject->room_name = $rowData[5]; // Update with the new value
-                                //     $subject->day = $rowData[6]; // Update with the new value
-                                //     // ... update other fields ...
-
-                                //     $subject->save(); // Save the updated Subject recor
-                                // }
-
-                                // Check if the student is already enrolled in this subject
-                                $enrollmentExists = SubjectEnrolled::where('student_id', $currentStudent->id)
-                                    ->where('subject_id', $subject->id)
-                                    ->exists();
-
-                                if (!$enrollmentExists) {
-                                    // Enroll the student in this subject (create a new enrollment record)
-                                    $enrollment = new SubjectEnrolled();
-                                    $enrollment->student_id = $currentStudent->id;
-                                    $enrollment->subject_id = $subject->id;
-
-                                    $enrollment->semester()->associate($subject->semester);
-                                    $enrollment->schoolYear()->associate($subject->schoolYear);
-
+                                    $correctedTime = implode(', ', $formattedTimeRanges);    
+                            
+                                // Update or create the subject record
+                                $subject->subject_code = $rowData[3]; // Assuming the subject code is in the 4th column
+                                $subject->description = !empty($rowData[4]) ? $rowData[4] : 'No Description Provided';
+                                $subject->units = $rowData[8]; // Assuming units is in the 9th column
+                                $subject->amount = empty($rowData[10]) ? 0 : $rowData[10]; // Assuming amount is in the 11th column
+                                $subject->save();
+                            
+                                // Update or create schedule
+                                $schedule->subject_id = $subject->id;
+                                $schedule->program_id = $programModel->id;
+                                $schedule->year_level_id = $yearLevelModel->id;
+                                $schedule->section_id = $sectionModel->id;
+                                $schedule->teacher_id = $teacherModel->id ?? null;
+                                $schedule->semester_id = $semesterModel->id;
+                                $schedule->school_year_id = $schoolYearModel->id;
+                                $schedule->room = $rowData[5];
+                                $schedule->days = $dayIsTBA ? 'TBA' : $rowData[6];
+                                $schedule->corrected_day = $dayIsTBA ? '' : $correctedDay;
+                                $schedule->time = $timeIsTBA ? 'TBA' : $rowData[7];
+                                $schedule->corrected_time = $timeIsTBA ? '' : $correctedTime;
+                                $schedule->save();
+                            
+                                // Enroll student in subject if not already enrolled
+                                if (!SubjectEnrolled::where([
+                                    'student_id' => $currentStudent->id,
+                                    'subject_id' => $subject->id,
+                                    'schedule_id' => $schedule->id,
+                                ])->exists()) {
+                                    $enrollment = new SubjectEnrolled([
+                                        'student_id' => $currentStudent->id,
+                                        'subject_id' => $subject->id,
+                                        'section_id' => $sectionModel->id ?? null,
+                                        'schedule_id' => $schedule->id ?? null,
+                                        'semester_id' => $semesterModel->id,
+                                        'school_year_id' => $schoolYearModel->id,
+                                        'year_level_id' => $yearLevelModel->id ?? null,
+                                        'prospectus_id' => $prospectusModel->id ?? null,
+                                    ]);
                                     $enrollment->save();
                                 }
-
                             }
+                            
                         }
 
                         // Append the data from this file to the result array

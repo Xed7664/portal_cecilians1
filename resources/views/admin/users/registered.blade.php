@@ -72,18 +72,19 @@
                                     </td>
                                     <td>
                                         @if($item->type === 'student')
-                                            {{ $item->student->Course }}
+                                            {{ $item->student && $item->student->program ? $item->student->program->code : '-' }}
                                         @else
                                             {{ '-' }}
                                         @endif
                                     </td>
                                     <td>
                                         @if($item->type === 'student')
-                                            {{ $item->student->YearLevel }}
+                                            {{ $item->student && $item->student->yearLevel ? $item->student->yearLevel->name : '-' }}
                                         @else
                                             {{ '-' }}
                                         @endif
                                     </td>
+
                                     <td><h6><span class="badge {{ $item->status === 'member' ? 'bg-success' : ($item->status === 'unverified' ? 'bg-secondary' : 'bg-danger') }}">{{ $item->status }}</span></h6></td>
 
                                     <td>

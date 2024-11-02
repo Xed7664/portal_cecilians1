@@ -8,7 +8,12 @@ class Schedule extends Model
 {
     use HasFactory;
 
-    
+    protected $fillable = [
+        'subject_id', 'program_id', 'year_level_id', 
+        'section_id', 'teacher_id', 'semester_id', 
+        'school_year_id', 'room', 'days', 'corrected_day', 
+        'start_time', 'end_time', 'time', 'corrected_time'
+    ];
     // Define the inverse relationship with Department
     public function department()
     {
