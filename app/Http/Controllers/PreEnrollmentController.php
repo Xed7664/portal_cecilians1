@@ -18,57 +18,64 @@ use Illuminate\Notifications\Notifiable;
 use App\Mail\PreEnrollmentConfirmation;
 use Illuminate\Support\Facades\Mail;
 use Barryvdh\DomPDF\Facade\Pdf; // Import the Pdf facade here
-use App\Models\PreEnrollmentSetting;
 
 class PreEnrollmentController extends Controller
 {
 // PreEnrollmentController.php
- 
-
-public function showSettings()
+public function showForm()
 {
+    $student = auth()->user()->student;
+
+    // Fetch available programs
+    $programs = Department::all();
+    
+    // Fetch all semesters
     $semesters = Semester::all();
-    $schoolYears = SchoolYear::all();
-    $preEnrollmentSettings = PreEnrollmentSetting::with(['semester', 'schoolYear'])->latest()->get();
 
-    return view('pre-enrollment.phead.pre-enrollment-settings', compact('semesters', 'schoolYears', 'preEnrollmentSettings'));
+    // Fetch all school years
+    $schoolYears = SchoolYear::all();  // Add this line
+
+    // Fetch the latest semester and school year
+    $currentSemester = Semester::latest()->first();
+    $currentSchoolYear = SchoolYear::latest()->first();
+
+    if (!$currentSemester || !$currentSchoolYear) {
+        return redirect()->back()->with('error', 'No semesters or school years found in the system.');
+    }
+
+    // Define available year levels
+    $yearLevels = ['1st Year', '2nd Year', '3rd Year', '4th Year'];
+
+    $uncompletedSubjects = null; // Initialize variable to avoid undefined error
+    $subjects = null; // New variable to hold subjects for new students
+
+    // Handle new students: automatically set year level to 'First Year'
+    if ($student->student_type == 'new') {
+        $student->year_level = '1st Year';
+        // Fetch subjects for 1st-year new students
+        $subjects = SubjectsProspectus::getSubjectsForYearLevel($student->program_id, '1st Year', $currentSemester->id);
+    } else {
+        // For old students, fetch enrolled subjects for the latest semester
+        $enrolledSubjects = DB::table('subjects_enrolled')
+            ->where('student_id', $student->id)
+            ->where('semester_id', $currentSemester->id)
+            ->where('school_year_id', $currentSchoolYear->id)
+            ->get();
+        
+        // Determine the student's next year level based on completed subjects
+        if ($enrolledSubjects->isEmpty()) {
+            $student->year_level = '1st Year'; // Assume first year if no enrollments
+        } else {
+            $student->year_level = $this->calculateNextYearLevel($student);
+        }
+
+        // Fetch schedules for uncompleted subjects only for old students
+        $uncompletedSubjects = $this->getUncompletedSubjects($student);
+    }
+
+    // Pass the fetched semesters and school years to the view
+    return view('pre-enrollment.form', compact('student', 'currentSemester', 'currentSchoolYear', 'programs', 'yearLevels', 'uncompletedSubjects', 'subjects', 'semesters', 'schoolYears'));  // Add 'schoolYears'
 }
-
-public function storeSettings(Request $request)
-{
-    $request->validate([
-        'semester_id' => 'required|exists:semesters,id',
-        'school_year_id' => 'required|exists:school_years,id',
-        'open_date' => 'required|date',
-        'close_date' => 'required|date|after_or_equal:open_date',
-    ]);
-
-    // Create or update setting
-    PreEnrollmentSetting::updateOrCreate(
-        [
-            'semester_id' => $request->semester_id,
-            'school_year_id' => $request->school_year_id,
-        ],
-        $request->only('open_date', 'close_date')
-    );
-
-    return redirect()->back()->with('success', 'Pre-enrollment settings updated successfully.');
-}
-public function togglePreEnrollmentStatus($semesterId)
-{
-    // Retrieve the pre-enrollment setting by semester
-    $preEnrollmentSetting = PreEnrollmentSetting::where('semester_id', $semesterId)->firstOrFail();
-
-    // Toggle the status
-    $preEnrollmentSetting->is_open = !$preEnrollmentSetting->is_open;
-    $preEnrollmentSetting->save();
-
-    return response()->json([
-        'success' => true,
-        'is_open' => $preEnrollmentSetting->is_open,
-    ]);
-}
-
 
 
 
