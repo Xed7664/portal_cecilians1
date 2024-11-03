@@ -17,7 +17,7 @@ use App\Http\Controllers\NotificationSendController;
 use App\Http\Controllers\GradeController;
 use App\Http\Controllers\ProspectusController;
 use App\Http\Controllers\EnrollmentController;
-use App\Http\Controllers\{StudentController, TeacherController, ProgramHeadController, AdminController};
+use App\Http\Controllers\{StudentController, TeacherController, ProgramHeadController,ProgramHeadPreEnrollmentController, AdminController};
 use App\Http\Controllers\WelcomeController;
 use App\Providers\RouteServiceProvider;
 use App\Http\Controllers\AdmissionController;
@@ -66,6 +66,22 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/program-head/prospectus', [ProgramHeadController::class, 'index'])->name('phead.prospectus');
          //Program Head Prospectus 
          Route::prefix('phead')->name('phead.')->group(function () {
+
+            // Show the pre-enrollment settings page
+            Route::get('/pre-enrollment/settings', [PreEnrollmentController::class, 'showSettings'])->name('pre-enrollment.settings');
+            
+            // Update pre-enrollment settings
+            Route::post('/pre-enrollment/store', [PreEnrollmentController::class, 'storeSettings'])->name('pre-enrollment.storeSettings');
+            // Add this inside the routes group for program head or pre-enrollment settings
+            Route::post('/pre-enrollment/toggle/{semester}', [PreEnrollmentController::class, 'togglePreEnrollmentStatus'])
+            ->name('pre-enrollment.toggle');
+
+            // List student applications for pre-enrollment
+            Route::get('/pre-enrollment/applications', [ProgramHeadPreEnrollmentController::class, 'listApplications'])->name('pre-enrollment.applications');
+            
+            // Review a specific student’s application
+            Route::get('/pre-enrollment/application/{studentId}', [ProgramHeadPreEnrollmentController::class, 'reviewApplication'])->name('pre-enrollment.review');
+
             Route::get('/prospectus', [ProgramHeadController::class, 'index'])->name('prospectus.index');
             Route::post('/prospectus', [ProgramHeadController::class, 'store'])->name('prospectus.store');
             Route::patch('/prospectus/{id}', [ProgramHeadController::class, 'update'])->name('prospectus.update');

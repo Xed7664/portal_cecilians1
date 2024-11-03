@@ -16,6 +16,10 @@
             </nav>
         </div><!-- End Page Title -->
         <div class="container">
+        @if(session('error'))
+            <div class="alert alert-danger">{{ session('error') }}</div>
+        @endif
+
             <!-- Progress Bar -->
             <div class="progress mb-4" style="height: 50px">
                 <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="width: 12%" id="progressBar">

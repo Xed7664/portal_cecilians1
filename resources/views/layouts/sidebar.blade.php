@@ -283,6 +283,13 @@
         </ul>
       </li>
       <li class="nav-item">
+          <a class="nav-link {{ Route::is('phead.pre-enrollment.settings') ? '' : 'collapsed' }}" href="{{ route('phead.pre-enrollment.settings') }}">
+              <i class='bx bx-cog'></i>
+              <span class="fw-medium">Pre-Enrollment Settings</span>
+          </a>
+      </li>
+
+      <li class="nav-item">
         <a class="nav-link {{ Route::is('program-head.grades.index') ? '' : 'collapsed' }}" href="{{ route('program-head.grades.index') }}">
             <i class='bx bx-bar-chart'></i>
           <span class="fw-medium">Grade</span>
