@@ -60,4 +60,3 @@ class SubjectsProspectusController extends Controller
         return redirect()->route('prospectus.index')->with('success', 'Subject archived!');
     }
 }
-

@@ -4,88 +4,77 @@
     </button>
     
     <ul class="sidebar-nav" id="sidebar-nav">
-    
     @if($userPanel === 'student')
-      <!-- School Year and Semester Section -->
-      <li class="nav-heading">SCHOOL YEAR</li>
+    <!-- School Year and Semester Section -->
+    <li class="nav-heading">SCHOOL YEAR</li>
+    <li class="nav-item school_year" data-syid="{{ Session::get('current_school_year_id') }}" data-semid="{{ Session::get('current_semester_id') }}">
+        <a class="nav-link collapsed" data-bs-target="#forms-nav" data-bs-toggle="collapse" href="#" aria-expanded="false">
+            <i class="bi bi-journal-text"></i>
+            <span class="fw-medium">
+                {{ App\Http\Controllers\SchoolYearController::getCurrentSchoolYearName() ?? 'Current School Year' }} 
+                ({{ App\Http\Controllers\SemesterController::getCurrentSemesterName() ?? 'Current Semester' }})
+            </span>
+            <i class="bi bi-chevron-down ms-auto"></i>
+        </a>
 
-<li class="nav-item school_year" data-syid="{{ Session::get('current_school_year_id') }}" data-semid="{{ Session::get('current_semester_id') }}">
-    <a class="nav-link collapsed" data-bs-target="#forms-nav" data-bs-toggle="collapse" href="#" aria-expanded="false">
-        <i class="bi bi-journal-text"></i>
-        <span class="fw-medium">
-            {{ App\Http\Controllers\SchoolYearController::getCurrentSchoolYearName() ?? 'Current School Year' }} 
-            ({{ App\Http\Controllers\SemesterController::getCurrentSemesterName() ?? 'Current Semester' }})
-        </span>
-        <i class="bi bi-chevron-down ms-auto"></i>
-    </a>
+        <ul id="forms-nav" class="nav-content collapse" data-bs-parent="#sidebar-nav">
+            <!-- Semesters Based on Selected School Year -->
+            @php
+                $semesters = App\Http\Controllers\SemesterController::getSemesters();
+            @endphp
+            @foreach ($semesters as $semester)
+                <li class="semester-select" data-semid="{{ $semester->id }}">
+                    <a href="javascript:void(0);" class="semester-link {{ $semester->id == Session::get('current_semester_id') ? 'active' : '' }}">
+                        <i class="bi bi-circle"></i>
+                        <span class="fw-medium">{{ $semester->name }}</span>
+                    </a>
+                </li>
+            @endforeach
 
-    <ul id="forms-nav" class="nav-content collapse" data-bs-parent="#sidebar-nav">
-        <!-- Semesters -->
-        @foreach (App\Http\Controllers\SemesterController::getSemesters() as $semester)
-        <li class="semester-select" data-semid="{{ $semester->id }}">
-            <a href="javascript:void(0);" class="semester-link {{ $semester->id == Session::get('current_semester_id') ? 'active' : '' }}">
-                <i class="bi bi-circle"></i>
-                <span class="fw-medium">{{ $semester->name }}</span>
-            </a>
-        </li>
-        @endforeach
+            <!-- School Years -->
+            <li class="nav-heading">ARCHIVE</li>
+            @foreach (App\Http\Controllers\SchoolYearController::getSchoolYears() as $schoolYear)
+                <li class="year-select" data-syid="{{ $schoolYear->id }}">
+                    <a href="javascript:void(0);" class="year-link {{ $schoolYear->id == Session::get('current_school_year_id') ? 'active' : '' }}">
+                        <i class="bi bi-circle"></i>
+                        <span class="fw-medium">{{ $schoolYear->name }}</span>
+                    </a>
+                </li>
+            @endforeach
+        </ul>
+    </li>
 
-        <!-- School Years -->
-        <li class="nav-heading">ARCHIVE</li>
-        @foreach (App\Http\Controllers\SchoolYearController::getSchoolYears() as $schoolYear)
-        <li class="year-select" data-syid="{{ $schoolYear->id }}">
-            <a href="javascript:void(0);" class="year-link {{ $schoolYear->id == Session::get('current_school_year_id') ? 'active' : '' }}">
-                <i class="bi bi-circle"></i>
-                <span class="fw-medium">{{ $schoolYear->name }}</span>
-            </a>
-        </li>
-        @endforeach
-      <!-- School Year End -->
-  </ul>
-</li>
 
                 <script>
-                $(document).on('click', '.year-link', function() {
-                var schoolYearId = $(this).closest('.year-select').data('syid');
-                var semesterId = $('.school_year').data('semid'); // Keep the current semester unless changed
+           $(document).on('click', '.year-link', function() {
+    var schoolYearId = $(this).closest('.year-select').data('syid');
+    var semesterId = $('.school_year').data('semid'); // Keep the current semester unless changed
 
-                if (schoolYearId) {
-                $.ajax({
-                    url: "{{ route('newsfeed') }}",
-                    type: "GET",
-                    data: {
-                        school_year_id: schoolYearId,
-                        semester_id: semesterId
-                    },
-                    success: function(response) {
-                        window.location.href = "{{ route('newsfeed') }}?school_year_id=" + schoolYearId + "&semester_id=" + semesterId;
-                    },
-                    error: function(error) {
-                        console.log(error);
-                    }
+    if (schoolYearId) {
+        $.ajax({
+            url: "/api/semesters/" + schoolYearId,  // Construct the URL manually
+            type: "GET",
+            success: function(response) {
+                var semesterList = $('#forms-nav');
+                semesterList.empty();
+                response.forEach(function(semester) { // Handle response directly
+                    semesterList.append(
+                        `<li class="semester-select" data-semid="${semester.id}">
+                            <a href="javascript:void(0);" class="semester-link ${semester.id == semesterId ? 'active' : ''}">
+                                <i class="bi bi-circle"></i>
+                                <span class="fw-medium">${semester.name}</span>
+                            </a>
+                        </li>`
+                    );
                 });
-                }
-                });
-
-                $(document).on('click', '.semester-link', function() {
-                var semesterId = $(this).closest('.semester-select').data('semid');
-                var schoolYearId = $('.school_year').data('syid'); // Keep the current school year unless changed
-
-                $.ajax({
-                url: "{{ route('newsfeed') }}",
-                type: "GET",
-                data: {
-                    school_year_id: schoolYearId,
-                    semester_id: semesterId
-                },
-                success: function(response) {
-                    window.location.href = "{{ route('newsfeed') }}?school_year_id=" + schoolYearId + "&semester_id=" + semesterId;
-                },
-                error: function(error) {
-                    console.log(error);
-                }
-                });
-                });
+                window.location.href = "{{ route('newsfeed') }}?school_year_id=" + schoolYearId + "&semester_id=" + semesterId;
+            },
+            error: function(error) {
+                console.log(error);
+            }
+        });
+    }
+});
 
                 </script>
 
@@ -249,69 +238,51 @@
 
       @if($userPanel === 'program_head')
       <li class="nav-heading">PHEAD PANEL</li>
-      
-      <li class="nav-item school_year" data-syid="{{ Session::get('current_school_year_id') }}" data-semid="{{ Session::get('current_semester_id') }}">
-        <a class="nav-link collapsed" data-bs-target="#forms-nav" data-bs-toggle="collapse" href="#" aria-expanded="false">
-            <i class="bi bi-journal-text"></i>
-            <span class="fw-medium">{{ App\Http\Controllers\SchoolYearController::getCurrentSchoolYearName() }} 
-              ({{ App\Http\Controllers\SemesterController::getCurrentSemesterName() }})</span>
-            <i class="bi bi-chevron-down ms-auto"></i>
-        </a>
-        <ul id="forms-nav" class="nav-content collapse" data-bs-parent="#sidebar-nav" style="">
-            <!-- Semester Start -->
-            @foreach (App\Http\Controllers\SemesterController::getSemesters() as $semester)
-            <li class="semester-select" data-semid="{{ $semester->id }}">
-                <a href="javascript:void(0);" class="{{ $semester->id == Session::get('current_semester_id') ? 'active' : '' }}">
-                    <i class="bi bi-circle"></i>
-                    <span class="fw-medium">{{ $semester->name }}</span>
-                </a>
-            </li>
-            @endforeach
-            <!-- Semester End -->
-    
-            <!-- School Year Start -->
-            <li class="nav-heading">ARCHIVE</li>
-            @foreach (App\Http\Controllers\SchoolYearController::getSchoolYears() as $schoolYear)
-            <li class="year-select" data-syid="{{ $schoolYear->id }}">
-                <a href="javascript:void(0);">
-                    <i class="bi bi-circle"></i>
-                    <span class="fw-medium">{{ $schoolYear->name }}</span>
-                </a>
-            </li>
-            @endforeach
-            <!-- School Year End -->
-        </ul>
-      </li>
-      <li class="nav-item">
+       <!-- Dashboard Link -->
+       <li class="nav-item">
+                    <a class="nav-link {{ Route::is('phead.dashboard') ? '' : 'collapsed' }}" href="{{ route('phead.dashboard') }}">
+                        <i class='bx bx-home'></i>
+                        <span class="fw-medium">Dashboard</span>
+                    </a>
+                </li>
+                <li class="nav-item">
           <a class="nav-link {{ Route::is('phead.pre-enrollment.settings') ? '' : 'collapsed' }}" href="{{ route('phead.pre-enrollment.settings') }}">
               <i class='bx bx-cog'></i>
               <span class="fw-medium">Pre-Enrollment Settings</span>
           </a>
       </li>
 
-      <li class="nav-item">
-        <a class="nav-link {{ Route::is('program-head.grades.index') ? '' : 'collapsed' }}" href="{{ route('program-head.grades.index') }}">
-            <i class='bx bx-bar-chart'></i>
-          <span class="fw-medium">Grade</span>
-        </a>
-      </li>
-
-      
-        <li class="nav-item">
-        <a class="nav-link {{ Route::is('phead.subjects.index') ? '' : 'collapsed' }}" href="{{ route('phead.subjects.index') }}">
-            <i class='bx bx-book'></i>
-            <span class="fw-medium">Subjects</span>
-        </a>
-        </li>
-    
-      <li class="nav-item">
-        <a class="nav-link {{ Route::is('phead.prospectus') ? '' : 'collapsed' }}" href="{{ route('phead.prospectus') }}">
-            <i class='bx bx-book-open'></i>
-          <span class="fw-medium">Prospectus</span>
-        </a>
-      </li>
-    
-      
+                <!-- Students Link -->
+                <li class="nav-item">
+                    <a class="nav-link {{ Route::is('phead.students.index') ? '' : 'collapsed' }}" href="{{ route('phead.students.index') }}">
+                        <i class='bx bx-user'></i>
+                        <span class="fw-medium">Students</span>
+                    </a>
+                </li>
+            
+                <!-- Year & Section Link -->
+                <li class="nav-item">
+                    <a class="nav-link {{ Route::is('phead.yearandsection') ? '' : 'collapsed' }}" href="{{ route('phead.yearandsection') }}">
+                        <i class='bx bx-calendar'></i>
+                        <span class="fw-medium">Year & Section</span>
+                    </a>
+                </li>
+            
+                <!-- Subjects Link -->
+                <li class="nav-item">
+                    <a class="nav-link {{ Route::is('phead.subjects.index') ? '' : 'collapsed' }}" href="{{ route('phead.subjects.index') }}">
+                        <i class='bx bx-book'></i>
+                        <span class="fw-medium">Subjects</span>
+                    </a>
+                </li>
+            
+                <!-- Prospectus Link -->
+                <li class="nav-item">
+                    <a class="nav-link {{ Route::is('phead.prospectus') ? '' : 'collapsed' }}" href="{{ route('phead.prospectus') }}">
+                        <i class='bx bx-book-open'></i>
+                        <span class="fw-medium">Prospectus</span>
+                    </a>
+                </li>
     @endif
 
 

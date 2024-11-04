@@ -23,44 +23,42 @@ class SemesterController extends Controller
         }
     }
 
-    public static function getSemesters()
-    {
-        // Retrieve the current school year ID from the session or wherever it's stored
-        $currentSchoolYearId = Session::get('current_school_year_id');
+   public static function getSemesters()
+{
+    // Retrieve the current school year ID from the session
+    $currentSchoolYearId = Session::get('current_school_year_id');
 
-        // Fetch the current school year
-        $currentSchoolYear = SchoolYear::find($currentSchoolYearId);
+    // Fetch semesters based on the current school year
+    $schoolYear = SchoolYear::with('semesters')->find($currentSchoolYearId);
 
-        // Check if the current school year exists and fetch its associated semesters
-        if ($currentSchoolYear) {
-            $semesters = $currentSchoolYear->semesters;
+    if ($schoolYear) {
+        $semesters = $schoolYear->semesters->map(function ($semester) {
+            switch ($semester->name) {
+                case '1st Sem':
+                    $semester->name = 'First Semester';
+                    break;
+                case '2nd Sem':
+                    $semester->name = 'Second Semester';
+                    break;
+                // Add more cases as needed for other semester names
+            }
+            return $semester;
+        });
 
-            // Map semester names to their human-readable equivalents
-            $semesters = $semesters->map(function ($semester) {
-                switch ($semester->name) {
-                    case '1st Sem':
-                        $semester->name = 'First Semester';
-                        break;
-                    case '2nd Sem':
-                        $semester->name = 'Second Semester';
-                        break;
-                    // Add more cases as needed for other semester names
-                }
-                return $semester;
-            });
-
-            return $semesters; // Returns a collection of Semester objects with modified names
-        } else {
-            return collect(); // Return an empty collection if the current school year is not found
-        }
+        return $semesters;
+    } else {
+        return collect(); // Return an empty collection if no semesters found
     }
+}
 
-    public function getSemestersBySchoolYear($schoolYearId)
-    {
-        $semesters = Semester::where('school_year_id', $schoolYearId)->get();
-        return response()->json($semesters);
-    }
-    
+public function getSemestersBySchoolYear($schoolYearId)
+{
+    $schoolYear = SchoolYear::with('semesters')->find($schoolYearId);
+
+    // Ensure that we return only the semesters in JSON format.
+    return response()->json($schoolYear ? $schoolYear->semesters : []);
+}
+
 
 
 }

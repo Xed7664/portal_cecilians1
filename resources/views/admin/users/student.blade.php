@@ -62,14 +62,14 @@
                                         </h6>
                                     </td>
                                     <td>
-                                        <a href="#">
+                                        <a href="#" >
                                             <button class="btn" type="button">
                                                 <i class="bx ri-edit-box-line"></i>
                                             </button>
                                         </a>
-                                        <a href="#">
+                                        <a href="{{ route('admin.users.student.grades', $item->id) }}">
                                             <button class="btn" type="button">
-                                                <i class="bi bi-eraser"></i>
+                                                <i class="bx bx-book"></i>
                                             </button>
                                         </a>
                                     </td>

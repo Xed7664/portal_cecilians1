@@ -25,7 +25,11 @@ class AuthController extends Controller
             if ($user->type === 'student' && !session('pre_enrollment_completed')) {
                 return redirect()->route('pre-enrollment.form'); // Redirect to the pre-enrollment page
             }
-    
+            // Check if the user is a program head and redirect to the dashboard
+            if ($user->type === 'program_head') {
+                return redirect()->route('phead.dashboard'); // Adjust the route to the actual route for the dashboard
+             }
+
             // Otherwise, proceed with the normal login flow
             return redirect()->intended($this->redirectTo($user));
         } else {

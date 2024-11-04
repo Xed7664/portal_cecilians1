@@ -22,6 +22,8 @@ use App\Http\Controllers\WelcomeController;
 use App\Providers\RouteServiceProvider;
 use App\Http\Controllers\AdmissionController;
 use App\Http\Controllers\PreEnrollmentController;
+use App\Http\Controllers\StudentPheadController;
+
 
 // First Page Route
 Route::get('/welcome', [WelcomeController::class, 'index'])->name('welcome');
@@ -60,10 +62,7 @@ Route::post('admission/tracker', [AdmissionController::class, 'trackAdmission'])
 
 // Role-specific home routes
 Route::middleware(['auth'])->group(function () {
-    Route::get('/student/dashboard', [StudentController::class, 'index'])->name('student.dashboard');
-    Route::get('/teacher/dashboard', [TeacherController::class, 'index'])->name('teacher.dashboard');
-    Route::get('/admin/dashboard', [AdminController::class, 'index'])->name('admin.dashboard');
-    Route::get('/program-head/prospectus', [ProgramHeadController::class, 'index'])->name('phead.prospectus');
+   
          //Program Head Prospectus 
          Route::prefix('phead')->name('phead.')->group(function () {
 
@@ -82,24 +81,53 @@ Route::middleware(['auth'])->group(function () {
             // Review a specific student’s application
             Route::get('/pre-enrollment/application/{studentId}', [ProgramHeadPreEnrollmentController::class, 'reviewApplication'])->name('pre-enrollment.review');
 
-            Route::get('/prospectus', [ProgramHeadController::class, 'index'])->name('prospectus.index');
-            Route::post('/prospectus', [ProgramHeadController::class, 'store'])->name('prospectus.store');
-            Route::patch('/prospectus/{id}', [ProgramHeadController::class, 'update'])->name('prospectus.update');
-            Route::patch('/prospectus/{id}/archive', [ProgramHeadController::class, 'archive'])->name('prospectus.archive');
-            Route::get('/prospectus/archived', [ProgramHeadController::class, 'archivedIndex'])->name('prospectus.archived');
-            Route::patch('/prospectus/{id}/restore', [ProgramHeadController::class, 'restore'])->name('prospectus.restore');
+             // Dashboard routes for each role
+    Route::get('/student/dashboard', [StudentController::class, 'index'])->name('student.dashboard');
+    Route::get('/teacher/dashboard', [TeacherController::class, 'index'])->name('teacher.dashboard');
+    Route::get('/admin/dashboard', [AdminController::class, 'index'])->name('admin.dashboard');
 
-            //Program Head Subjects
-            Route::get('/subjects', [SubjectsPheadController::class, 'index'])->name('subjects.index');
-            Route::post('/subjects', [SubjectsPheadController::class, 'store'])->name('subjects.store');
-            Route::get('/subjects/{subject}', [SubjectsPheadController::class, 'show'])->name('subjects.show');
-            Route::patch('/subjects/{subject}/archive', [SubjectsPheadController::class, 'archive'])->name('subjects.archive');
-            Route::put('/subjects/{subject}', [SubjectsPheadController::class, 'update'])->name('subjects.update');
-            Route::get('/archived-subjects', [SubjectsPheadController::class, 'archivedIndex'])->name('subjects.archived');
-            Route::patch('/subjects/{subject}/restore', [SubjectsPheadController::class, 'restore'])->name('subjects.restore');
-            Route::delete('/subjects/{subject}', [SubjectsPheadController::class, 'destroy'])->name('subjects.destroy');
+        
+        // Program Head Dashboard route
+    Route::get('/dashboard', [ProgramHeadController::class, 'dashboard'])->name('dashboard');
 
-            });
+
+
+
+    // Prospectus Management routes
+    Route::get('/program-head/prospectus', [ProgramHeadController::class, 'index'])->name('prospectus');
+    Route::post('/prospectus', [ProgramHeadController::class, 'store'])->name('prospectus.store');
+    Route::patch('/prospectus/{id}', [ProgramHeadController::class, 'update'])->name('prospectus.update');
+    Route::patch('/prospectus/{id}/archive', [ProgramHeadController::class, 'archive'])->name('prospectus.archive');
+    Route::get('/prospectus/archived', [ProgramHeadController::class, 'archivedIndex'])->name('prospectus.archived');
+    Route::patch('/prospectus/{id}/restore', [ProgramHeadController::class, 'restore'])->name('prospectus.restore');
+   
+    
+
+    // Subjects management routes
+    Route::get('/subjects', [SubjectsPheadController::class, 'index'])->name('subjects.index');
+    Route::post('/subjects', [SubjectsPheadController::class, 'store'])->name('subjects.store');
+    Route::put('/subjects/{subject}', [SubjectsPheadController::class, 'update'])->name('subjects.update');
+    Route::patch('/subjects/{subject}/archive', [SubjectsPheadController::class, 'archive'])->name('subjects.archive');
+    Route::get('/subjects/archived', [SubjectsPheadController::class, 'archivedSubjects'])->name('archived-subjects');
+    Route::patch('/subjects/{subject}/restore', [SubjectsPheadController::class, 'restore'])->name('restore');
+    Route::delete('/subjects/{subject}', [SubjectsPheadController::class, 'delete'])->name('delete');
+    
+    // Student management routes
+    Route::get('/students', [StudentPheadController::class, 'index'])->name('students.index');
+    Route::get('/students/{id}', [StudentPheadController::class, 'view'])->name('students.view');
+    Route::get('/students/{id}/grades', [StudentPheadController::class, 'grades'])->name('students.grades');
+    Route::post('/students/check', [StudentPheadController::class, 'check'])->name('students.check');
+    Route::post('/students/import', [StudentPheadController::class, 'import'])->name('students.import');
+
+    // Prospectus-Grade management
+    Route::get('/students/{id}/prospectus', [StudentPheadController::class, 'viewProspectus'])->name('students.prospectus');
+
+    // Year and Section route
+    Route::get('/yearandsection', [StudentPheadController::class, 'yearAndSection'])->name('yearandsection');
+
+    // Route for listing students in a section
+    Route::get('/sections/{section}/students', [StudentPheadController::class, 'studentsBySection'])->name('section.students');
+});
 });
 Route::get('/auth/registration', [AuthController::class, 'registration'])->name('registration');
 
@@ -188,8 +216,8 @@ Route::post('/send-grades-notification', [GradesController::class, 'sendGradesNo
      Route::post('teacher/grades/map', [GradesController::class, 'mapColumns'])->name('grades.map');
      Route::put('teacher/grades/{id}', [GradeController::class, 'update'])->name('grades.update');
    
-     // Route to get semesters for a selected school year
-     Route::get('/api/semesters/{schoolYearId}', [SemesterController::class, 'getSemestersBySchoolYear']);
+     Route::get('/api/semesters/{schoolYearId}', [SemesterController::class, 'getSemestersBySchoolYear'])->name('api.semesters.bySchoolYear');
+
 
 // Route to get subjects for the selected school year and semester
 Route::get('/fetch-subjects', [GradeController::class, 'fetchSubjects'])->name('fetch.subjects');
@@ -290,6 +318,7 @@ Route::post('/teacher/grades/{subjectEnrolled}/mark-ready', [GradeController::cl
     });
 
 
+   
     // Admin routes
     Route::prefix('admin/user')->group(function () {
         Route::get('/registered', [AdminUserController::class, 'index'])->name('admin.users.registered');
@@ -300,6 +329,17 @@ Route::post('/teacher/grades/{subjectEnrolled}/mark-ready', [GradeController::cl
         Route::post('/student/check', [AdminStudentController::class, 'checkFile'])->name('admin.users.student.check');
         Route::post('/student/upload', [AdminStudentController::class, 'upload'])->name('admin.users.student.upload');
 
+        //Edit Student Info and Grades- Admin Routes
+        Route::prefix('admin/users/student')->name('admin.users.student.')->group(function () {
+            Route::get('/', [StudentController::class, 'index'])->name('index');
+            Route::get('/{id}/edit', [StudentController::class, 'edit'])->name('edit');
+            Route::put('/{id}', [StudentController::class, 'update'])->name('update');
+            Route::get('/{id}/grades', [StudentController::class, 'showGrades'])->name('grades');
+            Route::get('/{id}/grades-data', [StudentController::class, 'getGradesData'])->name('grades-data');
+            
+        });
+        
+
         // Admin analytics
 
         Route::get('/analytics/logins', [AdminLoginController::class, 'index'])->name('admin.analytics.login');
@@ -309,7 +349,6 @@ Route::post('admin/admissions/{id}/reject', [AdmissionController::class, 'reject
 // In web.php (new route)
 Route::get('admin/admissions', [AdmissionController::class, 'index'])->name('admin.admissions.index');
     });
-
 
     //not yet applied
     // Route::get('admin',function(){

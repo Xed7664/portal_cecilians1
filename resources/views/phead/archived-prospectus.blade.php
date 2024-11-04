@@ -8,7 +8,7 @@
         <div class="d-flex justify-content-between align-items-center mb-4">
             <h1>Archived Subjects</h1>
             <!-- Back to Active Prospectus Button -->
-            <a href="{{ route('phead.prospectus.index') }}" class="btn btn-outline-primary">
+            <a href="{{ route('phead.prospectus') }}" class="btn btn-outline-primary">
                 <i class="bi bi-arrow-left-circle"></i> Back
             </a>
         </div>
