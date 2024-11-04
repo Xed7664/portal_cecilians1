@@ -86,7 +86,7 @@
 
         <tr data-student-id="{{ $student->id }}" data-subject-enrolled-id="{{ $subjectEnrolled->id }}">
             <td><input type="checkbox" class="student-checkbox" value="{{ $student->id }}"></td>
-            <td>{{ Str::limit($student->StudentID, 6, '...') }}</td>
+            <td>{{ $student->StudentID}}</td>
             <td>{{ $student->FullName }}</td>
             <td><input type="number" step="0.1" name="grades[{{ $student->id }}][prelim]" value="{{ $grade->prelim ?? '' }}" class="form-control grade-input" required></td>
             <td><input type="number" step="0.1" name="grades[{{ $student->id }}][midterm]" value="{{ $grade->midterm ?? '' }}" class="form-control grade-input" required></td>
