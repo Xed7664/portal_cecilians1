@@ -284,6 +284,17 @@ Route::post('/teacher/grades/{subjectEnrolled}/mark-ready', [GradeController::cl
         Route::post('/student/check', [AdminStudentController::class, 'checkFile'])->name('admin.users.student.check');
         Route::post('/student/upload', [AdminStudentController::class, 'upload'])->name('admin.users.student.upload');
 
+        //Edit Student Info and Grades- Admin Routes
+        Route::prefix('admin/users/student')->name('admin.users.student.')->group(function () {
+            Route::get('/', [StudentController::class, 'index'])->name('index');
+            Route::get('/{id}/edit', [StudentController::class, 'edit'])->name('edit');
+            Route::put('/{id}', [StudentController::class, 'update'])->name('update');
+            Route::get('/{id}/grades', [StudentController::class, 'showGrades'])->name('grades');
+            Route::get('/{id}/grades-data', [StudentController::class, 'getGradesData'])->name('grades-data');
+            
+        });
+        
+
         // Admin analytics
 
         Route::get('/analytics/logins', [AdminLoginController::class, 'index'])->name('admin.analytics.login');
