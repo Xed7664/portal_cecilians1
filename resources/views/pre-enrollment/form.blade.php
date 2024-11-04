@@ -68,7 +68,7 @@
                 <div class="step active" id="step1">
                     <h3 class="section-title text-primary">Step 1: Personal Information</h3>
                     <p><strong>Student Type:</strong> {{ $student->student_type }}</p>
-                    <p><strong>Year Level:</strong> {{ $student->YearLevel }}</p>
+                    <p><strong>Year Level:</strong> {{ $student->YearLevel->name }}</p>
 
                     <!-- Personal Information Fields -->
                     <div class="row mb-3">

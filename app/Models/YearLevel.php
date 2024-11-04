@@ -8,6 +8,11 @@ use Illuminate\Database\Eloquent\Model;
 class YearLevel extends Model
 {
    
+    public function students()
+{
+    return $this->hasMany(Student::class);
+}
+
      // Relationship with Section (if YearLevel is related to Section)
      public function sections()
      {

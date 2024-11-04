@@ -20,8 +20,10 @@
                     </div>
                     <div class="card-body">
                         <h5 class="card-title"></h5>
+
                         <!-- Table with stripped rows -->
                         <div class="table-responsive">
+
                         <table id="student" class="table datatable">
                             <thead>
                                 <tr>
@@ -40,10 +42,27 @@
                                     <td>{{ $item->StudentID }}</td>
                                     <td>{{ $item->FullName }}</td>
                                     <td>{{ $item->Birthday }}</td>
-                                    <td>{{ $item->Course }}</td>
-                                    <td><span class="text-truncate d-flex align-items-center"><span class="badge badge-center me-2"><div class="btn btn-sm @if(strtolower($item->Gender) === 'male') bg-primary-subtle @else bg-danger-subtle @endif rounded-circle">@if(strtolower($item->Gender) === 'male')<i class="bx bx-male-sign"></i>@else<i class="bx bx-female-sign"></i>@endif</div></span>{{ ucfirst($item->Gender) }}</span></td>
+                                    <td>{{ $item->program ? $item->program->code : '-' }}</td> <!-- Display program name -->
                                     <td>
-                                        <h6><span class="badge @if($item->isRegistered()) bg-success @else bg-secondary @endif">{{ $item->isRegistered() ? 'Registered' : 'Not Registered' }}</span></h6>
+                                        <span class="text-truncate d-flex align-items-center">
+                                            <span class="badge badge-center me-2">
+                                                <div class="btn btn-sm @if(strtolower($item->Gender) === 'male') bg-primary-subtle @else bg-danger-subtle @endif rounded-circle">
+                                                    @if(strtolower($item->Gender) === 'male')
+                                                        <i class="bx bx-male-sign"></i>
+                                                    @else
+                                                        <i class="bx bx-female-sign"></i>
+                                                    @endif
+                                                </div>
+                                            </span>
+                                            {{ ucfirst($item->Gender) }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <h6>
+                                            <span class="badge @if($item->isRegistered()) bg-success @else bg-secondary @endif">
+                                                {{ $item->isRegistered() ? 'Registered' : 'Not Registered' }}
+                                            </span>
+                                        </h6>
                                     </td>
                                     <td>
                                         <a href="{{ route('admin.users.student.edit', $item->id) }}" >
@@ -63,6 +82,7 @@
                         </table>
                     </div>
                         <!-- End Table with stripped rows -->
+
 
                     </div>
                 </div>
