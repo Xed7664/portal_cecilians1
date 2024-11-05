@@ -1,27 +1,28 @@
 <?php
-use App\Http\Controllers\{SearchController, ScheduleController, EventsController, CalendarController, AccountSettingsController, AjaxController, AuthController, PostController, ProfileController, UserController};
 use App\Livewire\Posts\{SingleFull};
-use App\Http\Controllers\Admin\UserController as AdminUserController;
-use App\Http\Controllers\Admin\EmployeeController as AdminEmployeeController;
-use App\Http\Controllers\Admin\StudentController as AdminStudentController;
-use App\Http\Controllers\Admin\Analytics\LoginController as AdminLoginController;
-use App\Http\Controllers\Socialite\GoogleController;
 use Illuminate\Support\Facades\Route;
-use Illuminate\Foundation\Auth\EmailVerificationRequest;
-use App\Http\Controllers\Auth\VerificationController;
-use App\Http\Controllers\Subjects\MiniController;
-use App\Http\Controllers\Subjects\SubjectController;
-use App\Http\Controllers\SubjectsPheadController;
-use App\Http\Controllers\SemesterController;
-use App\Http\Controllers\NotificationSendController;
-use App\Http\Controllers\GradeController;
-use App\Http\Controllers\ProspectusController;
-use App\Http\Controllers\EnrollmentController;
-use App\Http\Controllers\{StudentController, TeacherController, ProgramHeadController, AdminController};
-use App\Http\Controllers\WelcomeController;
 use App\Providers\RouteServiceProvider;
+use App\Http\Controllers\GradeController;
+use App\Http\Controllers\WelcomeController;
+use App\Http\Controllers\SemesterController;
 use App\Http\Controllers\AdmissionController;
+use App\Http\Controllers\EnrollmentController;
+use App\Http\Controllers\ProspectusController;
+use App\Http\Controllers\StudentPheadController;
 use App\Http\Controllers\PreEnrollmentController;
+use App\Http\Controllers\Subjects\MiniController;
+use App\Http\Controllers\SubjectsPheadController;
+use App\Http\Controllers\NotificationSendController;
+use App\Http\Controllers\Socialite\GoogleController;
+use App\Http\Controllers\Subjects\SubjectController;
+use App\Http\Controllers\Auth\VerificationController;
+use Illuminate\Foundation\Auth\EmailVerificationRequest;
+use App\Http\Controllers\Admin\UserController as AdminUserController;
+use App\Http\Controllers\Admin\StudentController as AdminStudentController;
+use App\Http\Controllers\Admin\EmployeeController as AdminEmployeeController;
+use App\Http\Controllers\Admin\Analytics\LoginController as AdminLoginController;
+use App\Http\Controllers\{StudentController, TeacherController, ProgramHeadController, AdminController};
+use App\Http\Controllers\{SearchController, ScheduleController, EventsController, CalendarController, AccountSettingsController, AjaxController, AuthController, PostController, ProfileController, UserController};
 
 // First Page Route
 Route::get('/welcome', [WelcomeController::class, 'index'])->name('welcome');
@@ -60,31 +61,61 @@ Route::post('admission/tracker', [AdmissionController::class, 'trackAdmission'])
 
 // Role-specific home routes
 Route::middleware(['auth'])->group(function () {
+
+    // Dashboard routes for each role
     Route::get('/student/dashboard', [StudentController::class, 'index'])->name('student.dashboard');
     Route::get('/teacher/dashboard', [TeacherController::class, 'index'])->name('teacher.dashboard');
     Route::get('/admin/dashboard', [AdminController::class, 'index'])->name('admin.dashboard');
-    Route::get('/program-head/prospectus', [ProgramHeadController::class, 'index'])->name('phead.prospectus');
-         //Program Head Prospectus 
-         Route::prefix('phead')->name('phead.')->group(function () {
-            Route::get('/prospectus', [ProgramHeadController::class, 'index'])->name('prospectus.index');
-            Route::post('/prospectus', [ProgramHeadController::class, 'store'])->name('prospectus.store');
-            Route::patch('/prospectus/{id}', [ProgramHeadController::class, 'update'])->name('prospectus.update');
-            Route::patch('/prospectus/{id}/archive', [ProgramHeadController::class, 'archive'])->name('prospectus.archive');
-            Route::get('/prospectus/archived', [ProgramHeadController::class, 'archivedIndex'])->name('prospectus.archived');
-            Route::patch('/prospectus/{id}/restore', [ProgramHeadController::class, 'restore'])->name('prospectus.restore');
+   
 
-            //Program Head Subjects
-            Route::get('/subjects', [SubjectsPheadController::class, 'index'])->name('subjects.index');
-            Route::post('/subjects', [SubjectsPheadController::class, 'store'])->name('subjects.store');
-            Route::get('/subjects/{subject}', [SubjectsPheadController::class, 'show'])->name('subjects.show');
-            Route::patch('/subjects/{subject}/archive', [SubjectsPheadController::class, 'archive'])->name('subjects.archive');
-            Route::put('/subjects/{subject}', [SubjectsPheadController::class, 'update'])->name('subjects.update');
-            Route::get('/archived-subjects', [SubjectsPheadController::class, 'archivedIndex'])->name('subjects.archived');
-            Route::patch('/subjects/{subject}/restore', [SubjectsPheadController::class, 'restore'])->name('subjects.restore');
-            Route::delete('/subjects/{subject}', [SubjectsPheadController::class, 'destroy'])->name('subjects.destroy');
+    // Program Head routes, with a prefix and name grouping for 'phead'
+    Route::prefix('phead')->name('phead.')->group(function () {
 
-            });
+        
+        // Program Head Dashboard route
+    Route::get('/dashboard', [ProgramHeadController::class, 'dashboard'])->name('dashboard');
+
+
+
+
+    // Prospectus Management routes
+    Route::get('/program-head/prospectus', [ProgramHeadController::class, 'index'])->name('prospectus');
+    Route::post('/prospectus', [ProgramHeadController::class, 'store'])->name('prospectus.store');
+    Route::patch('/prospectus/{id}', [ProgramHeadController::class, 'update'])->name('prospectus.update');
+    Route::patch('/prospectus/{id}/archive', [ProgramHeadController::class, 'archive'])->name('prospectus.archive');
+    Route::get('/prospectus/archived', [ProgramHeadController::class, 'archivedIndex'])->name('prospectus.archived');
+    Route::patch('/prospectus/{id}/restore', [ProgramHeadController::class, 'restore'])->name('prospectus.restore');
+    Route::get('/subjects/{id}', 'SubjectController@getSubjectDetails')->name('subjects.getDetails');
+    
+
+    // Subjects management routes
+    Route::get('/subjects', [SubjectsPheadController::class, 'index'])->name('subjects.index');
+    Route::post('/subjects', [SubjectsPheadController::class, 'store'])->name('subjects.store');
+    Route::put('/subjects/{subject}', [SubjectsPheadController::class, 'update'])->name('subjects.update');
+    Route::patch('/subjects/{subject}/archive', [SubjectsPheadController::class, 'archive'])->name('subjects.archive');
+    Route::get('/subjects/archived', [SubjectsPheadController::class, 'archivedSubjects'])->name('archived-subjects');
+    Route::patch('/subjects/{subject}/restore', [SubjectsPheadController::class, 'restore'])->name('restore');
+    Route::delete('/subjects/{subject}', [SubjectsPheadController::class, 'delete'])->name('delete');
+    
+    // Student management routes
+    Route::get('/students', [StudentPheadController::class, 'index'])->name('students.index');
+    Route::get('/students/{id}', [StudentPheadController::class, 'view'])->name('students.view');
+    Route::get('/students/{id}/grades', [StudentPheadController::class, 'grades'])->name('students.grades');
+    Route::post('/students/check', [StudentPheadController::class, 'check'])->name('students.check');
+    Route::post('/students/import', [StudentPheadController::class, 'import'])->name('students.import');
+
+    // Prospectus-Grade management
+    Route::get('/students/{id}/prospectus', [StudentPheadController::class, 'viewProspectus'])->name('students.prospectus');
+
+    // Year and Section route
+    Route::get('/yearandsection', [StudentPheadController::class, 'yearAndSection'])->name('yearandsection');
+
+    // Route for listing students in a section
+    Route::get('/sections/{section}/students', [StudentPheadController::class, 'studentsBySection'])->name('section.students');
 });
+
+});
+
 Route::get('/auth/registration', [AuthController::class, 'registration'])->name('registration');
 
 Route::get('/auth/verify', [AuthController::class, 'verify'])->name('verify');

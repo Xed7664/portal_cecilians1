@@ -43,13 +43,15 @@ class PostController extends Controller
             ]);
         } elseif ($user->type === 'program_head') {
             $programHead = $user->employee;
-            return view('posts.index', [
+            
+            return redirect()->route('phead.dashboard')->with([
                 'trendingHashtags' => $trendingHashtags,
                 'programHead' => $programHead
             ]);
-        } elseif ($user->type === 'admin') {
+}
+ elseif ($user->type === 'admin') {
             $admin = $user->employee;
-            return view('posts.index', [
+            return view('admin.analytics.login', [
                 'trendingHashtags' => $trendingHashtags,
                 'admin' => $admin
             ]);

@@ -29,5 +29,9 @@ class Department extends Model
     {
         return $this->hasMany(Schedule::class, 'program_id', 'id');
     }
+    public function students()
+    {
+        return $this->hasMany(Student::class);
+    }
     
 }

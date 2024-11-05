@@ -24,7 +24,9 @@ class Employee extends Model
         return $this->user !== null;
     }
     public function department()
-    {
-        return $this->belongsTo(Department::class);
-    }
+{
+    return $this->belongsTo(Department::class, 'department_id');
+}
+
+
 }

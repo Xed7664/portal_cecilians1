@@ -11,27 +11,44 @@ class SubjectsProspectus extends Model
 
     protected $table = 'subjects_prospectus'; // Specify the correct table name
 
-    protected $fillable = ['subject_id', 'archive_status'];
+    protected $fillable = ['subject_id', 'program_id', 'year_level_id', 'semester_id', 'archive_status'];
 
+    // Relationship with the Subject model
     public function subject()
     {
-        return $this->belongsTo(Subject::class);
+        return $this->belongsTo(Subject::class, 'subject_id');
     }
 
+    // Relationship with the Department model
     public function department()
     {
-        return $this->belongsTo(Department::class);
+        return $this->belongsTo(Department::class, 'department_id');
     }
+
+    // Relationship with the Grade model
     public function grades()
     {
-        return $this->belongsTo(Grade::class);
+        return $this->hasMany(Grade::class, 'subject_id', 'subject_id');
     }
-  /**
+
+    // Relationship with the Semester model
+    public function semester()
+    {
+        return $this->belongsTo(Semester::class, 'semester_id');
+    }
+
+    // Relationship with the YearLevel model
+    public function yearLevel()
+    {
+        return $this->belongsTo(YearLevel::class, 'year_level_id');
+    }
+
+    /**
      * Fetch subjects for a specific program, year level, and semester.
      *
      * @param  int  $programId
-     * @param  string  $yearLevel
-     * @param  string  $semester
+     * @param  int  $yearLevel
+     * @param  int  $semester
      * @return \Illuminate\Database\Eloquent\Collection
      */
     public static function getSubjectsForYearLevel($programId, $yearLevel, $semester)
@@ -39,9 +56,11 @@ class SubjectsProspectus extends Model
         return self::where('program_id', $programId)
                     ->where('year_level_id', $yearLevel)
                     ->where('semester_id', $semester)
-                    ->with('subject') // eager load the related subject
+                    ->with(['subject', 'semester', 'yearLevel']) // Eager load relationships
                     ->get();
     }
-    
+    public function program()
+    {
+        return $this->belongsTo(Department::class);
+    }
 }
-

@@ -58,12 +58,23 @@ class Student extends Model
     // You can also add a relationship for Semester if needed
     public function semester()
     {
-        return $this->belongsTo(Semester::class, 'Semester', 'id');
+        return $this->belongsTo(Semester::class, 'semester_id', 'id');
     }
+    
     
     public function enrollments()
         {
             return $this->hasMany(SubjectEnrolled::class, 'student_id', 'id');
         }
+
+        public function department()
+{
+    return $this->belongsTo(Department::class, 'program_id');
+}
+
+public function schoolYear()
+{
+    return $this->belongsTo(SchoolYear::class, 'school_year_id');
+}
 
 }

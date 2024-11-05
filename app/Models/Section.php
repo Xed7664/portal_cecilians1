@@ -44,9 +44,9 @@ public function subjects()
     {
         return $this->belongsTo(SchoolYear::class, 'school_year_id', 'id');
     }
-public function students()
-{
-    return $this->hasMany(Student::class);
-}
+    public function students()
+    {
+        return $this->hasMany(Student::class, 'section_id'); // Adjust 'section_id' if needed
+    }
 
 }

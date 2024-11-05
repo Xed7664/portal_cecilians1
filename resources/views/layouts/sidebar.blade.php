@@ -184,128 +184,114 @@
       @endif
       @if($userPanel === 'admin')
 
-<li class="nav-heading">ADMIN PANEL</li>
+                <li class="nav-heading">ADMIN PANEL</li>
 
-<li class="nav-item">
-    <a class="nav-link {{ request()->routeIs(['admin.users.registered', 'admin.users.student', 'admin.users.employee']) ? '' : 'collapsed' }}" data-bs-target="#components-nav" data-bs-toggle="collapse" href="#">
-        <i class="ri ri-group-line"></i>
-        <span>Users</span>
-        <i class="bi bi-chevron-down ms-auto"></i>
-    </a>
+                <li class="nav-item">
+                    <a class="nav-link {{ request()->routeIs(['admin.users.registered', 'admin.users.student', 'admin.users.employee']) ? '' : 'collapsed' }}" data-bs-target="#components-nav" data-bs-toggle="collapse" href="#">
+                        <i class="ri ri-group-line"></i>
+                        <span>Users</span>
+                        <i class="bi bi-chevron-down ms-auto"></i>
+                    </a>
 
-    <ul id="components-nav" class="nav-content collapse {{ request()->routeIs(['admin.users.registered', 'admin.users.student', 'admin.users.employee']) ? 'show' : '' }}" data-bs-target="#components-nav" data-bs-parent="#sidebar-nav">
-        <li>
-            <a href="{{ route('admin.users.registered') }}" class="{{ request()->routeIs('admin.users.registered') ? 'active' : '' }}">
-                <i class="bi bi-circle"></i><span>Registered</span>
-            </a>
-        </li>
-        <li>
-            <a href="{{ route('admin.users.student') }}" class="{{ request()->routeIs('admin.users.student') ? 'active' : '' }}">
-                <i class="bi bi-circle"></i><span>Students</span>
-            </a>
-        </li>
-        <li>
-            <a href="{{ route('admin.users.employee') }}" class="{{ request()->routeIs('admin.users.employee') ? 'active' : '' }}">
-                <i class="bi bi-circle"></i><span>Employees</span>
-            </a>
-        </li>
-    </ul>
-</li>
+                    <ul id="components-nav" class="nav-content collapse {{ request()->routeIs(['admin.users.registered', 'admin.users.student', 'admin.users.employee']) ? 'show' : '' }}" data-bs-target="#components-nav" data-bs-parent="#sidebar-nav">
+                        <li>
+                            <a href="{{ route('admin.users.registered') }}" class="{{ request()->routeIs('admin.users.registered') ? 'active' : '' }}">
+                                <i class="bi bi-circle"></i><span>Registered</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{{ route('admin.users.student') }}" class="{{ request()->routeIs('admin.users.student') ? 'active' : '' }}">
+                                <i class="bi bi-circle"></i><span>Students</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{{ route('admin.users.employee') }}" class="{{ request()->routeIs('admin.users.employee') ? 'active' : '' }}">
+                                <i class="bi bi-circle"></i><span>Employees</span>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
 
-<li class="nav-item">
-    <a class="nav-link collapsed" href="#">
-        <i class="bi bi-book"></i>
-        <span>Subjects</span>
-    </a>
-</li>
+                <li class="nav-item">
+                    <a class="nav-link collapsed" href="#">
+                        <i class="bi bi-book"></i>
+                        <span>Subjects</span>
+                    </a>
+                </li>
 
-<li class="nav-item">
-    <a class="nav-link {{ request()->routeIs(['admin.users.registered', 'admin.users.student', 'admin.users.employee']) ? '' : 'collapsed' }}" data-bs-target="#analytics-nav" data-bs-toggle="collapse" href="#">
-        <i class="ri ri-bar-chart-line"></i>
-        <span>Analytics</span>
-        <i class="bi bi-chevron-down ms-auto"></i>
-    </a>
+                <li class="nav-item">
+                    <a class="nav-link {{ request()->routeIs(['admin.users.registered', 'admin.users.student', 'admin.users.employee']) ? '' : 'collapsed' }}" data-bs-target="#analytics-nav" data-bs-toggle="collapse" href="#">
+                        <i class="ri ri-bar-chart-line"></i>
+                        <span>Analytics</span>
+                        <i class="bi bi-chevron-down ms-auto"></i>
+                    </a>
 
-    <ul id="analytics-nav" class="nav-content collapse {{ request()->routeIs(['admin.analytics.login']) ? 'show' : '' }}" data-bs-target="#components-nav" data-bs-parent="#sidebar-nav">
-        <li>
-            <a href="{{ route('admin.analytics.login') }}" class="{{ request()->routeIs('admin.analytics.login') ? 'active' : '' }}">
-                <i class="bi bi-circle"></i><span>Logins</span>
-            </a>
-        </li>
-    </ul>
-</li>
-<!-- Admission Section -->
-<li class="nav-item">
-    <a class="nav-link {{ request()->routeIs('admin.admissions.index') ? 'active' : 'collapsed' }}" href="{{ route('admin.admissions.index') }}">
-        <i class="bi bi-door-open"></i>
-        <span>Admissions</span>
-    </a>
-</li>
-
-
-
-@endif
+                    <ul id="analytics-nav" class="nav-content collapse {{ request()->routeIs(['admin.analytics.login']) ? 'show' : '' }}" data-bs-target="#components-nav" data-bs-parent="#sidebar-nav">
+                        <li>
+                            <a href="{{ route('admin.analytics.login') }}" class="{{ request()->routeIs('admin.analytics.login') ? 'active' : '' }}">
+                                <i class="bi bi-circle"></i><span>Logins</span>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+                <!-- Admission Section -->
+                <li class="nav-item">
+                    <a class="nav-link {{ request()->routeIs('admin.admissions.index') ? 'active' : 'collapsed' }}" href="{{ route('admin.admissions.index') }}">
+                        <i class="bi bi-door-open"></i>
+                        <span>Admissions</span>
+                    </a>
+                </li>
 
 
-      @if($userPanel === 'program_head')
-      <li class="nav-heading">PHEAD PANEL</li>
-      
-      <li class="nav-item school_year" data-syid="{{ Session::get('current_school_year_id') }}" data-semid="{{ Session::get('current_semester_id') }}">
-        <a class="nav-link collapsed" data-bs-target="#forms-nav" data-bs-toggle="collapse" href="#" aria-expanded="false">
-            <i class="bi bi-journal-text"></i>
-            <span class="fw-medium">{{ App\Http\Controllers\SchoolYearController::getCurrentSchoolYearName() }} 
-              ({{ App\Http\Controllers\SemesterController::getCurrentSemesterName() }})</span>
-            <i class="bi bi-chevron-down ms-auto"></i>
-        </a>
-        <ul id="forms-nav" class="nav-content collapse" data-bs-parent="#sidebar-nav" style="">
-            <!-- Semester Start -->
-            @foreach (App\Http\Controllers\SemesterController::getSemesters() as $semester)
-            <li class="semester-select" data-semid="{{ $semester->id }}">
-                <a href="javascript:void(0);" class="{{ $semester->id == Session::get('current_semester_id') ? 'active' : '' }}">
-                    <i class="bi bi-circle"></i>
-                    <span class="fw-medium">{{ $semester->name }}</span>
-                </a>
-            </li>
-            @endforeach
-            <!-- Semester End -->
-    
-            <!-- School Year Start -->
-            <li class="nav-heading">ARCHIVE</li>
-            @foreach (App\Http\Controllers\SchoolYearController::getSchoolYears() as $schoolYear)
-            <li class="year-select" data-syid="{{ $schoolYear->id }}">
-                <a href="javascript:void(0);">
-                    <i class="bi bi-circle"></i>
-                    <span class="fw-medium">{{ $schoolYear->name }}</span>
-                </a>
-            </li>
-            @endforeach
-            <!-- School Year End -->
-        </ul>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link {{ Route::is('program-head.grades.index') ? '' : 'collapsed' }}" href="{{ route('program-head.grades.index') }}">
-            <i class='bx bx-bar-chart'></i>
-          <span class="fw-medium">Grade</span>
-        </a>
-      </li>
 
-      
-        <li class="nav-item">
-        <a class="nav-link {{ Route::is('phead.subjects.index') ? '' : 'collapsed' }}" href="{{ route('phead.subjects.index') }}">
-            <i class='bx bx-book'></i>
-            <span class="fw-medium">Subjects</span>
-        </a>
-        </li>
-    
-      <li class="nav-item">
-        <a class="nav-link {{ Route::is('phead.prospectus') ? '' : 'collapsed' }}" href="{{ route('phead.prospectus') }}">
-            <i class='bx bx-book-open'></i>
-          <span class="fw-medium">Prospectus</span>
-        </a>
-      </li>
-    
-      
-    @endif
+                @endif
+
+
+                @if($userPanel === 'program_head')
+                <li class="nav-heading">Program Head Panel</li>
+            
+                <!-- Dashboard Link -->
+                <li class="nav-item">
+                    <a class="nav-link {{ Route::is('phead.dashboard') ? '' : 'collapsed' }}" href="{{ route('phead.dashboard') }}">
+                        <i class='bx bx-home'></i>
+                        <span class="fw-medium">Dashboard</span>
+                    </a>
+                </li>
+            
+                <!-- Students Link -->
+                <li class="nav-item">
+                    <a class="nav-link {{ Route::is('phead.students.index') ? '' : 'collapsed' }}" href="{{ route('phead.students.index') }}">
+                        <i class='bx bx-user'></i>
+                        <span class="fw-medium">Students</span>
+                    </a>
+                </li>
+            
+                <!-- Year & Section Link -->
+                <li class="nav-item">
+                    <a class="nav-link {{ Route::is('phead.yearandsection') ? '' : 'collapsed' }}" href="{{ route('phead.yearandsection') }}">
+                        <i class='bx bx-calendar'></i>
+                        <span class="fw-medium">Year & Section</span>
+                    </a>
+                </li>
+            
+                <!-- Subjects Link -->
+                <li class="nav-item">
+                    <a class="nav-link {{ Route::is('phead.subjects.index') ? '' : 'collapsed' }}" href="{{ route('phead.subjects.index') }}">
+                        <i class='bx bx-book'></i>
+                        <span class="fw-medium">Subjects</span>
+                    </a>
+                </li>
+            
+                <!-- Prospectus Link -->
+                <li class="nav-item">
+                    <a class="nav-link {{ Route::is('phead.prospectus') ? '' : 'collapsed' }}" href="{{ route('phead.prospectus') }}">
+                        <i class='bx bx-book-open'></i>
+                        <span class="fw-medium">Prospectus</span>
+                    </a>
+                </li>
+            @endif
+            
+
 
 
       
