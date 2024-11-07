@@ -85,7 +85,7 @@ Route::middleware(['auth'])->group(function () {
     Route::patch('/prospectus/{id}/archive', [ProgramHeadController::class, 'archive'])->name('prospectus.archive');
     Route::get('/prospectus/archived', [ProgramHeadController::class, 'archivedIndex'])->name('prospectus.archived');
     Route::patch('/prospectus/{id}/restore', [ProgramHeadController::class, 'restore'])->name('prospectus.restore');
-    Route::get('/subjects/{id}', 'SubjectController@getSubjectDetails')->name('subjects.getDetails');
+   
     
 
     // Subjects management routes
@@ -111,7 +111,13 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/yearandsection', [StudentPheadController::class, 'yearAndSection'])->name('yearandsection');
 
     // Route for listing students in a section
-    Route::get('/sections/{section}/students', [StudentPheadController::class, 'studentsBySection'])->name('section.students');
+    Route::get('/sections/{section}/{yearLevel}/students', [StudentPheadController::class, 'studentsBySection'])->name('section.students');
+
+
+    // route for schedules
+    Route::get('/schedules', [ProgramHeadController::class, 'schedules'])->name('schedules');
+
+
 });
 
 });

@@ -274,6 +274,14 @@
                     </a>
                 </li>
             
+                <!-- Schedules Link -->
+                <li class="nav-item">
+                    <a class="nav-link {{ Route::is('phead.schedules') ? '' : 'collapsed' }}" href="{{ route('phead.schedules') }}">
+                        <i class='bx bx-calendar-event'></i>
+                        <span class="fw-medium">Schedules</span>
+                    </a>
+                </li>
+            
                 <!-- Subjects Link -->
                 <li class="nav-item">
                     <a class="nav-link {{ Route::is('phead.subjects.index') ? '' : 'collapsed' }}" href="{{ route('phead.subjects.index') }}">
@@ -290,6 +298,7 @@
                     </a>
                 </li>
             @endif
+            
             
 
 

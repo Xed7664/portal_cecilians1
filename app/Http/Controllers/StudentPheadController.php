@@ -28,6 +28,15 @@ class StudentPheadController extends Controller
     
         return view('phead.students-list', compact('data'));
     }
+
+    public function view($id)
+        {
+            
+            $student = Student::with(['semester', 'yearLevel', 'section', 'program', 'schoolYear'])->findOrFail($id);
+            
+            return view('phead.view-student', compact('student'));
+        }
+
     
     public function grades($id)
 
@@ -78,7 +87,7 @@ class StudentPheadController extends Controller
                     $sections = Section::whereIn('id', function ($query) use ($yearLevel, $departmentId) {
                         $query->select('section_id')
                               ->from('subjects_enrolled')
-                              ->where('year_level_id', $yearLevel->id)
+                              ->where('year_level_id', $yearLevel->id) 
                               ->whereExists(function ($query) use ($departmentId) {
                                   $query->select('program_id')
                                         ->from('students')
@@ -92,22 +101,24 @@ class StudentPheadController extends Controller
             
                 return view('phead.yearandsection', compact('yearLevels', 'sectionsByYear'));
             }
+            
 
-    public function studentsBySection($sectionId)
+            public function studentsBySection($sectionId, $yearLevelId)
             {
-            
                 $section = Section::with('yearLevel')->findOrFail($sectionId);
-
             
-                $studentIds = SubjectEnrolled::where('section_id', $sectionId)->pluck('student_id');
-
                 
+                $studentIds = SubjectEnrolled::where('section_id', $sectionId)
+                                             ->where('year_level_id', $yearLevelId) 
+                                             ->pluck('student_id');
+            
                 $students = Student::whereIn('id', $studentIds)
-                            ->select(['StudentID', 'FullName', 'Birthday', 'Gender', 'Address', 'contact'])
-                            ->get();
-
+                                   ->select(['StudentID', 'FullName', 'Birthday', 'Gender', 'Address', 'contact'])
+                                   ->get();
+            
                 return view('phead.students-by-section', compact('section', 'students'));
             }
+            
 
 
 }

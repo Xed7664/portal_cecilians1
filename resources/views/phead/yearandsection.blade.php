@@ -26,13 +26,13 @@
                                         @if (!empty($sectionsByYear[$yearLevel->name]) && count($sectionsByYear[$yearLevel->name]) > 0)
                                             @foreach ($sectionsByYear[$yearLevel->name] as $section)
                                                 <div class="col-md-6">
-                                                    <a href="{{ route('phead.section.students', $section->id) }}" 
-                                                       class="section-card card shadow-sm text-decoration-none"
-                                                       data-section-id="{{ $section->id }}">
-                                                        <div class="card-body text-center">
-                                                            <h5 class="h6 mb-0 text-white">{{ $section->name }}</h5>
-                                                        </div>
-                                                    </a>
+                                                    <a href="{{ route('phead.section.students', ['section' => $section->id, 'yearLevel' => $yearLevel->id]) }}" 
+                                                        class="section-card card shadow-sm text-decoration-none"
+                                                        data-section-id="{{ $section->id }}">
+                                                         <div class="card-body text-center">
+                                                             <h5 class="h6 mb-0 text-white">{{ $section->name }}</h5>
+                                                         </div>
+                                                     </a>
                                                 </div>
                                             @endforeach
                                         @else
