@@ -18,7 +18,6 @@ class StudentController extends Controller
         // Logic specific to the student's dashboard
         return view('student.dashboard');
     }
-
     public function edit($id)
     {
         $student = Student::with(['subjectsEnrolled.subject', 'subjectsEnrolled.grades', 'subjectsEnrolled.schoolYear', 'subjectsEnrolled.semester'])
@@ -94,7 +93,5 @@ class StudentController extends Controller
     
         return view('admin.users.grades', compact('student', 'schoolYears', 'semesters', 'groupedGrades'));
     }
-    
-   
     
 }

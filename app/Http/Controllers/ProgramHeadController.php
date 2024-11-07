@@ -1,48 +1,73 @@
 <?php
 namespace App\Http\Controllers;
+use App\Models\Section;
+use App\Models\Student;
 use App\Models\Subject;
+use App\Models\Semester;
 use App\Models\YearLevel;
 use App\Models\Department;
 use Illuminate\Http\Request;
+use App\Models\DepartmentSubject;
 use App\Models\SubjectsProspectus;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
 
 class ProgramHeadController extends Controller
 {
-    public function index()
-    {
-        $user = Auth::user();
-        $employee = session('employee');
+    public function dashboard()
+{
+    $user = Auth::user();
+    $dashboardData = session('dashboard_data');
 
-        if (!$employee || !$employee->department_id) {
-            Log::error("Program head user {$user->id} has no associated employee record or department.");
-            return redirect()->back()->with('error', 'Unable to determine your department. Please contact the administrator.');
+    return view('phead.dashboard', [
+        'user' => $user,
+        'studentsCount' => $dashboardData['studentsCount'],
+        'sectionsCount' => $dashboardData['sectionsCount'],
+        'subjectsCount' => $dashboardData['subjectsCount'],
+        'prospectusCount' => $dashboardData['prospectusCount'],
+    ]);
+}
+
+
+public function index()
+    {
+        // Ensure we have the program_id from the session
+        $programId = session('program_id');
+        
+        if (!$programId) {
+            // If program_id is not in session, fetch it from the employee record
+            $employee = Auth::user()->employee;
+            $programId = $employee->department_id;
+            
+            // Store it in the session for future use
+            session(['program_id' => $programId]);
         }
 
-        $departmentId = $employee->department_id;
+        $subjects = SubjectsProspectus::with(['subject', 'yearLevel', 'program'])
+            ->where('program_id', $programId)
+            ->where('archive_status', 0)
+            ->get()
+            ->groupBy(['year_level_id', 'semester_id']);
 
-        // Fetch subjects that are not in the subjects_prospectus table
-        $subjects = Subject::whereDoesntHave('prospectus', function($query) {
-            $query->where('archive_status', 0);
-        })->where('department_id', $departmentId)->get();
+        $yearLevels = YearLevel::orderBy('id')->get();
+        $semesters = Semester::orderBy('id')->take(2)->get();
 
-        $prospectus = SubjectsProspectus::with(['subject' => function($query) use ($departmentId) {
-            $query->where('department_id', $departmentId);
-        }])->where('archive_status', 0)->get();
+        // Fetch department subjects for the logged-in program head
+        $departmentSubjects = Subject::whereHas('departmentSubjects', function ($query) use ($programId) {
+            $query->where('program_id', $programId);
+        })->get();
 
-        // Log any prospectus items without a subject for debugging
-        $prospectus->each(function ($item) {
-            if (!$item->subject) {
-                Log::warning("Prospectus item {$item->id} has no associated subject.");
-            }
-        });
-
-        $department = Department::find($departmentId);
-        $yearLevels = YearLevel::all();
-
-        return view('phead.prospectus', compact('subjects', 'prospectus', 'department', 'yearLevels'));
+        return view('phead.prospectus', compact('subjects', 'yearLevels', 'semesters', 'departmentSubjects'));
     }
+    public function getSubjectDetails($id)
+        {
+            $subject = Subject::findOrFail($id);
+            return response()->json($subject);
+        }
+
+
+
+
 
     public function store(Request $request)
     {
@@ -63,15 +88,22 @@ class ProgramHeadController extends Controller
             'lec_units' => 'required|numeric',
             'lab_units' => 'required|numeric',
         ]);
-
+    
         $prospectus = SubjectsProspectus::findOrFail($id);
         $subject = $prospectus->subject;
-
-        $subject->update($request->all());
-
-        return redirect()->route('phead.prospectus.index')->with('success', 'Prospectus updated successfully.');
+    
+        // Updating only specific fields to avoid overwriting unintended fields
+        $subject->update([
+            'subject_code' => $request->subject_code,
+            'description' => $request->description,
+            'lec_units' => $request->lec_units,
+            'lab_units' => $request->lab_units,
+            'pre_requisite' => $request->pre_requisite,
+        ]);
+    
+        return redirect()->route('phead.prospectus')->with('success', 'Prospectus updated successfully.');
     }
-
+    
     public function archive($id)
     {
         $prospectus = SubjectsProspectus::findOrFail($id);

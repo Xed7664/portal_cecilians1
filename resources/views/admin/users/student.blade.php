@@ -20,10 +20,8 @@
                     </div>
                     <div class="card-body">
                         <h5 class="card-title"></h5>
-
-                        <!-- Table with stripped rows -->
-                        <div class="table-responsive">
-
+                          <!-- Table with stripped rows -->
+                          <div class="table-responsive">
                         <table id="student" class="table datatable">
                             <thead>
                                 <tr>
@@ -65,7 +63,7 @@
                                         </h6>
                                     </td>
                                     <td>
-                                        <a href="{{ route('admin.users.student.edit', $item->id) }}" >
+                                        <a href="#" >
                                             <button class="btn" type="button">
                                                 <i class="bx ri-edit-box-line"></i>
                                             </button>
@@ -80,7 +78,7 @@
                                 @endforeach
                             </tbody>
                         </table>
-                    </div>
+                            </div>
                         <!-- End Table with stripped rows -->
 
 
@@ -520,8 +518,6 @@ function resetButton() {
     importBtn.removeAttribute('disabled');
     importBtn.innerHTML = 'Upload';
 }
-
- 
 
 
 </script>

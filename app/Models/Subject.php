@@ -61,6 +61,22 @@ public function schedules()
 {
     return $this->hasMany(Schedule::class);
 }
+public function departmentSubjects()
+{
+    return $this->hasMany(DepartmentSubject::class);
+}
 
+/**
+ * Get the subjects for a specific department (program).
+ *
+ * @param int $programId
+ * @return \Illuminate\Database\Eloquent\Collection
+ */
+public static function forDepartment(int $programId)
+{
+    return self::whereHas('departmentSubjects', function ($query) use ($programId) {
+        $query->where('program_id', $programId);
+    })->get();
+}
 
 }

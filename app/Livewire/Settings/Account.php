@@ -35,18 +35,20 @@ class Account extends Component
     public function mount($user)
     {
         $this->avatarReset = false;
-
         $this->fullname = $user->getFullname();
         $this->email = $user->email;
-        $this->birthday = $user->student->Birthday;
-        $this->birthplace = $user->student->BirthPlace;
-        $this->religion = $user->student->Religion;
-        $this->citizenship = $user->student->Citizenship;
-        $this->address = $user->student->Address;
+
+        // Check if student data is available
+        $student = $user->student;
+        $this->birthday = optional($student)->Birthday;
+        $this->birthplace = optional($student)->BirthPlace;
+        $this->religion = optional($student)->Religion;
+        $this->citizenship = optional($student)->Citizenship;
+        $this->address = optional($student)->Address;
+        
         $this->type = $user->type;
         $this->bio = $user->bio;
 
-        // Store the original values for resetting
         $this->originalValues = [
             'fullname' => $this->fullname,
             'email' => $this->email,

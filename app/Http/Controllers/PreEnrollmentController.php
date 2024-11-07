@@ -18,6 +18,7 @@ use Illuminate\Notifications\Notifiable;
 use App\Mail\PreEnrollmentConfirmation;
 use Illuminate\Support\Facades\Mail;
 use Barryvdh\DomPDF\Facade\Pdf; // Import the Pdf facade here
+use App\Models\PreEnrollmentSetting;
 
 class PreEnrollmentController extends Controller
 {
@@ -76,6 +77,52 @@ public function showForm()
     // Pass the fetched semesters and school years to the view
     return view('pre-enrollment.form', compact('student', 'currentSemester', 'currentSchoolYear', 'programs', 'yearLevels', 'uncompletedSubjects', 'subjects', 'semesters', 'schoolYears'));  // Add 'schoolYears'
 }
+
+
+public function showSettings()
+{
+    $semesters = Semester::all();
+    $schoolYears = SchoolYear::all();
+    $preEnrollmentSettings = PreEnrollmentSetting::with(['semester', 'schoolYear'])->latest()->get();
+
+    return view('pre-enrollment.phead.pre-enrollment-settings', compact('semesters', 'schoolYears', 'preEnrollmentSettings'));
+}
+
+public function storeSettings(Request $request)
+{
+    $request->validate([
+        'semester_id' => 'required|exists:semesters,id',
+        'school_year_id' => 'required|exists:school_years,id',
+        'open_date' => 'required|date',
+        'close_date' => 'required|date|after_or_equal:open_date',
+    ]);
+
+    // Create or update setting
+    PreEnrollmentSetting::updateOrCreate(
+        [
+            'semester_id' => $request->semester_id,
+            'school_year_id' => $request->school_year_id,
+        ],
+        $request->only('open_date', 'close_date')
+    );
+
+    return redirect()->back()->with('success', 'Pre-enrollment settings updated successfully.');
+}
+public function togglePreEnrollmentStatus($semesterId)
+{
+    // Retrieve the pre-enrollment setting by semester
+    $preEnrollmentSetting = PreEnrollmentSetting::where('semester_id', $semesterId)->firstOrFail();
+
+    // Toggle the status
+    $preEnrollmentSetting->is_open = !$preEnrollmentSetting->is_open;
+    $preEnrollmentSetting->save();
+
+    return response()->json([
+        'success' => true,
+        'is_open' => $preEnrollmentSetting->is_open,
+    ]);
+}
+
 
 
 

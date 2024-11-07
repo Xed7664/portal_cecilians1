@@ -20,11 +20,11 @@ class Semester extends Model
     {
         return $this->hasMany(SubjectEnrolled::class);
     }
+    public function schoolYears()
+    {
+        return $this->belongsToMany(SchoolYear::class, 'school_year_semester');
+    }
     
-    public function schoolYear()
-        {
-            return $this->belongsTo(SchoolYear::class, 'school_year_id', 'id');
-        }
 
         public function schedules()
         {
@@ -35,4 +35,5 @@ class Semester extends Model
     {
         return $this->hasMany(Grade::class);
     }
+    
 }
