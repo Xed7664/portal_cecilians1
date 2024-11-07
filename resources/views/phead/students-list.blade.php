@@ -4,18 +4,17 @@
 
 @section('content')
 <main id="main" class="main">
-    <section class="newsfeed-container">
+    <section class="container">
         <div class="row">
+            <h1>Student Masterlist</h1>
             <!-- Main Content -->
             <div class="col-lg-12">
                 <div class="card">
                     <div class="card-header border-bottom">
-                        <h5 class="card-title mb-3">Student Masterlist</h5>
                         <div class="d-flex justify-content-between align-items-center row pb-2 gap-3 gap-md-0">
-                            <div class="col-md-3 user_program"></div>
-                            <div class="col-md-3 user_year_level"></div>
-                            <div class="col-md-3 user_section"></div>
-                            <div class="col-md-3 user_semester"></div>
+                            <div class="col-md-4 user_year_level"></div>
+                            <div class="col-md-4 user_section"></div>
+                            <div class="col-md-4 user_semester"></div>
                         </div>
                     </div>
                     <div class="card-body">

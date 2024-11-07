@@ -13,9 +13,19 @@
             </a>
         </div>
 
+        <!-- Search Input for Archived Prospectus -->
+        <div class="row mb-3">
+            <div class="col-md-4">
+                <div class="input-group">
+                    <span class="input-group-text"><i class="bi bi-search"></i></span>
+                    <input type="text" id="subjectSearchInput" class="form-control" placeholder="Search Prospectus Subjects...">
+                </div>
+            </div>
+        </div>
+
         <!-- Archived Prospectus Table -->
         <div class="table-responsive">
-            <table class="table table-striped table-hover">
+            <table class="table table-striped table-hover" id="archivedSubjectsTable">
                 <thead class="table-light">
                     <tr>
                         <th>Subject Code</th>
@@ -52,6 +62,7 @@
 
 @section('styles')
 <style>
+    /* Style adjustments for buttons on smaller screens */
     .btn-group .btn {
         border-radius: 0;
     }
@@ -77,3 +88,4 @@
     }
 </style>
 @endsection
+

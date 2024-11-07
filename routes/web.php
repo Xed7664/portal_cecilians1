@@ -126,7 +126,13 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/yearandsection', [StudentPheadController::class, 'yearAndSection'])->name('yearandsection');
 
     // Route for listing students in a section
-    Route::get('/sections/{section}/students', [StudentPheadController::class, 'studentsBySection'])->name('section.students');
+    Route::get('/sections/{section}/{yearLevel}/students', [StudentPheadController::class, 'studentsBySection'])->name('section.students');
+
+
+    // route for schedules
+    Route::get('/schedules', [ProgramHeadController::class, 'schedules'])->name('schedules');
+
+
 });
 });
 Route::get('/auth/registration', [AuthController::class, 'registration'])->name('registration');
