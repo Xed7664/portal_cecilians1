@@ -371,9 +371,15 @@ class StudentController extends Controller
                                 $sectionName = $sectionMap[$rowData[43]] ?? $rowData[43];
                                 $programCode = $programMap[$rowData[45]] ?? $rowData[45];
 
-                                // Look up or create school year, semester, and other FK records
+                                 // Look up or create the School Year record
                                 $schoolYearModel = SchoolYear::firstOrCreate(['name' => $rowData[46]]);
-                                $semesterModel = Semester::firstOrCreate(['name' => $semesterName, 'school_year_id' => $schoolYearModel->id]);
+
+                                // Look up or create the Semester record
+                                $semesterModel = Semester::firstOrCreate(['name' => $semesterName]);
+
+                                // Attach the semester to the school year via the pivot table
+                                $schoolYearModel->semesters()->syncWithoutDetaching([$semesterModel->id]);
+
                                 $yearLevelModel = YearLevel::firstOrCreate(['name' => $rowData[42]]);
                                 $sectionModel = Section::firstOrCreate(['name' => $sectionName]);
                                 $programModel = Department::firstOrCreate(['code'=>$programCode]);
