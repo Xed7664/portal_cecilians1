@@ -16,6 +16,16 @@
             </nav>
         </div><!-- End Page Title -->
         <div class="container">
+        @if(session('success'))
+                <div class="alert alert-success">
+                    {{ session('success') }}
+                </div>
+            @endif
+            @if(session('error'))
+                <div class="alert alert-danger">
+                    {{ session('error') }}
+                </div>
+            @endif
             <!-- Progress Bar -->
             <div class="progress mb-4" style="height: 50px">
                 <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="width: 12%" id="progressBar">
@@ -52,23 +62,23 @@
                     </div>
                 </div>
             </div>
-            @if(session('success'))
-                <div class="alert alert-success">
-                    {{ session('success') }}
-                </div>
-            @endif
-            @if(session('error'))
-                <div class="alert alert-danger">
-                    {{ session('error') }}
-                </div>
-            @endif
+            
             <!-- Enrollment Form -->
             <form id="preEnrollmentForm" action="{{ route('pre-enrollment.submit') }}" method="POST">
                 @csrf
                 <div class="step active" id="step1">
-                    <h3 class="section-title text-primary">Step 1: Personal Information</h3>
-                    <p><strong>Student Type:</strong> {{ $student->student_type }}</p>
-                    <p><strong>Year Level:</strong> {{ $student->YearLevel }}</p>
+                <h3 class="section-title text-primary">Step 1: Personal Information</h3>
+                 <!-- Display student type -->
+                    <div class="form-group">
+                        <label for="studentType">Student Type:</label>
+                        <input type="text" id="studentType" class="form-control" value="{{ $student->student_type ?? 'N/A' }}" readonly>
+                    </div>
+
+                    <!-- Display year level -->
+                    <div class="form-group">
+                        <label for="yearLevel">Year Level:</label>
+                        <input type="text" id="yearLevel" class="form-control" value="{{ $student->year_level ?? 'N/A' }}" readonly>
+                    </div>
 
                     <!-- Personal Information Fields -->
                     <div class="row mb-3">

@@ -49,7 +49,7 @@
                             </thead>
                             <tbody>
                                 @foreach($enrollments as $enrollment)
-                                    @php $grade = $enrollment->grades->first(); @endphp
+                                    @php $grade = $enrollment->grade->first(); @endphp
                                     <tr>
                                         <td>{{ $enrollment->subject->subject_code }}</td>
                                         <td>{{ $enrollment->subject->description }}</td>

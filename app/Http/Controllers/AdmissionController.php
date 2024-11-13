@@ -4,6 +4,9 @@ namespace App\Http\Controllers;
 use App\Events\AdmissionApproved;
 use App\Models\Admission;
 use App\Models\Student;
+use App\Models\AdmissionSetting;
+use App\Models\Semester;
+use App\Models\SchoolYear;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use App\Mail\AdmissionApprovedEmail;
@@ -14,8 +17,18 @@ class AdmissionController extends Controller
 {
     public function showAdmissionForm()
     {
-        return view('admission.form'); 
+        // Retrieve the active admission period (currently open)
+        $activeAdmissionPeriod = AdmissionSetting::where('is_open', true)->first();  // Adjust the query to match your DB schema
+        
+        // If no active admission period, show the closed view
+        if (!$activeAdmissionPeriod) {
+            return view('admission.closed'); // Redirect to a "closed" view if no active period
+        }
+    
+        // If there is an active admission period, proceed with showing the form
+        return view('admission.form', compact('activeAdmissionPeriod'));
     }
+    
     public function submitAdmission(Request $request)
     {
         $request->validate([
@@ -127,11 +140,26 @@ public function trackAdmission(Request $request)
     return back()->with('error', 'Invalid email or tracker code.');
 }
 
-    public function index()
-    {
-        $admissions = Admission::where('status', 'pending')->get();
-        return view('admin.admission.index', compact('admissions'));
-    }
+public function index()
+{
+    // Retrieve pending admissions
+    $admissions = Admission::where('status', 'pending')->get();
+
+    // Retrieve the active admission period
+    $activeAdmissionPeriod = AdmissionSetting::with(['semester', 'schoolYear'])
+                                              ->where('is_open', true)
+                                              ->first();
+
+    // Retrieve all admission settings
+    $admissionSettings = AdmissionSetting::with(['semester', 'schoolYear'])->get();
+
+    // Retrieve all semesters and school years for selection in the settings form
+    $semesters = Semester::all();
+    $schoolYears = SchoolYear::all();
+
+    return view('admin.admission.index', compact('admissions', 'activeAdmissionPeriod', 'admissionSettings', 'semesters', 'schoolYears'));
+}
+
     
 
     // Admin: Review the admission
@@ -157,16 +185,19 @@ public function trackAdmission(Request $request)
             'Address' => $admission->address,
             'admission_status' => 'approved',
             'admission_date' => now(),
+            'student_type' => 'new',  // Set as 'new' for all newly admitted students
+            'year_level_id' => 1,     // Assuming 1 represents '1st Year' in your year level table
         ]);
     
-        // Update admission status
+        // Update admission status to approved
         $admission->update(['status' => 'approved']);
     
-// Send email to the applicant
-Mail::to($admission->email)->send(new AdmissionApprovedEmail($admission));
+        // Send approval email
+        Mail::to($admission->email)->send(new AdmissionApprovedEmail($admission));
     
         return redirect()->route('admin.admission.review', $id)->with('success', 'Admission approved and email sent, Student ID: ' . $studentID);
     }
+    
     
     public function rejectAdmission(Request $request, $id)
 {
@@ -181,4 +212,52 @@ Mail::to($admission->email)->send(new AdmissionApprovedEmail($admission));
     return redirect()->route('admin.admission.review', $id)->with('error', 'Admission rejected.');
 }
 
+
+
+public function storeAdmissionSettings(Request $request)
+{
+    $request->validate([
+        'semester_id' => 'required|exists:semesters,id',
+        'school_year_id' => 'required|exists:school_years,id',
+        'open_date' => 'required|date',
+        'close_date' => 'required|date|after_or_equal:open_date',
+    ]);
+
+    // Create or update admission setting
+    AdmissionSetting::updateOrCreate(
+        [
+            'semester_id' => $request->semester_id,
+            'school_year_id' => $request->school_year_id,
+        ],
+        $request->only('open_date', 'close_date')
+    );
+
+    return redirect()->back()->with('success', 'Admission settings updated successfully.');
+}
+
+public function toggleAdmissionStatus($semesterId, $schoolYearId)
+{
+    // Retrieve the selected admission setting
+    $admissionSetting = AdmissionSetting::where('semester_id', $semesterId)
+                                         ->where('school_year_id', $schoolYearId)
+                                         ->firstOrFail();
+
+    if ($admissionSetting->is_open) {
+        $admissionSetting->is_open = false;
+    } else {
+        AdmissionSetting::where('is_open', true)
+                        ->where(function ($query) use ($semesterId, $schoolYearId) {
+                            $query->where('semester_id', '!=', $semesterId)
+                                  ->orWhere('school_year_id', '!=', $schoolYearId);
+                        })
+                        ->update(['is_open' => false]);
+
+        $admissionSetting->is_open = true;
+    }
+
+    $admissionSetting->save();
+
+  // Redirect back to the settings page with a success message
+  return redirect()->route('admin.admissions.index')->with('success', 'Pre-enrollment status updated successfully.');
+}
 }

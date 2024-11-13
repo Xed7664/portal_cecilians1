@@ -34,10 +34,10 @@ class SemesterController extends Controller
     if ($schoolYear) {
         $semesters = $schoolYear->semesters->map(function ($semester) {
             switch ($semester->name) {
-                case '1st Sem':
+                case '1st':
                     $semester->name = 'First Semester';
                     break;
-                case '2nd Sem':
+                case '2nd':
                     $semester->name = 'Second Semester';
                     break;
                 // Add more cases as needed for other semester names

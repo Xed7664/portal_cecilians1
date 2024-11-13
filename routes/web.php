@@ -23,7 +23,9 @@ use App\Providers\RouteServiceProvider;
 use App\Http\Controllers\AdmissionController;
 use App\Http\Controllers\PreEnrollmentController;
 use App\Http\Controllers\StudentPheadController;
-
+use App\Http\Controllers\ChatBotController;
+use App\Http\Controllers\SimpleChatBotController;
+use App\Http\Controllers\ChatGPTController;
 
 // First Page Route
 Route::get('/welcome', [WelcomeController::class, 'index'])->name('welcome');
@@ -48,6 +50,9 @@ Route::post('/pre-enrollment/submit', [PreEnrollmentController::class, 'submitPr
 
     Route::get('/pre-enrollment/dashboard', [PreEnrollmentController::class, 'previewForm'])->name('pre-enrollment.dashboard');
 });
+// Route in web.php
+Route::patch('/sections/{section}/toggle-lock', [PreEnrollmentController::class, 'toggleLock'])->name('sections.toggleLock');
+
 Route::get('/get-schedules', [PreEnrollmentController::class, 'getSchedules'])->name('get-schedules');
 Route::get('/enrollment-status', [PreEnrollmentController::class, 'showStatus'])->name('enrollment.enrollment-status');
 // web.php
@@ -58,22 +63,23 @@ Route::post('admission-status', [AdmissionController::class, 'checkStatus'])->na
 Route::get('admission/tracker', [AdmissionController::class, 'showTracker'])->name('admission.tracker');
 Route::post('admission/tracker', [AdmissionController::class, 'trackAdmission']);
 
-
-
+Route::get('/chat', [ChatBotController::class, 'index'])->name('chat.index'); // For displaying the chatbot interface
+Route::post('/chat', [ChatBotController::class, 'handle'])->name('chat.handle'); // For handling the POST requests
+Route::post('/chat', [SimpleChatBotController::class, 'handle'])->name('chat.handle');
+Route::post('/chatgpt', [ChatGPTController::class, 'handle'])->name('chatgpt.handle');
+Route::post('/chatbot/message', [ChatbotController::class, 'message']);
 // Role-specific home routes
 Route::middleware(['auth'])->group(function () {
    
-         //Program Head Prospectus 
-         Route::prefix('phead')->name('phead.')->group(function () {
+    // Program Head Prospectus 
+    Route::prefix('phead')->name('phead.')->group(function () {
 
-            // Show the pre-enrollment settings page
-            Route::get('/pre-enrollment/settings', [PreEnrollmentController::class, 'showSettings'])->name('pre-enrollment.settings');
-            
-            // Update pre-enrollment settings
-            Route::post('/pre-enrollment/store', [PreEnrollmentController::class, 'storeSettings'])->name('pre-enrollment.storeSettings');
-            // Add this inside the routes group for program head or pre-enrollment settings
-            Route::post('/pre-enrollment/toggle/{semester}', [PreEnrollmentController::class, 'togglePreEnrollmentStatus'])
-            ->name('pre-enrollment.toggle');
+        // Pre-Enrollment Routes
+        Route::get('/preenrollment', [PreEnrollmentController::class, 'preenrollmentphead'])->name('preenrollment');
+        Route::post('/lock-section/{sectionId}', [PreEnrollmentController::class, 'lockSection'])->name('lockSection');
+        Route::post('/unlock-section/{sectionId}', [PreEnrollmentController::class, 'unlockSection'])->name('unlockSection');
+ 
+
 
             // List student applications for pre-enrollment
             Route::get('/pre-enrollment/applications', [ProgramHeadPreEnrollmentController::class, 'listApplications'])->name('pre-enrollment.applications');
@@ -83,7 +89,7 @@ Route::middleware(['auth'])->group(function () {
 
              // Dashboard routes for each role
     Route::get('/student/dashboard', [StudentController::class, 'index'])->name('student.dashboard');
-    Route::get('/teacher/dashboard', [TeacherController::class, 'index'])->name('teacher.dashboard');
+   
     Route::get('/admin/dashboard', [AdminController::class, 'index'])->name('admin.dashboard');
 
         
@@ -214,7 +220,7 @@ Route::post('/teacher/grades/mapHeaders', [GradeController::class, 'mapHeaders']
 Route::post('/teacher/grades/import', [GradeController::class, 'importGrades'])->name('teacher.grades.import');
 // routes/web.php
 
-Route::post('/send-grades-notification', [GradesController::class, 'sendGradesNotification']);
+Route::post('/send-grades-notification', [GradeController::class, 'sendGradesNotification']);
 
      // Route to display the file upload form
      Route::get('teacher/grades/upload', [GradesController::class, 'showUploadForm'])->name('grades.upload.form');
@@ -240,9 +246,16 @@ Route::get('/fetch-teacher-departments', [GradeControllerName::class, 'fetchTeac
 Route::post('/teacher/grades/submit-all-grades/{subjectId}', [GradeController::class, 'submitAllGrades'])->name('teacher.grades.submitAllGrades');
 
 Route::post('/teacher/grades/{subjectEnrolled}/mark-ready', [GradeController::class, 'markAsReady'])->name('teacher.grades.markReady');
+Route::get('/teacher/schedule', [ScheduleController::class, 'teacherSchedule'])->name('teacher.schedule');
 
+// Teacher Dashboard Route
+Route::get('/teacher/dashboard', [TeacherController::class, 'dashboard'])->name('teacher.dashboard');
+// fetch students
+Route::get('/teacher/fetch-enrolled-students', [TeacherController::class, 'fetchEnrolledStudents'])->name('teacher.fetchEnrolledStudents');
 
-
+Route::get('/teacher/students/{student}/grades', [TeacherController::class, 'viewGrades'])
+     ->name('teacher.students.grades');
+     Route::get('/students/data', [TeacherController::class, 'fetchEnrolledStudents'])->name('students.data');
 
 
 
@@ -354,7 +367,24 @@ Route::post('admin/admission/{id}/approve', [AdmissionController::class, 'approv
 Route::post('admin/admissions/{id}/reject', [AdmissionController::class, 'rejectAdmission'])->name('admin.admissions.reject');
 // In web.php (new route)
 Route::get('admin/admissions', [AdmissionController::class, 'index'])->name('admin.admissions.index');
+Route::post('/admin/admissions/store', [AdmissionController::class, 'storeAdmissionSettings'])->name('admin.admissions.store'); // Store settings
+Route::post('/admin/admissions/toggle/{semesterId}/{schoolYearId}', [AdmissionController::class, 'toggleAdmissionStatus'])->name('admin.admissions.toggle'); // Toggle status
+Route::view('admission/closed', 'admission.closed')->name('admission.closed');
+// Show the pre-enrollment settings page
+Route::get('/pre-enrollment/settings', [PreEnrollmentController::class, 'showSettings'])->name('admin.pre-enrollment.settings');
+            
+// Update pre-enrollment settings
+Route::post('/pre-enrollment/store', [PreEnrollmentController::class, 'storeSettings'])->name('admin.pre-enrollment.storeSettings');
+// Add this inside the routes group for admin or pre-enrollment settings
+
     });
+// Admin routes
+Route::prefix('admin/pre-enrollment')->group(function () {
+  // Admin routes
+Route::post('/toggle/{semesterId}/{schoolYearId}', [PreEnrollmentController::class, 'togglePreEnrollmentStatus'])
+->name('admin.pre-enrollment.toggle');
+
+});
 
     //not yet applied
     // Route::get('admin',function(){

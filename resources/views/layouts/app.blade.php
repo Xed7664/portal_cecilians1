@@ -64,7 +64,10 @@ use App\Models\User;
   <link href="{{ asset('vendor/bs-stepper/bs-stepper.css') }}" rel="stylesheet">
 
 <script src="{{ asset('vendor/datatables/datatables.min.js') }}"></script>
-
+<!-- Include DataTables and jQuery library -->
+<script src="https://cdn.datatables.net/1.11.3/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.11.3/js/dataTables.bootstrap5.min.js"></script>
+<link rel="stylesheet" href="https://cdn.datatables.net/1.11.3/css/dataTables.bootstrap5.min.css">
 
 
 
@@ -84,8 +87,10 @@ use App\Models\User;
 @if(in_array($currentRoute, ['schedule.index']))
 <link href="{{ asset('vendor/schedule/style.css') }}" rel="stylesheet">
 @endif
-
-  
+@if(in_array($currentRoute, ['pre-enrollment.form']))
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+<link href="{{ asset('css/preenrollment.css') }}" rel="stylesheet">
+@endif
   <!-- Template Main CSS File -->
   <link href="{{ asset('css/style.css') }}" rel="stylesheet">
   <link href="{{ asset('css/grade.css') }}" rel="stylesheet">
@@ -119,7 +124,7 @@ use App\Models\User;
   <!-- ======= Main ======= -->
     @yield('content')
   <!-- End #main -->
-
+  @include('chatbot') <!-- Chatbot modal blade -->
   <!-- ======= Footer ======= -->
     @include('layouts.footer')
   <!-- End Footer -->
@@ -214,6 +219,7 @@ use App\Models\User;
 @if(in_array($currentRoute, ['calendar.index']))
 <script src="{{ asset('vendor/fullcalendar/index.global.js') }}"></script>
 @endif
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <script>
     document.addEventListener('livewire:initialized', () => {

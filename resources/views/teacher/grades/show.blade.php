@@ -8,43 +8,91 @@
         <h1>Grade Management</h1>
         <nav>
             <ol class="breadcrumb">
-                <li class="breadcrumb-item"><a href="{{ route('newsfeed') }}">Dashboard</a></li>
-                <li class="breadcrumb-item active">Grades</li>
+                 <li class="breadcrumb-item"><a href="{{ route('newsfeed') }}">Dashboard</a></li>
+                <li class="breadcrumb-item"><a href="{{ route('teacher.grades.index') }}">Enrolled Subject</a></li>
+                <!-- <li class="breadcrumb-item"><a href="{{ route('teacher.grades.index') }}">Enrolled Subject</li> -->
+                <li class="breadcrumb-item active">Subject Student Grades</li>
             </ol>
         </nav>
     </div>
 
-    <div class="card mb-4">
+    <div class="card mb-4 px-4 py-3">
     <div class="user-profile-header-banner">
-        <img src="{{ asset('assets/images/finalhomebg11.png') }}" alt="Banner image" class="rounded-top">
-    </div>
+    <img src="{{ asset('assets/images/finalhomebg11.png') }}" alt="Banner image" class="rounded-top">
+</div>
 
-    <div class="user-profile-header d-flex flex-column flex-sm-row text-sm-start text-center mb-3">
-        <div class="flex-shrink-0 mt-n2 mx-sm-0 mx-auto">
-            <img src="{{ asset('img/course/default.png') }}" alt="user image" class="d-block ms-0 ms-sm-4 rounded user-profile-img border-dark" style="width: 120px; height: 120px; object-fit: cover;">
-        </div>
+<div class="user-profile-header d-flex flex-column flex-sm-row text-sm-start text-center mb-3">
+<div class="flex-shrink-0 mt-n2 mx-sm-0 mx-auto">
+    @php
+        // Define program logos
+        $programLogos = [
+            'BSIT' => 'img/bsitlogo1.png',
+            'BSBA' => 'assets/images/bsba.png',
+            'BSCRIM' => 'assets/images/bscrim.png',
+            'BSHTM' => 'assets/images/bshtm.png',
+            'BSTM' => 'assets/images/bshtm.png',
+            'BSHM' => 'assets/images/bshtm.png',
+            'BSED' => 'assets/images/bsed.png'
+        ];
+        
+        // Determine the appropriate logo based on the program code
+        $programCode = $schedule->program->code;
+        $profileImage = $programLogos[$programCode] ?? 'img/course/default.png';
+    @endphp
 
-        <div class="flex-grow-1 mt-3 mt-sm-5">
-            <div class="d-flex align-items-md-end align-items-sm-start align-items-center justify-content-md-between justify-content-start mx-4 flex-md-row flex-column gap-4">
-                <div class="user-profile-info">
-                    <div class="d-flex justify-content-sm-start justify-content-center">
-                        <h4 class="mb-0">{{ $schedule->subject->description }}</h4>
-                    </div>
-                    <span class="fw-light mt-0">{{ $schedule->subject->subject_code }}</span>
+    <img src="{{ asset($profileImage) }}" alt="{{ $programCode }} Logo" 
+     class="d-block ms-0 ms-sm-4 user-profile-img" 
+     style="width: 120px; height: 120px; object-fit: cover; border: 3px solid #800000;">
 
-                    <ul class="list-inline mt-2 mb-0 d-flex align-items-center flex-wrap justify-content-sm-start justify-content-center gap-2">
-                        <li class="list-inline-item d-flex gap-1">
-                            <i class="bx bxs-school mt-1"></i>
-                            <span class="fw-light">Section: {{ $section->name }}</span>
-                        </li>
-                    </ul>
+</div>
+
+    <div class="flex-grow-1 mt-3 mt-sm-5">
+        <div class="d-flex align-items-md-end align-items-sm-start align-items-center justify-content-md-between justify-content-start mx-4 flex-md-row flex-column gap-4">
+            <div class="user-profile-info">
+                <div class="d-flex justify-content-sm-start justify-content-center">
+                    <h4 class="mb-0">{{ $schedule->subject->description }}</h4>
                 </div>
+                <span class="fw-light mt-0">{{ $schedule->subject->subject_code }}</span>
+
+                <ul class="list-inline mt-3 mb-0 d-flex align-items-center flex-wrap justify-content-sm-start justify-content-center gap-3">
+                    <!-- Section Information -->
+                    <li class="list-inline-item d-flex gap-2 align-items-center">
+                        <i class="bx bxs-school text-primary" style="font-size: 1.5rem;"></i>
+                        <span class="fw-light">Section: {{ $section->name }}</span>
+                    </li>
+
+                    <!-- Program Information -->
+                    <li class="list-inline-item d-flex gap-2 align-items-center">
+                        <i class="bx bx-book text-success" style="font-size: 1.5rem;"></i>
+                        <span class="fw-light">Program: {{ $schedule->program->name }}</span>
+                    </li>
+
+                    <!-- School Year Information -->
+                    <li class="list-inline-item d-flex gap-2 align-items-center">
+                        <i class="bx bx-calendar-check text-warning" style="font-size: 1.5rem;"></i>
+                        <span class="fw-light">School Year: {{ $schedule->schoolYear->name }}</span>
+                    </li>
+
+                    <!-- Year Level Information -->
+                    <li class="list-inline-item d-flex gap-2 align-items-center">
+                        <i class="bx bx-calendar text-info" style="font-size: 1.5rem;"></i>
+                        <span class="fw-light">Year Level: {{ $schedule->yearLevel->name }}</span>
+                    </li>
+
+                    <!-- Semester Information -->
+                    <li class="list-inline-item d-flex gap-2 align-items-center">
+                        <i class="bx bx-calendar-event text-secondary" style="font-size: 1.5rem;"></i>
+                        <span class="fw-light">Semester: {{ $schedule->semester->name }}</span>
+                    </li>
+                </ul>
             </div>
         </div>
     </div>
+</div>
+
 
               <div class="card-body">
-    <!-- Notification Button -->
+    <!-- Notification Button
     <div class="d-flex justify-content-between align-items-center mb-3">
         <form action="{{ url('/send-grades-notification') }}" method="POST">
             @csrf
@@ -52,19 +100,27 @@
                 <i class="fas fa-bell"></i> Notify Students
             </button>
         </form>
-    </div>
-
+    </div> -->
+             <div class="card-header border-bottom">
+                <div class="row g-3">
+                     <div class="col-md-3 user_gender"></div>
+                     <div class="col-md-3 user_remarks"></div>
+                     <div class="col-md-3 user_status"></div>
+                 </div>
+             </div> <br>
     <!-- Grades Form -->
     <form id="gradesForm" action="{{ route('teacher.grades.storeOrUpdate', $subjectEnrolled->id) }}" method="POST">
         @csrf
         <!-- Add Bootstrap's table-responsive class -->
         <div class="table-responsive"  style="padding-bottom: 50px;">
             <table class="table table-bordered table-hover" id="gradesTable">
-                <thead class="table-danger">
+                  <thead class="table-dark">
                     <tr>
                         <th scope="col"><input type="checkbox" id="selectAll"></th>
+                        <th scope="col">No.</th>
                         <th scope="col">Student ID</th>
                         <th scope="col">Student Name</th>
+                        <th scope="col">Gender</th>
                         <th scope="col">Prelim</th>
                         <th scope="col">Midterm</th>
                         <th scope="col">Prefinal</th>
@@ -75,24 +131,27 @@
                     </tr>
                 </thead>
                 <tbody>
-    @foreach($students as $student)
+    @foreach($students as $index => $student)
         @php
             // Find the subjectEnrolled using the schedule's subject_id, section, and other filters
             $subjectEnrolled = $student->subjectsEnrolled->where('schedule_id', $schedule->id)->first();
 
             // Fetch the grades for the student, linked by schedule
-            $grade = $subjectEnrolled ? $subjectEnrolled->grades()->where('student_id', $student->id)->first() : null;
+            $grade = $subjectEnrolled ? $subjectEnrolled->grade()->where('student_id', $student->id)->first() : null;
         @endphp
 
         <tr data-student-id="{{ $student->id }}" data-subject-enrolled-id="{{ $subjectEnrolled->id }}">
             <td><input type="checkbox" class="student-checkbox" value="{{ $student->id }}"></td>
+            <td>{{ $index + 1 }}</td>
             <td>{{ $student->StudentID}}</td>
             <td>{{ $student->FullName }}</td>
+            <td><span class="text-truncate d-flex align-items-center"><span class="badge badge-center me-2"><div class="btn btn-sm @if(strtolower($student->Gender) === 'male') bg-primary-subtle @else bg-danger-subtle @endif rounded-circle">@if(strtolower($student->Gender) === 'male')<i class="bx bx-male-sign"></i>@else<i class="bx bx-female-sign"></i>@endif</div></span>{{ ucfirst($student->Gender) }}</span></td>
             <td><input type="number" step="0.1" name="grades[{{ $student->id }}][prelim]" value="{{ $grade->prelim ?? '' }}" class="form-control grade-input" required></td>
             <td><input type="number" step="0.1" name="grades[{{ $student->id }}][midterm]" value="{{ $grade->midterm ?? '' }}" class="form-control grade-input" required></td>
             <td><input type="number" step="0.1" name="grades[{{ $student->id }}][prefinal]" value="{{ $grade->prefinal ?? '' }}" class="form-control grade-input" required></td>
             <td><input type="number" step="0.1" name="grades[{{ $student->id }}][final]" value="{{ $grade->final ?? '' }}" class="form-control grade-input" required></td>
-            <td><input type="text" name="grades[{{ $student->id }}][remarks]" class="form-control" value="{{ $grade->remarks ?? '' }}" readonly></td>
+            <td class="remarks-cell">{{ $grade->remarks ?? '' }}</td>
+
             <td class="status-cell">{{ $grade->status ?? '' }}</td>
              <td>
                             <div class="d-flex gap-2">
@@ -110,31 +169,54 @@
                                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                     </div>
                                     <div class="modal-body">
-                                        <p><strong>Student ID:</strong> {{ $student->StudentID }}</p>
-                                        <div class="row">
-                                            <div class="col-md-6">
-                                                <label for="prelim">Prelim:</label>
-                                                <input type="number" step="0.1" name="modal_grades[{{ $student->id }}][prelim]" value="{{ $grade->prelim ?? '' }}" class="form-control grade-input">
+                                    <div class="card border-0 shadow-sm p-3">
+                                        <h5 class="text-primary mb-3">Student Details</h5>
+                                        <p class="mb-1"><strong>Student ID:</strong> <span class="text-muted">{{ $student->StudentID }}</span></p>
+                                        
+                                        <div class="row mt-3">
+                                            <div class="col-md-6 mb-3">
+                                                <div class="d-flex align-items-center">
+                                                    <i class="bx bx-book-reader text-secondary me-2" style="font-size: 1.5rem;"></i>
+                                                    <div>
+                                                        <span class="text-secondary">Prelim</span>
+                                                        <h6 class="mt-1">{{ $grade->prelim ?? 'N/A' }}</h6>
+                                                    </div>
+                                                </div>
                                             </div>
-                                            <div class="col-md-6">
-                                                <label for="midterm">Midterm:</label>
-                                                <input type="number" step="0.1" name="modal_grades[{{ $student->id }}][midterm]" value="{{ $grade->midterm ?? '' }}" class="form-control grade-input">
+                                            
+                                            <div class="col-md-6 mb-3">
+                                                <div class="d-flex align-items-center">
+                                                    <i class="bx bx-book-open text-secondary me-2" style="font-size: 1.5rem;"></i>
+                                                    <div>
+                                                        <span class="text-secondary">Midterm</span>
+                                                        <h6 class="mt-1">{{ $grade->midterm ?? 'N/A' }}</h6>
+                                                    </div>
+                                                </div>
                                             </div>
-                                            <div class="col-md-6 mt-3">
-                                                <label for="prefinal">Prefinal:</label>
-                                                <input type="number" step="0.1" name="modal_grades[{{ $student->id }}][prefinal]" value="{{ $grade->prefinal ?? '' }}" class="form-control grade-input">
+
+                                            <div class="col-md-6 mb-3">
+                                                <div class="d-flex align-items-center">
+                                                    <i class="bx bx-calendar text-secondary me-2" style="font-size: 1.5rem;"></i>
+                                                    <div>
+                                                        <span class="text-secondary">Prefinal</span>
+                                                        <h6 class="mt-1">{{ $grade->prefinal ?? 'N/A' }}</h6>
+                                                    </div>
+                                                </div>
                                             </div>
-                                            <div class="col-md-6 mt-3">
-                                                <label for="final">Final:</label>
-                                                <input type="number" step="0.1" name="modal_grades[{{ $student->id }}][final]" value="{{ $grade->final ?? '' }}" class="form-control grade-input">
+
+                                            <div class="col-md-6 mb-3">
+                                                <div class="d-flex align-items-center">
+                                                    <i class="bx bx-trophy text-secondary me-2" style="font-size: 1.5rem;"></i>
+                                                    <div>
+                                                        <span class="text-secondary">Final</span>
+                                                        <h6 class="mt-1">{{ $grade->final ?? 'N/A' }}</h6>
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="modal-footer">
-                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                                        <button type="button" class="btn btn-primary">Save Changes</button>
-                                    </div>
                                 </div>
+
                             </div>
                         </div>
                     @endforeach
@@ -391,7 +473,7 @@ $(document).ready(function () {
                     showToast('Success', response.message);
                     const remarks = final > 3 ? 'Failed' : 'Passed';
                     row.find('input[name="grades[' + studentId + '][remarks]"]').val(remarks);
-                    row.find('td:eq(8)').text('draft');
+                    row.find('td:eq(10)').text('draft');
                 } else {
                     showToast('Success', 'Grade saved successfully');
                 }
@@ -482,10 +564,8 @@ $('#gradesTable tbody').on('click', '.student-checkbox', function() {
 
 
 </script>
-
-
 <script>
- $(document).ready(function () {
+$(document).ready(function () {
     var table = $('#gradesTable').DataTable({
         lengthChange: true, // Enable or disable show entries
         buttons: [
@@ -496,115 +576,142 @@ $('#gradesTable tbody').on('click', '.student-checkbox', function() {
                 buttons: [
                     {
                         extend: "print",
-                        text: '<i class="bx bx-printer me-2" ></i>Print',
-                        className: "dropdown-item",
+                text: '<i class="bx bx-printer me-2"></i> Print',
+                className: "dropdown-item",
+                title: 'Grade Management - Cecilian Portal',
+                messageTop: function() {
+                    return `
+                        <h4>${'{{ $schedule->subject->description }}'}</h4>
+                        <span>Subject Code: ${'{{ $schedule->subject->subject_code }}'}</span><br>
+                        <span>Section: ${'{{ $section->name }}'}</span>
+                    `;
+                },
                         exportOptions: {
-                            columns: [1, 2, 3, 4, 5],
+                            columns: [2, 3, 4, 5, 6, 7, 8, 9,10], // Include only No., Student ID, Student Name, Prelim, Midterm, Prefinal, Final, Remarks, Status
                             format: {
-                                body: function (e, t, a) {
-                                    var s;
-                                    return e.length <= 0
-                                        ? e
-                                        : ((e = $.parseHTML(e)),
-                                            (s = ""),
-                                            $.each(e, function (e, t) {
-                                                void 0 !== t.classList && t.classList.contains("user-name") ? (s += t.lastChild.firstChild.textContent) : void 0 === t.innerText ? (s += t.textContent) : (s += t.innerText);
-                                            }),
-                                            s);
-                                },
-                            },
-                        },
-                        customize: function (e) {
-                            $(e.document.body).css("color", s).css("border-color", t).css("background-color", a),
-                                $(e.document.body).find("table").addClass("compact").css("color", "inherit").css("border-color", "inherit").css("background-color", "inherit");
-                        },
+                                body: function (data, row, column, node) {
+                                    return $(node).find('input').length ?
+                                        $(node).find('input').val() : data;
+                                }
+                            }
+                        }
                     },
                     {
-                        extend: "csv",
-                        text: '<i class="bx bx-file me-2" ></i>CSV',
-                        className: "dropdown-item",
+                        extend: "excelHtml5",
+                text: '<i class="bx bx-file me-2"></i> Excel',
+                className: "dropdown-item",
+                title: 'Grade Management - Cecilian Portal',
+                messageTop: function() {
+                    return `
+                        ${'{{ $schedule->subject->description }}'}
+                        Subject Code: ${'{{ $schedule->subject->subject_code }}'}
+                        Section: ${'{{ $section->name }}'}
+                    `;
+                },
                         exportOptions: {
-                            columns: [0, 1, 2, 3, 4, 5, 6],
+                            columns: [2, 3, 4, 5, 6, 7, 8, 9,10],
                             format: {
-                                body: function (e, t, a) {
-                                    var s;
-                                    return e.length <= 0
-                                        ? e
-                                        : ((e = $.parseHTML(e)),
-                                            (s = ""),
-                                            $.each(e, function (e, t) {
-                                                void 0 !== t.classList && t.classList.contains("user-name") ? (s += t.lastChild.firstChild.textContent) : void 0 === t.innerText ? (s += t.textContent) : (s += t.innerText);
-                                            }),
-                                            s);
-                                },
-                            },
-                        },
+                                body: function (data, row, column, node) {
+                                    return $(node).find('input').length ?
+                                        $(node).find('input').val() : data;
+                                        if (typeof data === 'string' && $(data).find('input').length > 0) {
+                                return $(data).find('input').val() || '';
+                            } else if (typeof data === 'string') {
+                                return $('<div>').html(data).text();
+                            }
+                            return data;
+                                }
+                                
+                            }
+                        }
                     },
                     {
-                        extend: "excel",
-                        text: '<i class="bx bx-spreadsheet me-2"></i>Excel',
+                        extend: "csvHtml5",
+                        text: '<i class="bx bx-file me-2"></i> CSV',
                         className: "dropdown-item",
-                        exportOptions: {
-                            columns: [1, 2, 3, 4, 5, 6, 7],
-                            format: {
-                                body: function (e, t, a) {
-                                    var s;
-                                    return e.length <= 0
-                                        ? e
-                                        : ((e = $.parseHTML(e)),
-                                            (s = ""),
-                                            $.each(e, function (e, t) {
-                                                void 0 !== t.classList && t.classList.contains("user-name") ? (s += t.lastChild.firstChild.textContent) : void 0 === t.innerText ? (s += t.textContent) : (s += t.innerText);
-                                            }),
-                                            s);
-                                },
-                            },
+                        title: 'Grade Management - Cecilian Portal',
+                          messageTop: function() {
+                            return `
+                                ${'{{ $schedule->subject->description }}'}
+                                Subject Code: ${'{{ $schedule->subject->subject_code }}'}
+                                Section: ${'{{ $section->name }}'}
+                            `;
                         },
+                        exportOptions: {
+                            columns: [2, 3, 4, 5, 6, 7, 8, 9,10],
+                            format: {
+                                body: function (data, row, column, node) {
+                                    return $(node).find('input').length ?
+                                        $(node).find('input').val() : data;
+                                        if (typeof data === 'string' && $(data).find('input').length > 0) {
+                                return $(data).find('input').val() || '';
+                            } else if (typeof data === 'string') {
+                                return $('<div>').html(data).text();
+                            }
+                            return data;
+                                        
+                                }
+                            }
+                        }
                     },
                     {
-                        extend: "pdf",
-                        text: '<i class="bx bxs-file-pdf me-2"></i>Pdf',
+                        extend: "pdfHtml5",
+                        text: '<i class="bx bxs-file-pdf me-2"></i> PDF',
                         className: "dropdown-item",
-                        exportOptions: {
-                            columns: [1, 2, 3, 4, 5, 6, 7],
-                            format: {
-                                body: function (e, t, a) {
-                                    var s;
-                                    return e.length <= 0
-                                        ? e
-                                        : ((e = $.parseHTML(e)),
-                                            (s = ""),
-                                            $.each(e, function (e, t) {
-                                                void 0 !== t.classList && t.classList.contains("user-name") ? (s += t.lastChild.firstChild.textContent) : void 0 === t.innerText ? (s += t.textContent) : (s += t.innerText);
-                                            }),
-                                            s);
-                                },
-                            },
+                        title: 'Grade Management - Cecilian Portal',
+                        messageTop: function() {
+                            return `
+                                ${'{{ $schedule->subject->description }}'}
+                                Subject Code: ${'{{ $schedule->subject->subject_code }}'}
+                                Section: ${'{{ $section->name }}'}
+                            `;
                         },
+                        exportOptions: {
+                            columns: [2, 3, 4, 5, 6, 7, 8, 9,10],
+                            format: {
+                                body: function (data, row, column, node) {
+                                    return $(node).find('input').length ?
+                                        $(node).find('input').val() : data;
+                                        if (typeof data === 'string' && $(data).find('input').length > 0) {
+                                return $(data).find('input').val() || '';
+                            } else if (typeof data === 'string') {
+                                return $('<div>').html(data).text();
+                            }
+                            return data;
+                                }
+                            }
+                        }
                     },
                     {
-                        extend: "copy",
-                        text: '<i class="bx bx-copy me-2" ></i>Copy',
+                        extend: "copyHtml5",
+                        text: '<i class="bx bxs-file-pdf me-2"></i> COPY',
                         className: "dropdown-item",
-                        exportOptions: {
-                            columns: [1, 2, 3, 4, 5],
-                            format: {
-                                body: function (e, t, a) {
-                                    var s;
-                                    return e.length <= 0
-                                        ? e
-                                        : ((e = $.parseHTML(e)),
-                                            (s = ""),
-                                            $.each(e, function (e, t) {
-                                                void 0 !== t.classList && t.classList.contains("user-name") ? (s += t.lastChild.firstChild.textContent) : void 0 === t.innerText ? (s += t.textContent) : (s += t.innerText);
-                                            }),
-                                            s);
-                                },
-                            },
+                        title: 'Grade Management - Cecilian Portal',
+                        messageTop: function() {
+                            return `
+                                ${'{{ $schedule->subject->description }}'}
+                                Subject Code: ${'{{ $schedule->subject->subject_code }}'}
+                                Section: ${'{{ $section->name }}'}
+                            `;
                         },
+                        exportOptions: {
+                            columns: [2, 3, 4, 5, 6, 7, 8, 9,10],
+                            format: {
+                                body: function (data, row, column, node) {
+                                    return $(node).find('input').length ?
+                                        $(node).find('input').val() : data;
+                                        if (typeof data === 'string' && $(data).find('input').length > 0) {
+                                        return $(data).find('input').val() || '';
+                                    } else if (typeof data === 'string') {
+                                        return $('<div>').html(data).text();
+                                    }
+                                    return data;
+                                }
+                            }
+                        }
                     },
                     {
-                        text: '<i class="bx bxs-file-blank"></i>Template',
+                                             text: '<i class="bx bxs-file-blank me-2"></i> Template',
                         className: "dropdown-item",
                         action: function () {
                             window.location.href = "{{ route('teacher.grades.template', ['subjectEnrolled' => $subjectEnrolled->id]) }}";
@@ -618,23 +725,35 @@ $('#gradesTable tbody').on('click', '.student-checkbox', function() {
                 attr: { "data-bs-toggle": "modal", "data-bs-target": "#importGradeModal" },
             },
         ],
-        initComplete: function () {
+        initComplete: function () { 
             console.log("Init complete");
-            this.api().columns([3, 4, 5]).every(function (colIdx) {
-                var column = this;
-                var select = $('<select class="form-select"><option value="">Select ' + column.header().innerHTML + '</option>')
-                    .appendTo($('.user_' + column.header().innerHTML.toLowerCase()))
-                    .on('change', function () {
-                        var val = $.fn.dataTable.util.escapeRegex($(this).val());
-                        column.search(val ? '^' + val + '$' : '', true, false).draw();
-                    });
 
-                column.data().unique().sort().each(function (d) {
-                    if (d.indexOf('>') !== -1) {
-                        d = $(d).text().trim();
-                    }
-                    select.append('<option value="' + d + '">' + d + '</option>');
-                });
+            const columnClassMapping = {
+                4: 'user_gender',
+                9: 'user_remarks', // Assuming 'remarks' column is now index 8 as a display cell
+                10: 'user_status'   // Assuming 'status' column is index 9
+            };
+
+            this.api().columns().every(function (colIdx) {
+                var column = this;
+
+                if (columnClassMapping[colIdx]) {
+                    const columnClass = columnClassMapping[colIdx];
+                    const select = $('<select class="form-select form-select-sm"><option value="">Select ' + column.header().innerHTML + '</option>')
+                        .appendTo($('.' + columnClass))
+                        .on('change', function () {
+                            const val = $.fn.dataTable.util.escapeRegex($(this).val());
+                            column.search(val ? '^' + val + '$' : '', true, false).draw();
+                        });
+
+                    column.data().unique().sort().each(function (d, j) {
+                        // Directly fetch the text content since 'remarks' is no longer an input
+                        const textContent = $('<div>').html(d).text().trim();
+                        if (textContent) {
+                            select.append('<option value="' + textContent + '">' + textContent + '</option>');
+                        }
+                    });
+                }
             });
         },
         language: {
@@ -644,24 +763,25 @@ $('#gradesTable tbody').on('click', '.student-checkbox', function() {
         }
     });
 
-// Handle the "select all" checkboxes logic
-$('#selectAll').on('click', function() {
-    $('.student-checkbox').prop('checked', this.checked);
-});
+    // Handle the "select all" checkboxes logic
+    $('#selectAll').on('click', function() {
+        $('.student-checkbox').prop('checked', this.checked);
+    });
 
-$('#gradesTable tbody').on('click', '.student-checkbox', function() {
-    if ($('.student-checkbox:checked').length === $('.student-checkbox').length) {
-        $('#selectAll').prop('checked', true);
-    } else {
-        $('#selectAll').prop('checked', false);
-    }
-});
+    $('#gradesTable tbody').on('click', '.student-checkbox', function() {
+        if ($('.student-checkbox:checked').length === $('.student-checkbox').length) {
+            $('#selectAll').prop('checked', true);
+        } else {
+            $('#selectAll').prop('checked', false);
+        }
+    });
 
     table.buttons().container()
         .appendTo($('.dataTables_filter', table.table().container()));
 });
-
 </script>
+
+
 <script>
 $(document).ready(function () {
     // Custom file upload UI

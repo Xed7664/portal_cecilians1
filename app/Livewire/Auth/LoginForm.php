@@ -77,6 +77,9 @@ class LoginForm extends Component
             if ($student->pre_enrollment_completed && $hasSubjectsEnrolled) {
                 return redirect()->intended(route('newsfeed'))->with('success', 'Login successful.');
             }
+        }    // Check if the user is a teacher
+        elseif ($user->type === 'teacher') {
+            return redirect()->intended(route('teacher.dashboard'))->with('success', 'Login successful.');
         }
 
         // Redirect to newsfeed for all other users or students who have completed pre-enrollment

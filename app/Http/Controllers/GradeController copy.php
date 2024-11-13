@@ -111,83 +111,41 @@ class GradeController extends Controller
     
 public function fetchSubjects(Request $request)
 {
-    // Store selected filters in the session
+    // Store the selected filters in the session
     session([
         'selectedSchoolYearId' => $request->school_year_id,
         'selectedSemesterId' => $request->semester_id,
         'selectedDepartmentId' => $request->department_id,
         'selectedSectionId' => $request->section_id,
     ]);
-
-    // Get unique schedules for each subject the teacher handles
-    $schedules = Schedule::with('subject', 'section', 'program')
-        ->where('teacher_id', Auth::user()->employee->id)
+    
+    // Build the query based on the schedules table
+    $query = SubjectEnrolled::with('schedule.subject', 'schedule.section', 'schedule.program')
+        ->whereHas('schedule', function ($query) {
+            $query->where('teacher_id', Auth::user()->employee->id);  // Filter by teacher
+        })
         ->where('school_year_id', $request->school_year_id)
         ->where('semester_id', $request->semester_id);
-
-    // Apply additional filters if provided
+    
+    // Filter by department if selected
     if ($request->department_id) {
-        $schedules->where('program_id', $request->department_id);
+        $query->whereHas('schedule.program', function ($q) use ($request) {
+            $q->where('id', $request->department_id);
+        });
     }
+    
+    // Filter by section if selected
     if ($request->section_id) {
-        $schedules->where('section_id', $request->section_id);
+        $query->whereHas('schedule', function ($q) use ($request) {
+            $q->where('section_id', $request->section_id);
+        });
     }
-
-    // Retrieve unique schedules by subject_id
-    $uniqueSchedules = $schedules->get()->unique('subject_id')->values();
-
-    // Map each unique schedule to its corresponding SubjectEnrolled entry
-    $subjectsEnrolled = $uniqueSchedules->map(function ($schedule) {
-        // Get the first enrolled record for this schedule's subject
-        $subjectEnrolled = SubjectEnrolled::where('schedule_id', $schedule->id)
-            ->where('semester_id', $schedule->semester_id)
-            ->where('school_year_id', $schedule->school_year_id)
-            ->first();
-
-        return [
-            'subjectEnrolledId' => $subjectEnrolled ? $subjectEnrolled->id : null,
-            'schedule' => $schedule,
-        ];
-    });
-
-    // Return data as JSON
+    
+    // Execute the query and get the results
+    $subjectsEnrolled = $query->get();
+    
+    // Return as JSON
     return response()->json($subjectsEnrolled);
-}
-
-public function fetchEnrolledStudents(Request $request)
-{
-    $teacherId = Auth::user()->employee->id;
-
-    // Retrieve filtering options
-    $schoolYears = SchoolYear::all();
-    $semesters = Semester::all();
-    $departments = Department::all();
-    $sections = Section::all();
-    $yearLevels = YearLevel::all();
-
-    // Capture filter inputs
-    $selectedSchoolYearId = $request->get('school_year_id');
-    $selectedSemesterId = $request->get('semester_id');
-    $selectedDepartmentId = $request->get('department_id');
-    $selectedSectionId = $request->get('section_id');
-    $selectedYearLevelId = $request->get('year_level_id');
-
-    // Build query to fetch students based on teacher's assigned subjects and filters
-    $students = Student::whereHas('subjectsEnrolled.schedule', function ($query) use ($teacherId, $selectedSchoolYearId, $selectedSemesterId, $selectedDepartmentId, $selectedSectionId, $selectedYearLevelId) {
-        $query->where('teacher_id', $teacherId);
-
-        // Apply filters dynamically
-        if ($selectedSchoolYearId) $query->where('school_year_id', $selectedSchoolYearId);
-        if ($selectedSemesterId) $query->where('semester_id', $selectedSemesterId);
-        if ($selectedDepartmentId) $query->where('program_id', $selectedDepartmentId);
-        if ($selectedSectionId) $query->where('section_id', $selectedSectionId);
-        if ($selectedYearLevelId) $query->where('year_level_id', $selectedYearLevelId);
-    })->with(['program', 'yearLevel', 'section'])->get();
-
-    return view('teacher.students-list', compact(
-        'students', 'schoolYears', 'semesters', 'departments', 'sections', 'yearLevels',
-        'selectedSchoolYearId', 'selectedSemesterId', 'selectedDepartmentId', 'selectedSectionId', 'selectedYearLevelId'
-    ));
 }
 
 
@@ -203,6 +161,8 @@ public function fetchTeacherDepartments()
 
     return response()->json($departments);
 }
+
+
 public function teacherShow($subjectEnrolledId)
 {
     $user = Auth::user();
@@ -213,14 +173,7 @@ public function teacherShow($subjectEnrolledId)
     }
 
     // Find the enrolled subject, now using schedule_id, or fail with a 404
-    $subjectEnrolled = SubjectEnrolled::with([
-            'schedule', 
-            'section', 
-            'schedule.program',      // Program information
-            'schedule.schoolYear',   // School year information
-            'schedule.yearLevel',   // Year level information
-            'schedule.semester'      // Semester information
-        ])
+    $subjectEnrolled = SubjectEnrolled::with(['schedule', 'section'])
         ->whereHas('schedule', function ($query) use ($user) {
             $query->where('teacher_id', $user->employee->id);
         })
@@ -237,7 +190,7 @@ public function teacherShow($subjectEnrolledId)
         ->where('subjects_enrolled.section_id', $subjectEnrolled->section_id)
         ->where('subjects_enrolled.semester_id', $subjectEnrolled->semester_id)
         ->where('subjects_enrolled.school_year_id', $subjectEnrolled->school_year_id)
-        ->select('students.id', 'students.StudentID', 'students.FullName', 'students.Gender')
+        ->select('students.id', 'students.StudentID', 'students.FullName')
         ->get();
 
     // Return the view with the required data
@@ -248,8 +201,7 @@ public function teacherShow($subjectEnrolledId)
         'students' => $students
     ]);
 }
-
-
+   
     
 
     

@@ -17,8 +17,9 @@ class SubjectEnrolled extends Model
 
     public function student()
     {
-        return $this->belongsTo(Student::class);
+        return $this->belongsTo(Student::class, 'student_id');
     }
+    
 
     public function subject()
     {
@@ -35,9 +36,13 @@ class SubjectEnrolled extends Model
             return $this->belongsTo(Section::class);
         }
     
-        public function grades()
+        // public function grades()
+        // {
+        //     return $this->hasMany(Grade::class, 'subject_enrolled_id');
+        // }
+        public function grade()
         {
-            return $this->hasMany(Grade::class, 'subject_enrolled_id');
+            return $this->hasOne(Grade::class, 'subject_enrolled_id');
         }
     
         public function yearLevel()

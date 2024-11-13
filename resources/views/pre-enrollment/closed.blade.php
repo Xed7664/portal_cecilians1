@@ -17,8 +17,8 @@
     </div><!-- End Page Title -->
 <div class="text-center">
     <img src="{{ asset('img/svg/no-record.svg')}}" alt="Closed Icon" style="width:150px;">
-    <h3>Pre-enrollment is currently closed.</h3>
-    <p>Please check back later or contact your Program Head for more information.</p>
+    <h1>Pre-Enrollment Closed</h1>
+    <p>The pre-enrollment period is currently closed. Please check back during the designated enrollment period, or contact the administration for more information.</p>
 </div>
 </main>
 @endsection

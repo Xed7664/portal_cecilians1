@@ -78,5 +78,10 @@ public static function forDepartment(int $programId)
         $query->where('program_id', $programId);
     })->get();
 }
+// Relationship to Enrollments
+public function enrollments()
+{
+    return $this->hasMany(Enrollment::class);
+}
 
 }

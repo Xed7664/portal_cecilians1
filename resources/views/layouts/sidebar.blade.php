@@ -135,6 +135,15 @@
               <span class="fw-medium">Prospectus</span>
           </a>
       </li> 
+ <!-- sidebar.blade.php -->
+<li class="nav-item">
+    <a class="nav-link collapsed" href="#" data-bs-toggle="modal" data-bs-target="#chatBotModal">
+        <i class="bx bx-chat"></i>
+        <span class="fw-medium">Chat with Support</span>
+    </a>
+</li>
+
+
 
       <li class="nav-heading">Social Media</li>
       <li class="nav-item">
@@ -171,6 +180,10 @@
         </li>
 
       @endif
+
+  
+
+
       @if($userPanel === 'admin')
 
 <li class="nav-heading">ADMIN PANEL</li>
@@ -230,7 +243,12 @@
         <span>Admissions</span>
     </a>
 </li>
-
+<li class="nav-item">
+          <a class="nav-link {{ Route::is('admin.pre-enrollment.settings') ? '' : 'collapsed' }}" href="{{ route('admin.pre-enrollment.settings') }}">
+              <i class='bx bx-cog'></i>
+              <span class="fw-medium">Pre-Enrollment Settings</span>
+          </a>
+      </li>
 
 
 @endif
@@ -245,12 +263,7 @@
                         <span class="fw-medium">Dashboard</span>
                     </a>
                 </li>
-                <li class="nav-item">
-          <a class="nav-link {{ Route::is('phead.pre-enrollment.settings') ? '' : 'collapsed' }}" href="{{ route('phead.pre-enrollment.settings') }}">
-              <i class='bx bx-cog'></i>
-              <span class="fw-medium">Pre-Enrollment Settings</span>
-          </a>
-      </li>
+
 
                 <!-- Students Link -->
                 <li class="nav-item">
@@ -272,10 +285,15 @@
                 <li class="nav-item">
                     <a class="nav-link {{ Route::is('phead.schedules') ? '' : 'collapsed' }}" href="{{ route('phead.schedules') }}">
                         <i class='bx bx-calendar-event'></i>
-                        <span class="fw-medium">Schedules</span>
+                        <span class="fw-medium">Class Schedules</span>
                     </a>
                 </li>
-            
+                <li class="nav-item">
+                    <a class="nav-link {{ Route::is('calendar.index') ? '' : 'collapsed' }}" href= "{{ Route::is('calendar.index') ? '' : 'collapsed' }}">
+                        <i class="bx bx-calendar-event"></i>
+                        <span class="fw-medium">Calendar</span>
+                    </a>
+                </li>
                 <!-- Subjects Link -->
                 <li class="nav-item">
                     <a class="nav-link {{ Route::is('phead.subjects.index') ? '' : 'collapsed' }}" href="{{ route('phead.subjects.index') }}">
@@ -291,6 +309,13 @@
                         <span class="fw-medium">Prospectus</span>
                     </a>
                 </li>
+                              <!-- Pre-Enrollment Link -->
+            <li class="nav-item">
+                <a class="nav-link {{ Route::is('phead.preenrollment') ? '' : 'collapsed' }}" href="{{ route('phead.preenrollment') }}">
+                    <i class='bx bx-lock'></i>
+                    <span class="fw-medium">Pre-Enrollment</span>
+                </a>
+            </li>
     @endif
 
 
@@ -298,12 +323,63 @@
       @if($userPanel === 'teacher')
      
 <li class="nav-heading">MENU</li>
+  
+    
+    <!-- Dashboard Link -->
+    <li class="nav-item">
+        <a class="nav-link {{ Route::is('teacher.dashboard') ? '' : 'collapsed' }}" href="{{ route('teacher.dashboard') }}">
+            <i class='bx bx-home'></i>
+            <span class="fw-medium">Dashboard</span>
+        </a>
+    </li>
+
+       <!-- Schedules Link -->
+       <!-- <li class="nav-item">
+            <a class="nav-link {{ Route::is('phead.schedules') ? '' : 'collapsed' }}" href="{{ route('phead.schedules') }}">
+                  <i class='bx bx-calendar-event'></i>
+                 <span class="fw-medium">Class Schedule</span>
+            </a>
+        </li> -->
+        <!-- Students List Link for Teacher -->
+        <li class="nav-item">
+            <a class="nav-link {{ Route::is('teacher.fetchEnrolledStudents') ? '' : 'collapsed' }}" href="{{ route('teacher.fetchEnrolledStudents') }}">
+                <i class='bx bx-user'></i>
+                <span class="fw-medium">Enrolled Students List</span>
+            </a>
+        </li>
+
+
       <li class="nav-item">
         <a class="nav-link {{ Route::is('teacher.grades.index') ? '' : 'collapsed' }}" href="{{ route('teacher.grades.index') }}">
             <i class='bx bx-bar-chart'></i>
-          <span class="fw-medium">Grade</span>
+          <span class="fw-medium">Grade Management</span>
         </a>
       </li>
+         <!-- Subjects Link -->
+         <li class="nav-item">
+                    <a class="nav-link {{ Route::is('phead.subjects.index') ? '' : 'collapsed' }}" href="{{ route('phead.subjects.index') }}">
+                        <i class='bx bx-book'></i>
+                        <span class="fw-medium">Subject's Masterlist</span>
+                    </a>
+                </li>
+            
+      <!-- Prospectus Link -->
+      <li class="nav-item">
+                    <a class="nav-link {{ Route::is('phead.prospectus') ? '' : 'collapsed' }}" href="{{ route('phead.prospectus') }}">
+                        <i class='bx bx-book-open'></i>
+                        <span class="fw-medium">Student's Prospectus</span>
+                    </a>
+                </li>
+                
+                <li class="nav-heading">Archived</li>
+                  <!-- Subjects Link -->
+               <li class="nav-item">
+                    <a class="nav-link {{ Route::is('phead.subjects.index') ? '' : 'collapsed' }}" href="{{ route('phead.subjects.index') }}">
+                        <i class='bx bx-book'></i>
+                        <span class="fw-medium">Archived Subjects</span>
+                    </a>
+                </li>
+            
       <!-- <li class="nav-item">
         <a class="nav-link {{ Route::is('admin.users.student') ? '' : 'collapsed' }}" href="{{ route('admin.users.student') }}">
             <i class='bx bx-bar-chart'></i>
@@ -316,4 +392,4 @@
 
 
   </aside>  
-  
+

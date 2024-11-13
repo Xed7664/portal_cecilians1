@@ -37,6 +37,11 @@ class Student extends Model
     {
         return $this->user !== null;
     }
+// In Student.php model
+public function admission()
+{
+    return $this->hasOne(Admission::class, 'email', 'email');
+}
 
     // Relationship with SubjectsEnrolled
     public function subjectsEnrolled()
@@ -73,4 +78,9 @@ class Student extends Model
     {
         return $this->belongsTo(SchoolYear::class, 'school_year_id', 'id');
     }
+     // Relationship to Enrollments
+     public function enrollments()
+     {
+         return $this->hasMany(Enrollment::class);
+     }
 }

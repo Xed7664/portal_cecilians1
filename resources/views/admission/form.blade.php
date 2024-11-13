@@ -36,6 +36,25 @@
 
     <div class="container py-5">
     <div class="row justify-content-center">
+        
+    @if ($activeAdmissionPeriod)
+    <div class="card shadow-sm border-0 mb-4">
+        <div class="card-body text-center">
+            <h4 class="card-title mb-3 text-success">Active Admission Period</h4>
+            <p><strong>School Year:</strong> {{ $activeAdmissionPeriod->schoolYear->name }}</p>
+            <p><strong>Semester:</strong> {{ $activeAdmissionPeriod->semester->name }}</p>
+            <p><strong>Enrollment Period:</strong> 
+                {{ \Carbon\Carbon::parse($activeAdmissionPeriod->open_date)->format('F d, Y') }} 
+                to 
+                {{ \Carbon\Carbon::parse($activeAdmissionPeriod->close_date)->format('F d, Y') }}
+            </p>
+        </div>
+    </div>
+@else
+    <div class="alert alert-warning text-center">
+        <i class="bi bi-exclamation-circle-fill"></i> No active admission period is currently open.
+    </div>
+@endif
         <div class="col-md-8">
             <div class="card shadow-lg border-0 rounded-lg registration-form animate__animated animate__fadeInDown">
                 <div class="card-header header-background text-white text-center py-4">
@@ -46,8 +65,8 @@
          
 
 
-
                 <div class="card-body p-4 bg-light">
+             
 
                     @if(session('success'))
                         <div class="alert alert-success alert-dismissible fade show animate__animated animate__fadeInUp" role="alert">

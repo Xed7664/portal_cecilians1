@@ -54,5 +54,9 @@ public function students()
 {
     return $this->hasMany(Student::class);
 }
+public function schedules()
+{
+    return $this->hasMany(Schedule::class);
+}
 
 }

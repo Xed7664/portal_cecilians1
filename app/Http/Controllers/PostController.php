@@ -35,13 +35,7 @@ class PostController extends Controller
                 'trendingHashtags' => $trendingHashtags,
                 'student' => $student
             ]);
-        } elseif ($user->type === 'teacher') {
-            $teacher = $user->employee;
-            return view('posts.index', [
-                'trendingHashtags' => $trendingHashtags,
-                'teacher' => $teacher
-            ]);
-        } elseif ($user->type === 'program_head') {
+        }  elseif ($user->type === 'program_head') {
             $programHead = $user->employee;
             
             return redirect()->route('phead.dashboard')->with([

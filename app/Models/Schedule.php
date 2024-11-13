@@ -14,6 +14,10 @@ class Schedule extends Model
         'school_year_id', 'room', 'days', 'corrected_day', 
         'start_time', 'end_time', 'time', 'corrected_time'
     ];
+    protected $casts = [
+        'updated_at' => 'datetime',
+    ];
+    
     // Define the inverse relationship with Department
     public function department()
     {
@@ -23,9 +27,10 @@ class Schedule extends Model
 
     // A schedule belongs to one section
     public function section()
-    {
-        return $this->belongsTo(Section::class);
-    }
+{
+    return $this->belongsTo(Section::class, 'section_id');
+}
+
 
     // A schedule belongs to one semester
     public function semester()
@@ -63,6 +68,10 @@ public function subject()
 public function teacher()
 {
     return $this->belongsTo(Employee::class, 'teacher_id');
+}
+public function subjectsEnrolled()
+{
+    return $this->hasMany(SubjectEnrolled::class, 'schedule_id');
 }
 
 

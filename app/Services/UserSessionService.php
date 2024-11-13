@@ -3,7 +3,7 @@
 namespace App\Services;
 
 use Illuminate\Support\Facades\Session;
-use App\Models\{Employee, Student, SubjectEnrolled, SystemSetting, User, Section, SubjectsProspectus};
+use App\Models\{Employee, Student, SubjectEnrolled,Schedule, SystemSetting, User, Section, SubjectsProspectus};
 
 class UserSessionService
 {
@@ -30,8 +30,9 @@ class UserSessionService
             $employee = Employee::where('EmployeeID', $user->employee_id)->first();
             session()->put('employee', $employee);
             session()->put('panel', 'teacher');
-
-        } elseif ($user->type === 'program_head') {
+        }
+        
+        elseif ($user->type === 'program_head') {
             $employee = Employee::where('EmployeeID', $user->employee_id)->first();
             session()->put('employee', $employee);
             session()->put('panel', 'program_head');
@@ -69,4 +70,12 @@ class UserSessionService
         // Set the initial theme for the user
         Session::put('theme', 'light'); // Adjust if needed
     }
+    public static function getTeacherSchedulesSummary($teacherId, $limit = 3)
+{
+    return Schedule::with(['subject', 'program', 'section', 'yearLevel'])
+        ->where('teacher_id', $teacherId)
+        ->limit($limit)
+        ->get(['id', 'subject_id', 'program_id', 'section_id', 'year_level_id', 'days', 'start_time']);
+}
+
 }

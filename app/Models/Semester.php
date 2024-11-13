@@ -35,5 +35,10 @@ class Semester extends Model
     {
         return $this->hasMany(Grade::class);
     }
-    
+    // Relationship to Enrollments
+    public function enrollments()
+    {
+        return $this->hasMany(Enrollment::class);
+    }
+
 }
