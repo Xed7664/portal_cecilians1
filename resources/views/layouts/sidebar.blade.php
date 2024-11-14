@@ -335,12 +335,7 @@
     </li>
 
        <!-- Schedules Link -->
-       <!-- <li class="nav-item">
-            <a class="nav-link {{ Route::is('phead.schedules') ? '' : 'collapsed' }}" href="{{ route('phead.schedules') }}">
-                  <i class='bx bx-calendar-event'></i>
-                 <span class="fw-medium">Class Schedule</span>
-            </a>
-        </li> -->
+
         <!-- Students List Link for Teacher -->
         <li class="nav-item">
             <a class="nav-link {{ Route::is('teacher.fetchEnrolledStudents') ? '' : 'collapsed' }}" href="{{ route('teacher.fetchEnrolledStudents') }}">
