@@ -19,6 +19,8 @@ use App\Models\User;
   <meta content="" name="keywords">
   <meta name="csrf-token" content="{{ csrf_token() }}">
 
+  
+
 
   <!-- Favicons -->
   <link href="{{ asset('img/favicon.ico') }}" rel="icon">
@@ -48,6 +50,7 @@ use App\Models\User;
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
 
 
+
   <!-- Google Fonts -->
   <link href="https://fonts.gstatic.com" rel="preconnect">
   <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Nunito:300,300i,400,400i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i" rel="stylesheet">
@@ -68,6 +71,11 @@ use App\Models\User;
 <script src="https://cdn.datatables.net/1.11.3/js/jquery.dataTables.min.js"></script>
 <script src="https://cdn.datatables.net/1.11.3/js/dataTables.bootstrap5.min.js"></script>
 <link rel="stylesheet" href="https://cdn.datatables.net/1.11.3/css/dataTables.bootstrap5.min.css">
+
+<!--Toast -->
+<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+
 
 
 
@@ -123,6 +131,7 @@ use App\Models\User;
 
   <!-- ======= Main ======= -->
     @yield('content')
+
   <!-- End #main -->
   @include('chatbot') <!-- Chatbot modal blade -->
   <!-- ======= Footer ======= -->

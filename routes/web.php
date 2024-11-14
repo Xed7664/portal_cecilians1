@@ -1,31 +1,36 @@
 <?php
-use App\Http\Controllers\{SearchController, ScheduleController, EventsController, CalendarController, AccountSettingsController, AjaxController, AuthController, PostController, ProfileController, UserController};
-use App\Livewire\Posts\{SingleFull};
-use App\Http\Controllers\Admin\UserController as AdminUserController;
-use App\Http\Controllers\Admin\EmployeeController as AdminEmployeeController;
-use App\Http\Controllers\Admin\StudentController as AdminStudentController;
-use App\Http\Controllers\Admin\Analytics\LoginController as AdminLoginController;
-use App\Http\Controllers\Socialite\GoogleController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
-use App\Http\Controllers\Auth\VerificationController;
-use App\Http\Controllers\Subjects\MiniController;
-use App\Http\Controllers\Subjects\SubjectController;
-use App\Http\Controllers\SubjectsPheadController;
-use App\Http\Controllers\SemesterController;
-use App\Http\Controllers\NotificationSendController;
-use App\Http\Controllers\GradeController;
-use App\Http\Controllers\ProspectusController;
-use App\Http\Controllers\EnrollmentController;
-use App\Http\Controllers\{StudentController, TeacherController, ProgramHeadController,ProgramHeadPreEnrollmentController, AdminController};
-use App\Http\Controllers\WelcomeController;
 use App\Providers\RouteServiceProvider;
-use App\Http\Controllers\AdmissionController;
-use App\Http\Controllers\PreEnrollmentController;
-use App\Http\Controllers\StudentPheadController;
-use App\Http\Controllers\ChatBotController;
-use App\Http\Controllers\SimpleChatBotController;
-use App\Http\Controllers\ChatGPTController;
+
+use App\Http\Controllers\{ 
+    SearchController, ScheduleController, EventsController, CalendarController, 
+    AccountSettingsController, AjaxController, AuthController, PostController, 
+    ProfileController, UserController, StudentController, TeacherController, 
+    ProgramHeadController, ProgramHeadPreEnrollmentController, AdminController
+};
+
+use App\Http\Controllers\Admin\{
+    UserController as AdminUserController, 
+    StudentController as AdminStudentController, 
+    EmployeeController as AdminEmployeeController, 
+    Analytics\LoginController as AdminLoginController
+};
+
+use App\Http\Controllers\Subjects\{ MiniController, SubjectController };
+use App\Http\Controllers\{
+    GradeController, ProspectusController, EnrollmentController, 
+    WelcomeController, AdmissionController, PreEnrollmentController, 
+    StudentPheadController, SubjectsPheadController, SchedulesPheadController, 
+    NotificationSendController, Socialite\GoogleController, 
+    Auth\VerificationController
+};
+
+use App\Livewire\Posts\SingleFull;
+use App\Http\Controllers\{
+    ChatBotController, SimpleChatBotController, ChatGPTController
+};
+
 
 // First Page Route
 Route::get('/welcome', [WelcomeController::class, 'index'])->name('welcome');
@@ -136,10 +141,28 @@ Route::middleware(['auth'])->group(function () {
 
 
     // route for schedules
-    Route::get('/schedules', [ProgramHeadController::class, 'schedules'])->name('schedules');
+    Route::get('/schedules', [SchedulesPheadController::class, 'index'])->name('schedules.index');
+    Route::post('/schedules', [SchedulesPheadController::class, 'store'])->name('schedules.store');
+
+
+    Route::post('/schedules/update/{schedule}', [SchedulesPheadController::class, 'update'])->name('schedules.update');
+
+
+
+   
+
+    Route::delete('/schedules/{id}', [SchedulesPheadController::class, 'destroy'])->name('schedules.destroy');
+        
+
+    // Filter Year and Section for Schedules
+    Route::get('/get-sections/{yearLevelId}', [SchedulesPheadController::class, 'getSections'])->name('getSections');
+    
+    
 
 
 });
+
+
 });
 Route::get('/auth/registration', [AuthController::class, 'registration'])->name('registration');
 

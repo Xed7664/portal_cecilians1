@@ -281,13 +281,14 @@
                     </a>
                 </li>
             
-                <!-- Schedules Link -->
-                <li class="nav-item">
-                    <a class="nav-link {{ Route::is('phead.schedules') ? '' : 'collapsed' }}" href="{{ route('phead.schedules') }}">
-                        <i class='bx bx-calendar-event'></i>
-                        <span class="fw-medium">Class Schedules</span>
-                    </a>
-                </li>
+                 <!-- Schedules Link -->
+            <li class="nav-item">
+                <a class="nav-link {{ Route::is('phead.schedules.index') ? 'active' : 'collapsed' }}" href="{{ route('phead.schedules.index') }}">
+                    <i class='bx bx-calendar-event'></i>
+                    <span class="fw-medium">Schedules</span>
+                </a>
+            </li>
+            
                 <li class="nav-item">
                     <a class="nav-link {{ Route::is('calendar.index') ? '' : 'collapsed' }}" href= "{{ Route::is('calendar.index') ? '' : 'collapsed' }}">
                         <i class="bx bx-calendar-event"></i>

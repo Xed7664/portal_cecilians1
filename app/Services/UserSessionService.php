@@ -50,7 +50,7 @@ class UserSessionService
                       ->from('students')
                       ->where('program_id', $employee->department_id)
                       ->distinct();
-            })->count();
+            })->count();    
 
             $prospectusCount = SubjectsProspectus::where('program_id', $employee->department_id)->distinct('program_id')->count();
 
