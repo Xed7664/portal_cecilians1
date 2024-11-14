@@ -74,10 +74,7 @@
                         </div>
                         <div class="card-body d-grid gap-3">
                            
-                            <a href="{{ route('phead.pre-enrollment.settings') }}" class="btn btn-outline-primary d-flex align-items-center justify-content-center gap-2">
-                                <i class="bx bx-cog"></i>
-                                Pre-Enrollment Settings
-                            </a>
+                        
                             <a href="{{ route('phead.students.index') }}" class="btn btn-outline-primary d-flex align-items-center justify-content-center gap-2">
                                 <i class="bx bx-user"></i>
                                 Manage Students
