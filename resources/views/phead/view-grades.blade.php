@@ -36,7 +36,7 @@
                                 <thead class="table-dark">
                                     <tr>
                                         <th>Course Code</th>
-                                        <th>COurse Description</th>
+                                        <th>Course Description</th>
                                         <th>Prelim</th>
                                         <th>Midterm</th>
                                         <th>Pre-Final</th>

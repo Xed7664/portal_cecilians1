@@ -9,12 +9,17 @@
             <!-- Welcome Card -->
             <div class="row mb-4">
                 <div class="col-12">
-                    <div class="card shadow-sm border-0 rounded-lg">
-                        <div class="card-body text-center">
-                            <h2 class="mb-3">Welcome, {{ $user->name ?? 'Program Head' }}!</h2>
-                            <p class="text-muted">
-                                Here's an overview of your department's activities and quick access to essential management tools.
-                            </p>
+                    <div class="card shadow-sm border-0 rounded-lg bg-primary text-white hover-shadow">
+                        <div class="card-body p-4">
+                            <div class="d-flex flex-column flex-md-row justify-content-between align-items-center">
+                                <div class="text-center text-md-start mb-3 mb-md-0">
+                                    <h2 class="display-6 fw-bold mb-1">Welcome, {{ $user->name ?? 'Program Head' }}!</h2>
+                                    <p class="lead mb-0">
+                                        Here's an overview of your department's activities.
+                                    </p>
+                                </div>
+                                
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -22,46 +27,35 @@
 
             <!-- Statistics Overview -->
             <div class="row g-4 mb-4">
-                <div class="col-lg-3 col-md-6">
-                    <div class="card h-100 text-white bg-primary shadow-sm border-0 hover-shadow transition-all">
+                <div class="col-lg-4 col-md-4">
+                    <div class="card h-100 text-white bg-white shadow-sm border-0 hover-shadow transition-all">
                         <div class="card-body text-center d-flex flex-column align-items-center justify-content-center">
-                            <i class="bx bx-user display-4 mb-3"></i>
-                            <h4 class="fw-bold mb-2">Students</h4>
-                            <p class="h2 mb-0">{{ number_format($studentsCount ?? 0) }}</p>
-                            <small>Total Enrolled</small>
+                            <i class="bx bx-user display-3 mb-3 text-primary"></i>
+                            <h3 class="fw-bold mb-2 text-primary">Students</h3>
+                            <p class="h1 mb-0 text-primary">{{ number_format($studentsCount ?? 0) }}</p>
+                            <small class="text-muted">Total Enrolled</small>
                         </div>
                     </div>
                 </div>
 
-                <div class="col-lg-3 col-md-6">
-                    <div class="card h-100 text-white bg-success shadow-sm border-0 hover-shadow transition-all">
+                <div class="col-lg-4 col-md-4">
+                    <div class="card h-100 text-white bg-white shadow-sm border-0 hover-shadow transition-all">
                         <div class="card-body text-center d-flex flex-column align-items-center justify-content-center">
-                            <i class="bx bx-calendar display-4 mb-3"></i>
-                            <h4 class="fw-bold mb-2">Sections</h4>
-                            <p class="h2 mb-0">{{ number_format($sectionsCount ?? 0) }}</p>
-                            <small>Active Sections</small>
+                            <i class="bx bx-calendar display-3 mb-3 text-success"></i>
+                            <h3 class="fw-bold mb-2 text-success">Sections</h3>
+                            <p class="h1 mb-0 text-success">{{ number_format($sectionsCount ?? 0) }}</p>
+                            <small class="text-muted">Active Sections</small>
                         </div>
                     </div>
                 </div>
 
-                <div class="col-lg-3 col-md-6">
-                    <div class="card h-100 text-white bg-warning shadow-sm border-0 hover-shadow transition-all">
+                <div class="col-lg-4 col-md-4">
+                    <div class="card h-100 text-white bg-white shadow-sm border-0 hover-shadow transition-all">
                         <div class="card-body text-center d-flex flex-column align-items-center justify-content-center">
-                            <i class="bx bx-book display-4 mb-3"></i>
-                            <h4 class="fw-bold mb-2">Subjects</h4>
-                            <p class="h2 mb-0">{{ number_format($subjectsCount ?? 0) }}</p>
-                            <small>Subjects Offered</small>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col-lg-3 col-md-6">
-                    <div class="card h-100 text-white bg-info shadow-sm border-0 hover-shadow transition-all">
-                        <div class="card-body text-center d-flex flex-column align-items-center justify-content-center">
-                            <i class="bx bx-book-open display-4 mb-3"></i>
-                            <h4 class="fw-bold mb-2">Prospectus</h4>
-                            <p class="h2 mb-0">{{ number_format($prospectusCount ?? 0) }}</p>
-                            <small>Total Programs</small>
+                            <i class="bx bx-book display-3 mb-3 text-warning"></i>
+                            <h3 class="fw-bold mb-2 text-warning">Subjects</h3>
+                            <p class="h1 mb-0 text-warning">{{ number_format($subjectsCount ?? 0) }}</p>
+                            <small class="text-muted">Subjects Offered</small>
                         </div>
                     </div>
                 </div>
@@ -79,19 +73,28 @@
                             </h5>
                         </div>
                         <div class="card-body d-grid gap-3">
-                            <a href="{{ route('phead.students.index') }}" class="btn btn-primary d-flex align-items-center justify-content-center gap-2">
+                           
+                            <a href="{{ route('phead.pre-enrollment.settings') }}" class="btn btn-outline-primary d-flex align-items-center justify-content-center gap-2">
+                                <i class="bx bx-cog"></i>
+                                Pre-Enrollment Settings
+                            </a>
+                            <a href="{{ route('phead.students.index') }}" class="btn btn-outline-primary d-flex align-items-center justify-content-center gap-2">
                                 <i class="bx bx-user"></i>
                                 Manage Students
                             </a>
-                            <a href="{{ route('phead.yearandsection') }}" class="btn btn-success d-flex align-items-center justify-content-center gap-2">
+                            <a href="{{ route('phead.yearandsection') }}" class="btn btn-outline-primary d-flex align-items-center justify-content-center gap-2">
                                 <i class="bx bx-calendar"></i>
                                 Manage Year & Sections
                             </a>
-                            <a href="{{ route('phead.subjects.index') }}" class="btn btn-warning d-flex align-items-center justify-content-center gap-2">
+                            <a href="{{ route('phead.schedules.index') }}" class="btn btn-outline-primary d-flex align-items-center justify-content-center gap-2">
+                                <i class="bx bx-calendar-event"></i>
+                                Manage Schedules
+                            </a>
+                            <a href="{{ route('phead.subjects.index') }}" class="btn btn-outline-primary d-flex align-items-center justify-content-center gap-2">
                                 <i class="bx bx-book"></i>
                                 Manage Subjects
                             </a>
-                            <a href="{{ route('phead.prospectus') }}" class="btn btn-info d-flex align-items-center justify-content-center gap-2">
+                            <a href="{{ route('phead.prospectus') }}" class="btn btn-outline-primary d-flex align-items-center justify-content-center gap-2">
                                 <i class="bx bx-book-open"></i>
                                 View Prospectus
                             </a>
@@ -121,7 +124,7 @@
                                 @empty
                                     <div class="text-center text-muted py-4">
                                         <i class="bx bx-info-circle display-4"></i>
-                                        <p class="mb-0">No recent activities to display</p>
+                                        <p class="mb-0">No recent activities for today</p>
                                     </div>
                                 @endforelse
                             </div>
@@ -155,10 +158,29 @@
     .btn {
         padding: 0.75rem 1.5rem;
         font-weight: 500;
+        transition: all 0.3s ease;
     }
-
-    .btn i {
-        font-size: 1.2rem;
+    .btn-outline-primary {
+        position: relative;
+        z-index: 1;
+        overflow: hidden;
+    }
+    .btn-outline-primary:hover {
+        color: #fff;
+    }
+    .btn-outline-primary::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+        transition: left 0.5s;
+        z-index: -1;
+    }
+    .btn-outline-primary:hover::before {
+        left: 100%;
     }
 
     .card-header {
@@ -167,6 +189,20 @@
 
     .display-4 {
         font-size: 2.5rem;
+    }
+    .card.bg-primary {
+        background: linear-gradient(135deg, #871616 0%, #224abe 100%);
+        transition: all 0.3s ease;
+    }
+    .card.bg-primary:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+    }
+    .display-6 {
+        font-size: 2.5rem;
+    }
+    .lead {
+        font-size: 1.1rem;
     }
 </style>
 @endsection
