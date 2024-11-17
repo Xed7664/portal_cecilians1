@@ -29,7 +29,7 @@
                         <h2><b>New here?</b><br><span>Sign up to stay connected and get the latest updates! </span><br>
                         <button onclick="showRegCon()">SIGN UP</button>
                         </h2>
-                        <img src="{{ asset('img/schoolbg2.png') }}" class="bldg"> 
+                        <img src="{{ asset('assets/images/schoolbggg.png') }}" class="bldg"> 
                         
                         
             
@@ -56,7 +56,7 @@
                         </div>
                         <!-- end of loginCard -->
 
-                        <img src="{{ asset('img/svg/coding.svg') }}" class="signup">
+                        <img src="{{ asset('img/svg/coding.png') }}" class="signup">
 
                     </div>
                      <!-- end of left-con2 -->
@@ -98,7 +98,7 @@
     
 
 <script>
-    document.addEventListener('DOMContentLoaded', () => {
+   document.addEventListener('DOMContentLoaded', () => {
     const circle = document.querySelector('.circle');
     const loginCard = document.querySelector('.loginCard');
     const registerCard = document.querySelector('.registerCard');
@@ -111,22 +111,46 @@
     function adjustCardsForScreenWidth() {
         const screenWidth = window.innerWidth;
 
-       
+        if (screenWidth <= 900) {
+            if (registerCard.style.transform === 'translateX(-150%)') {
+                registerCard.style.transform = 'translateX(-50%)';
+                registerCard.style.opacity = '1';
+                registerCard.style.transition = '0s';
+            } else if (loginCard.style.transform === 'translateX(0)') {
+                loginCard.style.transform = 'translateX(0)';
+                loginCard.style.opacity = '1';
+                loginCard.style.transition = '0';
+            }
+        } else {
+            registerCard.style.transform = 'translateX(-150%)';
+            registerCard.style.transition = '0.5s ease';
+            loginCard.style.transform = 'translateX(0)';
+            loginCard.style.opacity = '1';
+        }
     }
 
     // Function to show the register card
     window.showRegCon = function () {
+        const screenWidth = window.innerWidth;
+
         if (circle) {
             circle.style.transform = 'translate(50%, -50%)';
-            circle.style.background = 'linear-gradient(190deg, rgb(255, 216, 216), rgb(220, 53, 69)';
+            circle.style.background = 'linear-gradient(180deg, white, rgb(189, 26, 42)';
+            
+            if (screenWidth <= 900) {
+                registerCard.style.transform = 'translateX(-50%)';
+            } else {
+                registerCard.style.transform = 'translateX(-150%)';
+            }
+
             loginCard.style.transform = 'translateX(-200%)';
-            registerCard.style.transform = 'translateX(-150%)';
+            registerCard.style.transition = '0.5s ease';
             registerCard.style.opacity = '1';
             loginCard.style.zIndex = '-10';
             registerCard.style.zIndex = '1';
-            h2.style.transform = 'translateX(-150%)';
-            bldg.style.transform = 'translateX(-150%)';
-            signup.style.transform = 'translateX(-20%)';
+            h2.style.transform = 'translateX(-200%)';
+            bldg.style.transform = 'translateX(-200%)';
+            signup.style.transform = 'translateX(-54%)';
             loginFormh2.style.transform = 'translateX(0)';
         }
         history.pushState(null, '', '/auth/login?/registration');
@@ -134,19 +158,29 @@
 
     // Function to show the login card
     window.showLoginCon = function () {
+        const screenWidth = window.innerWidth;
+
         if (circle) {
             circle.style.transform = 'translate(-50%, -50%)';
-            circle.style.background = 'linear-gradient(145deg, rgb(255, 216, 216), rgb(220, 53, 69)';
+            circle.style.background = 'linear-gradient(135deg, white, rgb(189, 26, 42)';
+            
             loginCard.style.transform = 'translateX(0)';
             loginCard.style.opacity = '1';
-            registerCard.style.transform = 'translateX(50%)';
+
+            if (screenWidth <= 900) {
+                registerCard.style.transform = 'translateX(50%)';
+            } else {
+                registerCard.style.transform = 'translateX(50%)';
+            }
+
+            registerCard.style.transition = '0.2s ease';
             loginCard.style.zIndex = '1';
             registerCard.style.zIndex = '-10';
             registerCard.style.opacity = '0';
             h2.style.transform = 'translateX(0)';
             bldg.style.transform = 'translateX(0)';
-            signup.style.transform = 'translateX(100%)';
-            loginFormh2.style.transform = 'translateX(100%)';
+            signup.style.transform = 'translateX(200%)';
+            loginFormh2.style.transform = 'translateX(200%)';
         }
         history.pushState(null, '', '/auth/login?');
     };
