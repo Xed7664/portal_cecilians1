@@ -103,7 +103,13 @@ use App\Models\User;
   <link href="{{ asset('css/style.css') }}" rel="stylesheet">
   <link href="{{ asset('css/grade.css') }}" rel="stylesheet">
 
-  
+  @if(in_array($currentRoute, ['cmos.index']))
+  <!-- Include Bootstrap CSS -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<!-- Include Bootstrap Bundle JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+@endif
 
 
 </head>

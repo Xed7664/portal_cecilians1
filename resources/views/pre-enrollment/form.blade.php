@@ -89,8 +89,16 @@
         <!-- Custom CSS for aesthetic enhancement -->
 
 <div class="form-container">
-    <form id="preEnrollmentForm" action="{{ route('pre-enrollment.submit') }}" method="POST">
+<form id="preEnrollmentForm" action="{{ route('pre-enrollment.submit') }}" method="POST">
         @csrf
+           <!-- Hidden Inputs -->
+           <input type="hidden" name="student_type" value="{{ $student->student_type ?? 'N/A' }}">
+        <input type="hidden" name="previous_year_level" value="{{ $previousYearLevel }}">
+        <input type="hidden" name="student_id" value="{{ $student->StudentID }}">
+        <input type="hidden" name="full_name" value="{{ $student->FullName }}">
+        <input type="hidden" name="program_id" value="{{ $student->program_id }}">
+        <input type="hidden" name="year_level" value="{{ $student->year_level ?? '1st Year' }}">
+
               <div class="step active" id="step1">
                     <h3 class="section-title text-primary">Step 1: Personal Information</h3>
 
@@ -198,7 +206,23 @@
                  <button type="button" class="btn btn-primary next-step">Next</button>
               </div>
               <div class="step active" id="step2">
-                    <h3 class="section-title text-primary">Step 2: Family Info</h3>
+              <h3 class="section-title text-primary">Step 2: Educational Info</h3>
+                 <!-- Previous School Information -->
+                 <div class="row mb-3">
+                        <div class="col-md-6 form-group">
+                            <label for="prevschool">Previous School Attended</label>
+                            <input type="text" id="prevschool" name="prevschool" class="form-control custom-input" value="{{ old('prevschool', $student->previous_school) }}" required>
+                        </div>
+                        <div class="col-md-6 form-group">
+                            <label for="prevschooladdress">Previous School Address</label>
+                            <input type="text" id="prevschooladdress" name="prevschooladdress" class="form-control custom-input" value="{{ old('prevschooladdress', $student->previous_school_adress) }}" required>
+                        </div>
+                    </div>
+                    <button type="button" class="btn btn-secondary prev-step">Previous</button>
+                    <button type="button" class="btn btn-primary next-step">Next</button>
+                </div>
+              <div class="step active" id="step3">
+                    <h3 class="section-title text-primary">Step 3: Family Info</h3>
                     <!-- Father's Information -->
                         <div class="row mb-3">
                             <div class="col-md-6 form-group">
@@ -227,8 +251,8 @@
                     <button type="button" class="btn btn-primary next-step">Next</button>
                 </div>
 
-                <div class="step active" id="step3">
-    <h3 class="section-title text-primary">Step 3: Programs Offered & Year Level</h3>
+                <div class="step active" id="step4">
+    <h3 class="section-title text-primary">Step 4: Programs Offered & Year Level</h3>
 
     <div class="mb-3">
         <label for="year-level" class="form-label text-dark">
@@ -266,41 +290,45 @@
         <p class="text-dark">No completed subjects available.</p>
     @endif
 
-    <!-- Program Selection -->
-    <div class="mb-3">
-        <label for="program" class="form-label text-dark" >
-            Program
-            <i class="fas fa-info-circle" data-bs-toggle="tooltip" title="Choose your current program. This determines the subjects and curriculum for your course."></i>
-        </label>
+  <!-- Program Selection -->
+<div class="mb-3">
+    <label for="program" class="form-label text-dark">
+        Program
+        <i class="fas fa-info-circle" data-bs-toggle="tooltip" title="Choose your current program. This determines the subjects and curriculum for your course."></i>
+    </label>
 
-        <!-- Program Select Field -->
-              
-        <select class="form-control text-dark" id="program" disabled>
-            @foreach($programs as $program)
-                <option value="{{ $program->id }}" {{ $student->program_id == $program->id ? 'selected' : '' }}>
-                    {{ $program->name }}
-                </option>
-            @endforeach
-        </select>
+    <!-- Program Select Field -->
+    <select 
+        class="form-control text-dark" 
+        id="program" 
+        name="program_id"
+        {{ ($student->student_type == 'new' || $student->student_type == 'transferee') ? '' : 'disabled' }}>
+        @foreach($programs as $program)
+            <option value="{{ $program->id }}" {{ $student->program_id == $program->id ? 'selected' : '' }}>
+                {{ $program->name }}
+            </option> 
+        @endforeach
+    </select>
 
-        <!-- Hidden input to submit the program ID -->
+    @if(!in_array($student->student_type, ['new', 'transferee']))
+        <!-- Hidden input to submit the program ID for returning students -->
         <input type="hidden" name="program_id" value="{{ $student->program_id }}">
+    @endif
 
-
-        <!-- Toggle Button for Program Change -->
-        @if($student->program_id)
-            <button type="button" class="btn btn-outline-primary mt-2" id="changeProgramButton">
-                Change Program
-            </button>
-        @endif
-    </div>
-
-    <button type="button" class="btn btn-secondary prev-step">Previous</button>
-    <button type="button" class="btn btn-primary next-step">Next</button>
+    <!-- Toggle Button for Program Change -->
+    @if($student->program_id && $student->student_type != 'new' && $student->student_type != 'transferee')
+        <button type="button" class="btn btn-outline-primary mt-2" id="changeProgramButton">
+            Change Program
+        </button>
+    @endif
 </div>
 
-<div class="step active" id="step4"> 
-    <h3 class="section-title text-primary">Step 4: Class Schedule</h3>
+<button type="button" class="btn btn-secondary prev-step">Previous</button>
+<button type="button" class="btn btn-primary next-step">Next</button>
+
+</div>
+<div class="step active" id="step5"> 
+    <h3 class="section-title text-primary">Step 5: Class Schedule</h3>
     <div id="schedule-container">
         <p>Select a program and year level to view the schedule by section.</p>
 
@@ -308,32 +336,46 @@
         <div id="sectionCardsContainer" class="d-flex flex-wrap mb-3"></div>
 
         <!-- Schedules Table -->
-        <div id="schedulesTableWrapper"></div>
+        <div id="schedulesTableWrapper" class="table-responsive">
+            <!-- Dynamic table will be injected here -->
+        </div>
+        
+        <!-- Hidden input to store the selected schedule ID -->
+        <input type="hidden" name="schedule" id="selectedScheduleId" value="">
     </div>
     <button type="button" class="btn btn-secondary prev-step">Previous</button>
-    <button type="button" class="btn btn-primary next-step">Next</button>
+    <button type="submit" class="btn btn-primary">Submit Pre-Enrollment</button>
 </div>
 
-                <div class="step" id="step5"> 
-                    <h3 class="section-title text-primary">Step 5: Pre-enrollment Confirmation</h3>
-               <div class="text-dark">
-                    <h5>Review your information:</h5>
-                    <p><strong>Full Name:</strong> <span id="previewFullName"></span></p>
-                    <p><strong>Student ID:</strong> <span id="previewStudentID"></span></p>
-                    <p><strong>Birth Date:</strong> <span id="previewBirthDate"></span></p>
-                    <p><strong>Sex:</strong> <span id="previewSex"></span></p>
-                    <p><strong>Religion:</strong> <span id="previewReligion"></span></p>
-                    <p><strong>Status:</strong> <span id="previewStatus"></span></p>
-                    <p><strong>Address:</strong> <span id="previewAddress"></span></p>
-                    <p><strong>Program:</strong> <span id="previewProgram"></span></p>
-                    <p><strong>Year Level:</strong> <span id="previewYearLevel"></span></p>
-                    <p><strong>Preferred Schedule:</strong> <span id="previewSchedule"></span></p>
-                </div>
-                    <button type="button" class="btn btn-secondary prev-step">Previous</button>
-                    <button type="submit" class="btn btn-primary">Submit Now</button>
-                </div>
-        </div>
+        </div> 
     </form>
+    @if(session('pdf_path'))
+<div class="modal" id="confirmationModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Enrollment Completed</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p>Your pre-enrollment was successfully submitted!</p>
+                <a href="{{ route('download.preenrollment.pdf') }}" target="_blank" class="btn btn-primary">Download PDF Summary</a>
+            </div>
+        </div>
+    </div>
+    <script>
+    $(document).ready(function() {
+        $('#confirmationModal').modal('show');
+    });
+</script>
+@endif
+<div id="toastContainer" class="position-fixed" style="top: 60px; right: 0; z-index: 1055; padding: 1rem;"></div>
+
+</div>
+
+
 </div>
 <script>
     document.addEventListener("DOMContentLoaded", function() {
@@ -373,18 +415,24 @@
     });
 </script>
 <script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const changeProgramButton = document.getElementById('changeProgramButton');
-        const programSelect = document.getElementById('program');
+ document.addEventListener('DOMContentLoaded', function () {
+    const changeProgramButton = document.getElementById('changeProgramButton');
+    const programSelect = document.getElementById('program');
 
-        if (changeProgramButton) {
-            changeProgramButton.addEventListener('click', function () {
-                // Enable the program select field if they want to change programs
-                programSelect.disabled = !programSelect.disabled;
-            });
-        }
-    });
+    if (changeProgramButton) {
+        changeProgramButton.addEventListener('click', function () {
+            // Enable the program select field for returning students
+            if (programSelect.hasAttribute('disabled')) {
+                programSelect.removeAttribute('disabled');
+            } else {
+                programSelect.setAttribute('disabled', 'disabled');
+            }
+        });
+    }
+});
+
 </script>
+
 <script>
 document.addEventListener('DOMContentLoaded', () => {
     let currentStep = 1;
@@ -394,6 +442,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const programSelect = document.getElementById('program');
     const yearLevelSelect = document.getElementById('year-level');
     const scheduleSelect = document.getElementById('schedule');
+    let selectedSchedule = null; // Store the selected schedule
 
     function showStep(step) {
         steps.forEach((element, index) => {
@@ -466,7 +515,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (currentStep < totalSteps && validateStep(currentStep)) {
                 currentStep++;
                 showStep(currentStep);
-                if (currentStep === 4) updatePreview();
+                if (currentStep === 5) updatePreview(); // Trigger update for Step 5 preview
             }
         });
     });
@@ -480,7 +529,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // Debounced input validation to improve performance
     const validateFieldDebounced = debounce((field) => {
         const fieldValid = field.checkValidity();
         field.classList.toggle('is-invalid', !fieldValid);
@@ -499,61 +547,36 @@ document.addEventListener('DOMContentLoaded', () => {
         };
     }
 
-
-
-    function updatePreview() {
-    document.getElementById('previewFullName').innerText = document.getElementById('fullName').value;
-    document.getElementById('previewStudentID').innerText = document.getElementById('studentID').value;
-    document.getElementById('previewBirthDate').innerText = document.getElementById('birthDate').value;
-    document.getElementById('previewSex').innerText = document.getElementById('sex').value;
-    document.getElementById('previewReligion').innerText = document.getElementById('religion').value;
-    document.getElementById('previewStatus').innerText = document.getElementById('status').value;
-    document.getElementById('previewAddress').innerText = document.getElementById('address').value;
-    document.getElementById('previewProgram').innerText = document.getElementById('program').options[document.getElementById('program').selectedIndex].text;
-
-    // Update the Year Level preview
-    const yearLevelInput = document.getElementById('year-level');
-    if (yearLevelInput) {
-        document.getElementById('previewYearLevel').innerText = yearLevelInput.value;
-    }
-
-    // Update the Schedule preview
-    const scheduleSelect = document.getElementById('schedule');
-    if (scheduleSelect && scheduleSelect.selectedIndex > -1) {
-        document.getElementById('previewSchedule').innerText = scheduleSelect.options[scheduleSelect.selectedIndex].text;
-    }
-}
-
-
-document.getElementById('program').addEventListener('change', fetchSchedules);
+    document.getElementById('program').addEventListener('change', fetchSchedules);
 document.getElementById('year-level').addEventListener('change', fetchSchedules);
-
+// Function to fetch schedules and initialize SSE listener
 function fetchSchedules() {
     const programId = document.getElementById('program').value;
     const yearLevel = document.getElementById('year-level').value || '1st Year';
-    
+
     if (programId && yearLevel) {
+        // Fetch the schedules as usual
         fetch(`/get-schedules?program_id=${programId}&year_level=${yearLevel}`)
             .then(response => response.json())
             .then(data => {
                 const sectionCardsContainer = document.getElementById('sectionCardsContainer');
                 const schedulesTableWrapper = document.getElementById('schedulesTableWrapper');
 
-                // Clear previous content
                 sectionCardsContainer.innerHTML = '';
                 schedulesTableWrapper.innerHTML = '';
 
-                // Display section cards with validation
                 for (const sectionId in data.schedules) {
                     const section = data.schedules[sectionId];
                     const isFull = section.enrolled_count >= section.max_enrollment;
-                    const isLocked = section.is_locked;
+                    const isLocked = section.is_locked; // Directly access lock status for this section-year level
 
+                    // Create the card for each section
                     const card = document.createElement('div');
                     card.className = 'card m-2';
                     card.style.cursor = isFull || isLocked ? 'not-allowed' : 'pointer';
                     card.style.width = '150px';
 
+                    // Add card HTML with lock status badge
                     card.innerHTML = `
                         <div class="card-body text-center">
                             <h5 class="card-title">${section.section_name}</h5>
@@ -562,12 +585,17 @@ function fetchSchedules() {
                         </div>
                     `;
 
+                    // Set card behavior based on full and lock status
                     if (!isFull && !isLocked) {
-                        card.onclick = () => displaySchedulesTable(section.schedules);
+                        card.onclick = () => {
+                            selectedSchedule = section; // Store selected section
+                            document.getElementById('selectedScheduleId').value = section.schedules[0].id; // Set schedule ID
+                            displaySchedulesTable(section.schedules);
+                        };
                     } else {
                         card.onclick = () => {
                             displayToastMessage(
-                                isLocked ? 'This section is currently locked.' : 
+                                isLocked ? 'This section is currently locked.' :
                                 'This section is fully occupied. Please select another section.'
                             );
                         };
@@ -578,92 +606,128 @@ function fetchSchedules() {
             .catch(error => {
                 console.error('Error fetching schedules:', error);
             });
+
+        // Listen for SSE updates on section lock status
+        const sectionLockUpdates = new EventSource(`/phead/section-lock/updates?program_id=${programId}&year_level=${yearLevel}`);
+
+        sectionLockUpdates.onmessage = function(event) {
+            const updates = JSON.parse(event.data);
+
+            updates.forEach(update => {
+                const sectionCard = document.querySelector(`[data-section-id="${update.section_id}"]`);
+
+                if (sectionCard) {
+                    const lockStatusElement = sectionCard.querySelector('.lock-status');
+                    lockStatusElement.textContent = update.is_locked ? 'Locked' : 'Unlocked';
+                    sectionCard.classList.toggle('locked', update.is_locked);
+                    sectionCard.style.cursor = update.is_locked ? 'not-allowed' : 'pointer';  // Update cursor based on lock status
+                }
+            });
+        };
+
+        sectionLockUpdates.onerror = function(event) {
+            console.error('Error with SSE connection:', event);
+            sectionLockUpdates.close(); // Close the connection if there's an error
+        };
     }
-}
-
-function displayToastMessage(message) {
-    const toast = document.createElement('div');
-    toast.className = 'toast align-items-center text-bg-warning border-0 position-fixed';
-    toast.role = 'alert';
-    toast.style.bottom = '1rem'; // Position from the bottom
-    toast.style.right = '1rem'; // Position from the right
-    toast.style.zIndex = '1055'; // Ensure it appears above other elements
-
-    toast.innerHTML = `
-        <div class="d-flex">
-            <div class="toast-body">${message}</div>
-            <button type="button" class="btn-close me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
-        </div>
-    `;
-    
-    document.body.appendChild(toast);
-    const bootstrapToast = new bootstrap.Toast(toast);
-    bootstrapToast.show();
-
-    // Automatically remove the toast from the DOM after it hides
-    toast.addEventListener('hidden.bs.toast', () => {
-        document.body.removeChild(toast);
-    });
 }
 
 
 function displaySchedulesTable(schedules) {
     const container = document.getElementById('schedulesTableWrapper');
-    container.innerHTML = ''; // Clear previous table
+    container.innerHTML = ''; // Clear existing content
 
+    // Create the table element
     const table = document.createElement('table');
-    table.classList.add('table', 'table-bordered', 'display', 'dataTable');
+    table.classList.add('table', 'table-striped', 'table-bordered', 'display', 'w-100');
 
+    // Define the table structure
     table.innerHTML = `
         <thead>
             <tr>
-                <th>COURSE CODE</th>   
-                <th>DESCRIPTION</th>
-                <th>LECTURE</th>
-                <th>LAB</th>
-                <th>UNITS</th>
-                <th>DAYS</th>
-                <th>TIME</th>
-                <th>ROOM</th>
-                <th>INSTRUCTOR</th>
+                <th>Course Code</th>
+                <th>Description</th>
+                <th>Lecture</th>
+                <th>Lab</th>
+                <th>Units</th>
+                <th>Days</th>
+                <th>Time</th>
+                <th>Room</th>
+                <th>Instructor</th>
             </tr>
         </thead>
+        <tbody>
+            ${schedules.map(schedule => `
+                <tr>
+                    <td>${schedule.subject_code || ''}</td>
+                    <td>${schedule.subject_description || ''}</td>
+                    <td>${schedule.subject_lecture || ''}</td>
+                    <td>${schedule.subject_lab || ''}</td>
+                    <td>${schedule.subject_units || ''}</td>
+                    <td>${schedule.days || ''}</td>
+                    <td>${schedule.time || ''}</td>
+                    <td>${schedule.room || ''}</td>
+                    <td>${schedule.teacher_name || ''}</td>
+                </tr>
+            `).join('')}
+        </tbody>
     `;
 
-    const tbody = document.createElement('tbody');
-    schedules.forEach(schedule => {
-        const row = `<tr>
-            <td>${schedule.subject_code || ''}</td>
-            <td>${schedule.subject_description || ''}</td>
-            <td>${schedule.subject_lecture || ''}</td>
-            <td>${schedule.subject_lab || ''}</td>
-            <td>${schedule.subject_units || ''}</td>
-            <td>${schedule.days || ''}</td>
-            <td>${schedule.time || ''}</td>
-            <td>${schedule.room || ''}</td>
-            <td>${schedule.teacher_name || ''}</td>
-        </tr>`;
-        tbody.innerHTML += row;
-    });
-    table.appendChild(tbody);
+    // Append the table to the container
     container.appendChild(table);
 
+    // Initialize DataTables
+    if ($.fn.DataTable.isDataTable(table)) {
+        $(table).DataTable().destroy();
+    }
     $(table).DataTable({
         responsive: true,
-        paging: false,
-        searching: false
+        autoWidth: false,
+        pageLength: 10,
+        language: {
+            emptyTable: "No schedules available. Please select a program and year level."
+        }
     });
 }
-
 
 // Auto-fetch schedules on page load if fields are pre-filled
 window.onload = function() {
     if (document.getElementById('program').value || document.getElementById('year-level').value) {
         fetchSchedules();
     }
-    };
-  });
+};
+
+});
 </script>
+<script>
+    function displayToastMessage(message) {
+    const toastContainer = document.getElementById('toastContainer');
+    const toastId = `toast-${Date.now()}`;
 
+    const toastHTML = `
+        <div class="toast align-items-center text-white bg-primary border-0 mb-2" id="${toastId}" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="d-flex">
+                <div class="toast-body">
+                    ${message}
+                </div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+        </div>
+    `;
 
+    // Append toast to the container
+    toastContainer.insertAdjacentHTML('beforeend', toastHTML);
+
+    // Initialize and show the toast
+    const toastElement = document.getElementById(toastId);
+    const toast = new bootstrap.Toast(toastElement);
+    toast.show();
+
+    // Automatically remove the toast from DOM after it's hidden
+    toastElement.addEventListener('hidden.bs.toast', () => {
+        toastElement.remove();
+    });
+}
+
+</script>
     @endsection

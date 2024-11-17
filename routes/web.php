@@ -7,7 +7,8 @@ use App\Http\Controllers\{
     SearchController, ScheduleController, EventsController, CalendarController, 
     AccountSettingsController, AjaxController, AuthController, PostController, 
     ProfileController, UserController, StudentController, TeacherController, 
-    ProgramHeadController, ProgramHeadPreEnrollmentController, AdminController
+    ProgramHeadController, ProgramHeadPreEnrollmentController, AdminController,
+    CMOController
 };
 
 use App\Http\Controllers\Admin\{
@@ -51,12 +52,14 @@ Route::middleware('auth')->group(function() {
     // routes/web.php
 Route::get('/pre-enrollment/preview', [PreEnrollmentController::class, 'preview'])->name('pre-enrollment.preview');
 Route::post('/pre-enrollment/submit', [PreEnrollmentController::class, 'submitPreEnrollment'])->name('pre-enrollment.submit');
+Route::get('/download-preenrollment-pdf', [PreEnrollmentController::class, 'downloadPreEnrollmentPdf'])
+    ->name('download.preenrollment.pdf');
 
 
     Route::get('/pre-enrollment/dashboard', [PreEnrollmentController::class, 'previewForm'])->name('pre-enrollment.dashboard');
 });
 // Route in web.php
-Route::patch('/sections/{section}/toggle-lock', [PreEnrollmentController::class, 'toggleLock'])->name('sections.toggleLock');
+
 
 Route::get('/get-schedules', [PreEnrollmentController::class, 'getSchedules'])->name('get-schedules');
 Route::get('/enrollment-status', [PreEnrollmentController::class, 'showStatus'])->name('enrollment.enrollment-status');
@@ -81,9 +84,10 @@ Route::middleware(['auth'])->group(function () {
 
         // Pre-Enrollment Routes
         Route::get('/preenrollment', [PreEnrollmentController::class, 'preenrollmentphead'])->name('preenrollment');
-        Route::post('/lock-section/{sectionId}', [PreEnrollmentController::class, 'lockSection'])->name('lockSection');
-        Route::post('/unlock-section/{sectionId}', [PreEnrollmentController::class, 'unlockSection'])->name('unlockSection');
- 
+        Route::post('/section/{section}/toggle-lock/{year_level_id}', [PreEnrollmentController::class, 'toggleLock'])->name('toggleLock');
+        Route::get('/section/{section}/year-level/{year_level_id}/schedules', [PreEnrollmentController::class, 'viewSchedules'])->name('viewSchedules');
+
+
 
 
             // List student applications for pre-enrollment
@@ -100,9 +104,18 @@ Route::middleware(['auth'])->group(function () {
         
         // Program Head Dashboard route
     Route::get('/dashboard', [ProgramHeadController::class, 'dashboard'])->name('dashboard');
-
-
-
+    Route::get('/ched-curriculum', [ProgramHeadController::class, 'chedCurriculums'])->name('ched_curriculum');
+  
+     // CHED CMO Management Routes
+     Route::resource('cmos', CMOController::class)->names([
+        'index' => 'cmos.index',
+        'create' => 'cmos.create',
+        'store' => 'cmos.store',
+        'show' => 'cmos.show',
+        'edit' => 'cmos.edit',
+        'update' => 'cmos.update',
+        'destroy' => 'cmos.destroy',
+    ]);
 
     // Prospectus Management routes
     Route::get('/program-head/prospectus', [ProgramHeadController::class, 'index'])->name('prospectus');
@@ -164,6 +177,7 @@ Route::middleware(['auth'])->group(function () {
 
 
 });
+
 Route::get('/auth/registration', [AuthController::class, 'registration'])->name('registration');
 
 Route::get('/auth/verify', [AuthController::class, 'verify'])->name('verify');

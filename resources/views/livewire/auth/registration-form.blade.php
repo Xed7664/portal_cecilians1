@@ -1,4 +1,5 @@
-<div class="card-body pt-4 border border-danger border-opacity-25 border-25 border-top-0 bg-body-tertiary registration-form">
+<div class="card-body pt-4 border border-danger border-opacity-25 border-25 border-top-0 bg-body-tertiary">
+    <div>
         <div id="response">
             @if(session()->has('error'))
                 <div class="alert alert-danger alert-dismissible fade show" role="alert">
@@ -19,7 +20,7 @@
             <div class="col-12">
                 <label class="form-label">School ID</label>
                 <div class="input-group">
-                    <span class="input-group-text">SCC-</span>
+                    <span class="input-group-text" style="font-size:14px">SCC-</span>
                     <input wire:model="school_id" type="text" class="form-control @error('school_id') is-invalid @enderror" name="school_id" value="{{ old('school_id') }}" required>
                     @error('school_id')
                         <div class="invalid-feedback">{{ $message }}</div>
@@ -100,17 +101,114 @@
             </div>
 
             <div class="col-12 mb-2">
-                <button id="submitBtn" type="submit" class="btn btn-danger w-100">Sign Up</button>
+                <button id="submitBtn" type="submit" class="btn btn-danger w-100" style="z-index:20">Sign Up</button>
             </div>
 
             <hr class="border border-50 opacity-50 mb-0">
 
-            <p class="text-center mb-0">
-                <span style="color:rgb(90,90,90)">Already have an account?</span>
-                <a href="{{ route('login') }}">
-                    <span class="text-danger fw-semibold">Login instead</span>
+            <p class="text-center mb-0 signinbtn">
+                <span style="color:rgb(90,90,90);font-size:18px">Already have an account?</span>
+                <a href="#" onclick="showLoginCon()">
+                    <span class="text-danger fw-semibold" style="font-size:18px"> Sign in</span>
                 </a>
             </p>
         </form>
     </div>
+    </div>
 </div>
+
+<script>
+$(document).ready(function() {
+    // Function to check username criteria
+    function checkUsernameCriteria(username) {
+        const usernameRegex = /^[A-Za-z0-9_.]+$/;
+        return username.length >= 3 && username.length <= 30 && usernameRegex.test(username);
+    }
+
+    // Attach event handlers to the username input field
+    const usernameInput = $('.username');
+    const feedbackContainer = usernameInput.closest('.col-12');
+    const feedbackElement = feedbackContainer.find('.invalid-feedback');
+
+    usernameInput.on('input', function() {
+        const username = $(this).val();
+        const isValid = checkUsernameCriteria(username);
+
+        if (isValid) {
+            feedbackElement.hide();
+            $(this).removeClass('is-invalid');
+            $(this).addClass('is-valid');
+            $('#submitBtn').prop('disabled', false); // Enable submit button
+        } else {
+            feedbackElement.show();
+            $(this).removeClass('is-valid');
+            $(this).addClass('is-invalid');
+            $('#submitBtn').prop('disabled', true); // Disable submit button
+        }
+    });
+
+    // Function to check password criteria
+    function checkPasswordCriteria(password) {
+        const criteria = {
+            length: password.length >= 8,
+            uppercase: /[A-Z]/.test(password),
+            lowercase: /[a-z]/.test(password),
+            number: /\d/.test(password),
+            special: /[!@#$%^&*()_+\-=[\]{};:'"\\|,.<>/?]/.test(password)
+        };
+
+        return criteria;
+    }
+
+    // Attach event handlers to the password input field
+    const passwordInput = $('.toggle-password');
+    const criteriaContainer = $('.password-criteria');
+    
+    passwordInput.focus(function() {
+        criteriaContainer.removeClass('visually-hidden');
+    });
+
+    passwordInput.blur(function() {
+        criteriaContainer.addClass('visually-hidden');
+    });
+
+    passwordInput.on('input', function() {
+        const password = $(this).val();
+        const criteria = checkPasswordCriteria(password);
+
+        // Show/hide criteria and update check marks
+        const criteriaItems = criteriaContainer.find('.password-criteria-item');
+        criteriaItems.each(function(index, item) {
+            const checkElement = $(item).find('.criteria-check i');
+            const criteriaText = $(item).find('.criteria-text');
+            const isMet = criteria[Object.keys(criteria)[index]];
+            const iconClass = isMet ? 'bi-check-circle-fill text-success' : 'bi-check-circle text-secondary';
+
+            checkElement.removeClass().addClass('bi ' + iconClass);
+            criteriaText.removeClass('text-success text-dark').addClass(isMet ? 'text-success' : 'text-dark');
+        });
+
+        // Password validation
+        const isValid = Object.values(criteria).every(Boolean);
+        const feedbackContainer = $(this).closest('.col-12');
+        const feedbackElement = feedbackContainer.find('.invalid-feedback');
+        const validFeedbackElement = feedbackContainer.find('.valid-feedback');
+        
+        if (isValid) {
+            feedbackElement.hide();
+            validFeedbackElement.show();
+            $(this).removeClass('is-invalid');
+            $(this).addClass('is-valid');
+            $('#submitBtn').prop('disabled', false); // Enable submit button
+        } else {
+            feedbackElement.show();
+            validFeedbackElement.hide();
+            $(this).removeClass('is-valid');
+            $(this).addClass('is-invalid');
+            $('#submitBtn').prop('disabled', true); // Disable submit button
+        }
+    });
+});
+
+
+</script>

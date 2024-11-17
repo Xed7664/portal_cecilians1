@@ -53,7 +53,7 @@
         <hr class="border border-50 opacity-75 mb-0">
 
         <div class="col-12 mt-1">
-            <p class="small mb-0 text-center">- OR -</p>
+            <p class="small mb-0 text-center" style="position: static !important">- OR -</p>
         </div>
 
         <div class="d-flex justify-content-center column-gap-1">
@@ -61,7 +61,7 @@
                 <i class="bx bxl-google"></i> Sign in with Google
             </a>
 
-            <a href="{{ route('registration') }}" type="button" class="btn btn-outline-light w-100 fw-semibold">
+            <a href="#" onclick="showRegCon()" type="button" class="btn btn-outline-light w-100 fw-semibold sign-up">
                 Sign Up
             </a>
         </div>

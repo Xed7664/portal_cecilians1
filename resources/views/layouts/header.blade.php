@@ -18,54 +18,6 @@
     <nav class="header-nav ms-auto">
         <ul class="d-flex align-items-center">
 
-            <li class="nav-item dropdown">
-                <a class="nav-link nav-icon" href="#" data-bs-toggle="dropdown">
-                    <i class="bi bi-grid-3x3-gap-fill"></i> <!-- Icon for grid-style dropdown -->
-                </a>
-                <div class="dropdown-menu dropdown-menu-end p-3" style="width: 250px; max-width: 100%; border-radius: 10px;">
-                    <div class="row g-2">
-                        <!-- Quick Action Icons (like Google Apps) -->
-                        <div class="col-4 text-center">
-                            <a href="#" class="d-block">
-                                <i class="bi bi-journal-text fs-3"></i>
-                                <small>Grades</small>
-                            </a>
-                        </div>
-                        <div class="col-4 text-center">
-                            <a href="#" class="d-block">
-                                <i class="bi bi-file-earmark-arrow-up fs-3"></i>
-                                <small>Upload</small>
-                            </a>
-                        </div>
-                        <div class="col-4 text-center">
-                            <a href="#" class="d-block">
-                                <i class="bi bi-calendar-event fs-3"></i>
-                                <small>Schedule</small>
-                            </a>
-                        </div>
-                        <div class="col-4 text-center">
-                            <a href="#" class="d-block">
-                                <i class="bi bi-chat-dots fs-3"></i>
-                                <small>Messages</small>
-                            </a>
-                        </div>
-                        <div class="col-4 text-center">
-                            <a href="#" class="d-block">
-                                <i class="bi bi-people fs-3"></i>
-                                <small>Students</small>
-                            </a>
-                        </div>
-                        <div class="col-4 text-center">
-                            <a href="#" class="d-block">
-                                <i class="bi bi-file-earmark-check fs-3"></i>
-                                <small>Attendance</small>
-                            </a>
-                        </div>
-                        <!-- Add more quick actions as needed -->
-                    </div>
-                </div>
-            </li>
-
             <li class="nav-item d-none d-sm-block">
                 <a class="nav-link nav-icon" href="./../../scan">
                     <i class="ri ri-qr-scan-line"></i>

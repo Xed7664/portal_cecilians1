@@ -58,5 +58,9 @@ public function schedules()
 {
     return $this->hasMany(Schedule::class);
 }
+public function yearLevelLocks()
+{
+    return $this->hasMany(SectionYearLevelLock::class);
+}
 
 }

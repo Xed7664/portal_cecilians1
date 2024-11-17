@@ -264,7 +264,13 @@
                     </a>
                 </li>
 
-
+ <!-- CHED CMO Management Link -->
+ <li class="nav-item">
+        <a class="nav-link {{ Route::is('phead.cmos.*') ? '' : 'collapsed' }}" href="{{ route('phead.cmos.index') }}">
+            <i class='bx bx-book'></i>
+            <span class="fw-medium">CHED CMO Management</span>
+        </a>
+    </li>
                 <!-- Students Link -->
                 <li class="nav-item">
                     <a class="nav-link {{ Route::is('phead.students.index') ? '' : 'collapsed' }}" href="{{ route('phead.students.index') }}">
@@ -289,20 +295,8 @@
                 </a>
             </li>
             
-                <li class="nav-item">
-                    <a class="nav-link {{ Route::is('calendar.index') ? '' : 'collapsed' }}" href= "{{ Route::is('calendar.index') ? '' : 'collapsed' }}">
-                        <i class="bx bx-calendar-event"></i>
-                        <span class="fw-medium">Calendar</span>
-                    </a>
-                </li>
-                <!-- Subjects Link -->
-                <li class="nav-item">
-                    <a class="nav-link {{ Route::is('phead.subjects.index') ? '' : 'collapsed' }}" href="{{ route('phead.subjects.index') }}">
-                        <i class='bx bx-book'></i>
-                        <span class="fw-medium">Subjects</span>
-                    </a>
-                </li>
-            
+                
+
                 <!-- Prospectus Link -->
                 <li class="nav-item">
                     <a class="nav-link {{ Route::is('phead.prospectus') ? '' : 'collapsed' }}" href="{{ route('phead.prospectus') }}">

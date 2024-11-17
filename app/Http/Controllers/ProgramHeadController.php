@@ -10,6 +10,7 @@ use App\Models\YearLevel;
 use App\Models\Department;
 use Illuminate\Http\Request;
 use App\Models\DepartmentSubject;
+use App\Models\ChedCurriculum;
 use App\Models\SubjectsProspectus;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
@@ -30,6 +31,13 @@ class ProgramHeadController extends Controller
         ]);
     }
 
+    public function chedCurriculums()
+    {
+        $programId = session('program_id');
+        $chedCurriculums = ChedCurriculum::where('program_id', $programId)->get();
+    
+        return view('phead.ched_curriculums', compact('chedCurriculums'));
+    }
     public function index()
     {
         $programId = session('program_id');

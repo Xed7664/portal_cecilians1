@@ -78,7 +78,7 @@
                                             @php
                                                 $subject = $subjectProspectus->subject;
                                                 $enrollment = $enrolledSubjects->get($subject->id);
-                                                $finalGrade = $enrollment && $enrollment->grades->first() ? $enrollment->grades->first()->final : '--';
+                                                $finalGrade = $enrollment && $enrollment->grade->first() ? $enrollment->grade->first()->final : '--';
 
                                                 $totalLecUnits += $subject->lec_units;
                                                 $totalLabUnits += $subject->lab_units;

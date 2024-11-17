@@ -30,7 +30,7 @@
 }
 
 .main-banner {
-  background-image: url('assets/images/finalhomebg.png');
+  background-image: url('assets/images/sccbuilding.png');
   width: 100%;
   height: 100vh;
   background-repeat: no-repeat;
@@ -247,6 +247,23 @@ section.contact-us .right-info {
 </style>
 <body>
 
+  <script>
+     document.addEventListener('DOMContentLoaded', function() {
+        const text = "Welcome to Cecilian's Portal";
+        const typingText = document.getElementById('typingText');
+        let index = 0;
+
+        function type() {
+            if (index < text.length) {
+                typingText.textContent += text.charAt(index);
+                index++;
+                setTimeout(type, 80); // Adjust speed by changing the timeout value (100 ms per character here)
+            }
+        }
+
+        type();
+    });
+  </script>
   
   <!-- ***** Header Area Start ***** -->
   <header class="header-area header-sticky" style="top:0">
@@ -291,11 +308,10 @@ section.contact-us .right-info {
                 <div class="col-lg-12">
                     <div class="caption">
                         <h6>Hello Students</h6>
-                        <h2>Welcome to Cecilian's Portal</h2>
+                        <h2 id="typingText"></h2>
                         <p>The College Student Portal is your digital companion throughout your academic journey...</p>
                         <div class="main-button-red">
                             <a href="{{ route('login') }}">Signin</a>
-                            <a href="{{ route('registration') }}" class="button2">Create an Account</a>
                             <!-- Link to Admission Form -->
                             <a href="{{ route('admission.tracker') }}"class="button2">Admission Tracker</a>
                         </div>

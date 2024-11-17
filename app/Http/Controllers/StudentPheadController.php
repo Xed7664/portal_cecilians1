@@ -63,7 +63,7 @@ class StudentPheadController extends Controller
             
             
                 $enrolledSubjects = SubjectEnrolled::where('student_id', $studentId)
-                    ->with(['subject', 'grades' => function ($query) {
+                    ->with(['subject', 'grade' => function ($query) {
                         $query->select('subject_enrolled_id', 'final'); 
                     }])
                     ->get()

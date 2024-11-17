@@ -1,0 +1,365 @@
+* {
+    font-family: "Poppins";
+}
+
+.container1 {
+    box-sizing: border-box;
+    margin: 0 auto;
+    padding: 10px;
+    display: flex;
+    justify-content: center;
+}
+
+.row {
+    max-width: 1024px;
+    background-color: rgb(245, 245, 245);
+    padding: 50px;
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.row-con {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    overflow: hidden;
+    gap: 20px;
+}
+
+.col-1 {
+    border: 3px solid black;
+    border-style: dotted;
+    overflow: hidden;
+}
+
+.col12 {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.col-1 p {
+    font-weight: bold;
+    font-size: 9px;
+    margin-bottom: -5.5px;
+}
+
+.col-2 img {
+    width: 65px;
+}
+
+.col-1,
+.col-3 {
+    padding: 0 10px;
+    line-height: 10px;
+}
+
+.col-2 {
+    display: flex;
+    align-items: start;
+    gap: 10px;
+}
+
+.col-2 h4 {
+    font-size: 18px;
+    font-weight: bolder;
+}
+
+.col-2 div {
+    text-align: center;
+    line-height: 5px;
+}
+
+.col-2 p,
+.col-2 h5 {
+    font-size: 12px;
+    position: relative;
+}
+
+.span-ay::before {
+    content: "";
+    position: absolute;
+    bottom: -5px;
+    width: 95px;
+    height: 1px;
+    background-color: black;
+}
+
+.col-3 table {
+    border-collapse: collapse;
+    table-layout: auto;
+}
+
+.col-3 td {
+    border: 1px solid black !important;
+    font-size: 11px !important;
+}
+
+.col-3 td:last-child {
+    padding: 3px 5px !important;
+    font-weight: 600;
+    font-size: 14px;
+    width: 135px;
+}
+
+.col-3 td:first-child {
+    width: 15px;
+}
+
+.academic-stat {
+    margin-top: -5px;
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 50px;
+    transform: translateX(-40px);
+}
+
+.academic-stat div {
+    line-height: 10px;
+}
+
+.academic-stat p {
+    font-size: 12px;
+    position: relative;
+}
+
+.academic-stat div:first-child {
+    text-align: right;
+}
+
+.a-stat {
+    font-weight: 600;
+    color: rgb(27, 27, 27);
+}
+
+.span-year {
+    padding-left: 40px;
+}
+
+.span-program {
+    padding-left: 15px;
+}
+
+.u-year,
+.u-program {
+    padding-left: 5px;
+}
+
+.u-year::before,
+.u-program:before {
+    content: "";
+    position: absolute;
+    bottom: -2px;
+    width: 110px;
+    height: 1px;
+    background-color: black;
+}
+
+.personal-info table,
+.courses {
+    border-collapse: collapse;
+    width: 100%;
+    table-layout: auto;
+    overflow: hidden;
+}
+
+.personal-info table td {
+    padding: 0 10px;
+    font-size: 12px;
+}
+
+.personal-info tr {
+    border: 1px solid black;
+}
+
+.name td {
+    font-size: 11px !important;
+    font-style: italic;
+}
+
+.personal-info div {
+    display: flex;
+    justify-content: space-between;
+    padding: 0;
+    margin-bottom: -25px;
+}
+
+.asd p {
+    padding: 0 10px;
+    margin: 0;
+    width: 100%;
+    text-align: left;
+    font-size: 12px;
+}
+
+.asd {
+    margin: 0;
+    border: 1px solid;
+    border-top: none;
+}
+
+.asd1 {
+    display: flex;
+}
+
+.employer {
+    width: 36.5% !important;
+}
+
+.occupation {
+    width: 60% !important;
+}
+
+.courses td {
+    font-size: 12px;
+}
+
+thead td {
+    font-weight: bolder;
+    text-align: center;
+}
+
+.courses {
+    margin-top: -10px;
+}
+.courses tbody tr td:first-child {
+    padding-left: 10px;
+}
+
+.courses tr td {
+    border: 1px solid;
+    text-align: center;
+}
+
+.cap,
+.code {
+    text-align: left !important;
+}
+
+.units,
+.h-units {
+    display: flex;
+    justify-content: space-between;
+    border: none !important;
+}
+
+.units p,
+.h-units p {
+    margin: 0;
+    width: 100%;
+    text-align: center;
+}
+
+.units p:first-child,
+.h-units p:first-child {
+    border-right: 1px solid;
+}
+
+.h-units p:first-child {
+    padding-right: 4px;
+}
+
+.h-units p:last-child {
+    padding-left: 4px;
+}
+
+.nb {
+    border: none !important;
+}
+
+.applicant p {
+    font-size: 14px;
+    float: right;
+    text-align: center;
+}
+
+.applicant b {
+    font-size: 12px;
+    position: relative;
+}
+
+.applicant b::before {
+    content: "";
+    width: 100%;
+    height: 1px;
+    position: absolute;
+    top: 0;
+    background-color: black;
+}
+
+.approved-by {
+    display: flex;
+    justify-content: space-around;
+    flex-wrap: wrap;
+    margin-top: -5px;
+}
+
+.approved-by p {
+    font-size: 12px;
+    margin: 10px 0 0 0;
+    position: relative;
+    text-align: center;
+}
+
+.approved-by p::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -20px;
+    width: 150px;
+    background-color: rgb(0, 0, 0);
+    height: 1px;
+}
+
+.separator {
+    border: 1px solid;
+    border-style: dashed;
+}
+
+@media screen and (max-width: 900px) {
+    .row-con {
+        flex-direction: column;
+        display: grid;
+        place-items: center;
+    }
+
+    .col12 {
+        flex-direction: column-reverse;
+        place-items: center;
+    }
+
+    .academic-stat div:first-child {
+        text-align: left;
+    }
+    .academic-stat {
+        gap: 0;
+        justify-content: center;
+        width: 100%;
+        transform: translateX(0);
+    }
+
+    .col-3 {
+        width: 100%;
+        display: flex;
+        justify-content: center;
+    }
+}
+
+/* @media screen and (max-width:768px) {
+    .approved-by {
+        flex-direction: column;
+    }
+    
+    .approved-by p:before {
+        left: 0;
+    }
+
+    .approved-by p {
+        margin-bottom: 40px;
+        padding-left: 0 !important;
+        text-align: left;
+    }
+} */

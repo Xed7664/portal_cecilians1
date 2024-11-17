@@ -11,7 +11,7 @@ class SubjectsProspectus extends Model
 
     protected $table = 'subjects_prospectus'; // Specify the correct table name
 
-    protected $fillable = ['subject_id', 'program_id', 'year_level_id', 'semester_id', 'archive_status'];
+    protected $fillable = [  'cmo_id', 'ched_curriculum_id','subject_id', 'program_id', 'year_level_id', 'semester_id', 'archive_status'];
 
     // Relationship with the Subject model
     public function subject()
@@ -62,5 +62,13 @@ class SubjectsProspectus extends Model
     public function program()
     {
         return $this->belongsTo(Department::class);
+    }
+    public function chedCurriculum()
+    {
+        return $this->belongsTo(ChedCurriculum::class, 'ched_curriculum_id', 'id');
+    }
+    public function cmo()
+    {
+        return $this->belongsTo(CMO::class, 'cmo_id');
     }
 }

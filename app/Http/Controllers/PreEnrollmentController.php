@@ -16,11 +16,13 @@ use App\Notifications\PreEnrollmentSubmittedNotification; // Import the notifica
 use App\Models\User; // Assuming you are notifying a user
 use Notification; // Import the Notification facade
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Notifications\Notifiable;
 use App\Mail\PreEnrollmentConfirmation;
 use Illuminate\Support\Facades\Mail;
 use Barryvdh\DomPDF\Facade\Pdf; // Import the Pdf facade here
 use App\Models\PreEnrollmentSetting;
+use App\Models\SectionYearLevelLock;
 
 class PreEnrollmentController extends Controller
 {
@@ -106,11 +108,18 @@ class PreEnrollmentController extends Controller
     private function determineYearLevel($student, $completedSubjects)
     {
         $allSubjectsCompleted = $completedSubjects->count() === $student->subjectsEnrolled()->count();
+    
         if ($allSubjectsCompleted) {
+            // Attempt to find the next year level
             $nextYearLevel = YearLevel::find($student->year_level_id + 1);
+            
+            // Return the next year level's name if found, otherwise "Graduated"
             return $nextYearLevel ? $nextYearLevel->name : 'Graduated';
         }
-        return YearLevel::find($student->year_level_id)->name;
+    
+        // Check for the current year level; return "Unknown Year Level" if not found
+        $currentYearLevel = YearLevel::find($student->year_level_id);
+        return $currentYearLevel ? $currentYearLevel->name : '1st Year';
     }
     
     public function showStudentDetails($studentId)
@@ -236,112 +245,217 @@ protected function getEligibleSubjects($student, $nextYearLevel)
     return $eligibleSubjects;
 }
 
-
 public function submitPreEnrollment(Request $request)
 {
-    // Validate incoming request data
-    $request->validate([
-        'birthDate' => 'required|date',
-        'sex' => 'required|string',
-        'religion' => 'required|string',
-        'status' => 'required|string',
-        'birthplace' => 'required|string',
-        'address' => 'required|string',
-        'father' => 'required|string',
-        'fatheroccupation' => 'required|string',
-        'mother' => 'required|string',
-        'motheroccupation' => 'required|string',
-        'prevschool' => 'required|string',
-        'prevschooladdress' => 'required|string',
-        'contact' => 'required|string',
-        'program' => 'required|exists:departments,id',
-        'year_level' => 'required|string',
-        'schedule' => 'required|exists:schedules,id',
-    ]);
+    try {
+        Log::info('Pre-enrollment submission initiated.', ['user_id' => auth()->id()]);
 
-    // Get the authenticated student
-    $student = auth()->user()->student;
+        // Validate incoming request data
+        $request->validate([
+            'birthDate' => 'required|date',
+            'sex' => 'required|string',
+            'religion' => 'required|string',
+            'status' => 'required|string',
+            'birthplace' => 'required|string',
+            'address' => 'required|string',
+            'father' => 'required|string',
+            'fatheroccupation' => 'required|string',
+            'mother' => 'required|string',
+            'motheroccupation' => 'required|string',
+            'prevschool' => 'required|string',
+            'prevschooladdress' => 'required|string',
+            'contactNumber' => 'nullable|string',
+            'program_id' => 'required|exists:departments,id',
+            'year_level' => 'required|string',
+            'schedule' => 'required|exists:schedules,id',
+        ]);
+        Log::info('Validation passed.', ['request_data' => $request->all()]);
 
-    // Update the student record with the new values
-    $student->update([
-        'Birthday' => $request->input('birthDate'),
-        'Gender' => $request->input('sex'),
-        'Religion' => $request->input('religion'),
-        'Status' => $request->input('status'),
-        'BirthPlace' => $request->input('birthplace'),
-        'Address' => $request->input('address'),
-        'father_name' => $request->input('father'),
-        'father_occupation' => $request->input('fatheroccupation'),
-        'mother_name' => $request->input('mother'),
-        'mother_occupation' => $request->input('motheroccupation'),
-        'previous_school' => $request->input('prevschool'),
-        'previous_school_adress' => $request->input('prevschooladdress'),
-        'contact' => $request->input('contact'),
-    ]);
-      // Fetch the selected program and year level
-      $selectedProgram = Department::find($request->input('program'));  // Fetch program by ID
-      $selectedYearLevel = $request->input('year_level');  // Get year level directly from request
-  
-      // Fetch the chosen schedule based on the selected schedule ID
-      $schedule = Schedule::find($request->input('schedule'));
-     // Retrieve the semester and school year based on the selected schedule
-     $semester = Semester::find($schedule->semester_id); // Fetch semester model
-     $schoolYear = SchoolYear::find($schedule->school_year_id); // Fetch school year model
-      // Find the corresponding prospectus using the schedule's subject, program, and year level
-      $prospectus = SubjectsProspectus::where('program_id', $schedule->program_id)
-                      ->where('year_level_id', $schedule->year_level_id)
-                      ->where('subject_id', $schedule->subject_id)
-                      ->first();
-  
-      if (!$prospectus) {
-          // Handle the case where no prospectus entry exists for the selected schedule
-          return redirect()->back()->with('error', 'No prospectus entry found for the selected schedule.');
-      }
-  
-      // Insert into subjects_enrolled with the prospectus_id based on the chosen schedule
-      DB::table('subjects_enrolled')->insert([
-          'student_id' => $student->id,
-          'subject_id' => $schedule->subject_id,
-          'section_id' => $schedule->section_id,
-          'schedule_id' => $schedule->id,
-          'semester_id' => $schedule->semester_id,
-          'school_year_id' => $schedule->school_year_id,
-          'year_level_id' => $schedule->year_level_id,
-          'prospectus_id' => $prospectus->id, // Include prospectus_id based on schedule
-          'created_at' => now(),
-          'updated_at' => now(),
-      ]);
-  
-      // Generate a unique reference code for the pre-enrollment
-      $enrollmentReferenceCode = 'REF' . strtoupper(uniqid());
-      $pdf = Pdf::loadView('pdf.pre_enrollment', [
-        'student' => $student,
-        'referenceCode' => $enrollmentReferenceCode,
-        'program' => $selectedProgram->name,
-        'yearLevel' => $selectedYearLevel,
-        'semester' => $semester->name,
-        'schoolYear' => $schoolYear->name,
-    ])
-    ->setPaper([0, 0, 612, 1008], 'portrait') // Approx 8.5 x 13 inches
-    ->setOption('margin-top', 5)
-    ->setOption('margin-right', 5)
-    ->setOption('margin-bottom', 5)
-    ->setOption('margin-left', 5);
+        // Get the authenticated student
+        $student = auth()->user()->student;
+        if (!$student) {
+            Log::warning('Student record not found for the user.', ['user_id' => auth()->id()]);
+            return redirect()->back()->with('error', 'Student record not found.');
+        }
 
-  
-      // Send email with PDF attachment
-      Mail::to($student->user->email)->send(new PreEnrollmentConfirmation($student, $enrollmentReferenceCode, $pdf));
-  
-      // Notify the student (user) about the pre-enrollment
-      $notification = new PreEnrollmentSubmittedNotification($enrollmentReferenceCode);
-      $student->user->notify($notification); // Notify the related user
-  
-      // Store the notification manually in portal_notifications and user_portal_notifications
-      $notification->storeInPortalNotifications($student);
-  
-      // Redirect with a success message
-      return redirect()->route('pre-enrollment.form')->with('success', 'Pre-enrollment details have been successfully updated.');
-  }
+        // Update the student record
+        $student->update([
+            'Birthday' => $request->input('birthDate'),
+            'Gender' => $request->input('sex'),
+            'Religion' => $request->input('religion'),
+            'Status' => $request->input('status'),
+            'BirthPlace' => $request->input('birthplace'),
+            'Address' => $request->input('address'),
+            'father_name' => $request->input('father'),
+            'father_occupation' => $request->input('fatheroccupation'),
+            'mother_name' => $request->input('mother'),
+            'mother_occupation' => $request->input('motheroccupation'),
+            'previous_school' => $request->input('prevschool'),
+            'previous_school_adress' => $request->input('prevschooladdress'),
+            'contact' => $request->input('contactNumber'),
+        ]);
+        Log::info('Student record updated.', ['student_id' => $student->id]);
+
+        // Fetch the selected program and year level
+        $selectedProgram = Department::find($request->input('program_id'));
+        $selectedYearLevel = $request->input('year_level');
+        Log::info('Program and year level retrieved.', [
+            'program_id' => $selectedProgram->id,
+            'year_level' => $selectedYearLevel,
+        ]);
+        $activeAcademicPeriod = PreEnrollmentSetting::where('is_open', 1)
+        ->whereDate('open_date', '<=', now())
+        ->whereDate('close_date', '>=', now())
+        ->first();
+    
+    if (!$activeAcademicPeriod) {
+        return redirect()->back()->with('error', 'No active enrollment period.');
+    }
+    
+    $selectedSemester = $activeAcademicPeriod->semester_id;
+    $selectedSchoolYear = $activeAcademicPeriod->school_year_id;
+    
+        // Fetch the chosen schedule
+        $schedule = Schedule::with(['program', 'section'])->find($request->input('schedule'));
+
+        if (!$schedule) {
+            Log::warning('Schedule not found.', ['schedule_id' => $request->input('schedule')]);
+            return redirect()->back()->with('error', 'Schedule not found.');
+        }
+        
+        $selectedProgram = $schedule->program;
+        $selectedSection = $schedule->section_id;
+        
+        if (!$selectedProgram || !$selectedSection) {
+            Log::warning('Program or section not found for the selected schedule.', [
+                'schedule_id' => $schedule->id,
+                'program_id' => $selectedProgram->id ?? null,
+                 'program_code' => $selectedProgram->code,
+                'section_id' => $selectedSection ?? null,
+            ]);
+            return redirect()->back()->with('error', 'Program or section not found for the selected schedule.');
+        }
+
+$schedules = Schedule::where('semester_id', $selectedSemester)
+    ->where('school_year_id', $selectedSchoolYear)
+    ->where('program_id', $selectedProgram)
+    ->where('year_level_id', $selectedYearLevel)
+    ->where('section_id', $selectedSection)
+    ->whereNotIn('id', function ($query) use ($student) {
+        $query->select('schedule_id')
+              ->from('subjects_enrolled')
+              ->where('student_id', $student);
+    })
+    ->with(['subject', 'teacher', 'section'])
+    ->get();
+
+
+
+$schedulesData = [];
+foreach ($schedules as $sectionId => $sectionSchedules) {
+    $section = $sectionSchedules->first()->section;
+    $schedulesData[$sectionId] = [
+        'section_name' => $section->name,
+        'schedules' => $sectionSchedules->map(function($schedule) {
+            return [
+                'id' => $schedule->id,
+                'subject_code' => $schedule->subject->subject_code ?? '',
+                'subject_description' => $schedule->subject->description ?? '',
+                'lec_units' => $schedule->subject->lec_units ?? 0,
+                'lab_units' => $schedule->subject->lab_units ?? 0,
+                'room' => $schedule->room ?? '',
+                'teacher_name' => $schedule->teacher->FullName ?? '',
+                'days' => $schedule->days ?? '',
+                'time' => $schedule->time ?? '',
+            ];
+        }),
+    ];
+}
+
+// Pass the schedules to the PDF view
+
+        // Retrieve the semester and school year
+        $semester = Semester::find($schedule->semester_id);
+        $schoolYear = SchoolYear::find($schedule->school_year_id);
+        Log::info('Semester and school year retrieved.', [
+            'semester_id' => $semester->id,
+            'school_year_id' => $schoolYear->id,
+        ]);
+
+        // Find the corresponding prospectus
+        $prospectus = SubjectsProspectus::where([
+            ['program_id', $schedule->program_id],
+            ['year_level_id', $schedule->year_level_id],
+            ['subject_id', $schedule->subject_id],
+        ])->first();
+
+        if (!$prospectus) {
+            Log::error('No prospectus entry found.', [
+                'program_id' => $schedule->program_id,
+                'year_level_id' => $schedule->year_level_id,
+                'subject_id' => $schedule->subject_id,
+            ]);
+            return redirect()->back()->with('error', 'No prospectus entry found for the selected schedule.');
+        }
+        Log::info('Prospectus found.', ['prospectus_id' => $prospectus->id]);
+
+        // Insert into subjects_enrolled
+        DB::table('subjects_enrolled')->insert([
+            'student_id' => $student->id,
+            'subject_id' => $schedule->subject_id,
+            'section_id' => $schedule->section_id,
+            'schedule_id' => $schedule->id,
+            'semester_id' => $schedule->semester_id,
+            'school_year_id' => $schedule->school_year_id,
+            'year_level_id' => $schedule->year_level_id,
+            'prospectus_id' => $prospectus->id,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+        Log::info('Subject enrolled successfully.', ['student_id' => $student->id]);
+
+        // Generate a unique reference code
+        $enrollmentReferenceCode = 'REF' . strtoupper(uniqid());
+
+        $semester = $activeAcademicPeriod->semester->name ?? 'N/A';
+        $schoolYear = $activeAcademicPeriod->schoolYear->name ?? 'N/A';
+        
+        $pdf = Pdf::loadView('pdf.pre_enrollment', [
+            'student' => $student,
+            'referenceCode' => $enrollmentReferenceCode,
+            'program' => $selectedProgram->name,
+            'yearLevel' => $selectedYearLevel,
+            'semester' => $semester,
+            'schoolYear' => $schoolYear,
+            'schedules' => $schedulesData,
+        ])
+        ->setPaper([0, 0, 612, 1008], 'portrait')
+        ->setOption('margin-top', 5)
+        ->setOption('margin-right', 5)
+        ->setOption('margin-bottom', 5)
+        ->setOption('margin-left', 5);
+        
+        
+        Log::info('PDF generated.', ['student_id' => $student->id]);
+
+        // Send email with PDF attachment
+        Mail::to($student->user->email)->send(new PreEnrollmentConfirmation($student, $enrollmentReferenceCode, $pdf));
+        Log::info('Email sent.', ['email' => $student->user->email]);
+
+        // Notify the student
+        $student->user->notify(new PreEnrollmentSubmittedNotification($enrollmentReferenceCode));
+        Log::info('Notification sent.', ['student_id' => $student->id]);
+
+        return redirect()->route('pre-enrollment.form')->with('success', 'Pre-enrollment successfully completed.');
+    } catch (\Exception $e) {
+        Log::error('Error during pre-enrollment submission.', [
+            'error' => $e->getMessage(),
+            'trace' => $e->getTraceAsString(),
+        ]);
+        return redirect()->back()->with('error', 'An unexpected error occurred. Please try again.');
+    }
+}
+
 
 public function preview(Request $request)  
 {
@@ -406,12 +520,76 @@ public function preview(Request $request)
 }
 public function preenrollmentphead()
 {
-    // Fetch sections with their current lock status and related schedules
-    $sections = Section::with(['schedules' => function($query) {
-        $query->with(['subject', 'teacher', 'program', 'semester', 'schoolYear']);
-    }])->get();
+    // Get the active academic school year and semester
+    $activeEnrollmentSetting = PreEnrollmentSetting::where('is_open', true)->first();
 
-    return view('pre-enrollment.phead.preenrollment', compact('sections'));
+    if (!$activeEnrollmentSetting) {
+        return redirect()->back()->with('error', 'No active enrollment period found.');
+    }
+
+    // Get the department ID of the authenticated program head
+    $departmentId = auth()->user()->employee->department_id;
+
+    // Fetch sections with year levels and schedules for the active school year and semester
+    $sections = Section::whereHas('schedules', function ($query) use ($activeEnrollmentSetting, $departmentId) {
+        $query->where('school_year_id', $activeEnrollmentSetting->school_year_id)
+              ->where('semester_id', $activeEnrollmentSetting->semester_id)
+              ->where('program_id', $departmentId);
+    })
+    ->with(['schedules' => function ($query) use ($activeEnrollmentSetting) {
+        $query->with(['subject', 'teacher', 'program', 'semester', 'schoolYear'])
+              ->orderBy('year_level_id', 'asc');
+    }])
+    ->get()
+    ->map(function ($section) {
+        // Group schedules by year level
+        $section->schedules_by_year_level = $section->schedules->groupBy('year_level_id');
+        return $section;
+    });
+
+    return view('pre-enrollment.phead.preenrollment', compact('sections', 'activeEnrollmentSetting'));
+}
+
+
+
+public function viewSchedules(Section $section, $year_level_id)
+{
+    // Fetch the active enrollment setting
+    $activeEnrollmentSetting = PreEnrollmentSetting::where('is_open', true)->first();
+
+    if (!$activeEnrollmentSetting) {
+        return redirect()->route('phead.preenrollment')->with('error', 'No active enrollment period found.');
+    }
+
+    // Get schedules for the specified section and year level, matching the active school year and semester
+    $schedules = $section->schedules()
+        ->where('school_year_id', $activeEnrollmentSetting->school_year_id)
+        ->where('semester_id', $activeEnrollmentSetting->semester_id)
+        ->where('year_level_id', $year_level_id)
+        ->with(['subject', 'teacher', 'program', 'semester', 'schoolYear'])
+        ->get();
+
+    return view('pre-enrollment.phead.view-schedules', compact('section', 'schedules', 'activeEnrollmentSetting', 'year_level_id'));
+}
+
+
+
+public function toggleLock(Section $section, $year_level_id)
+{
+    // Find or create the specific year-level lock status for the section
+    $lockStatus = SectionYearLevelLock::firstOrCreate(
+        ['section_id' => $section->id, 'year_level_id' => $year_level_id]
+    );
+
+    // Toggle the lock status
+    $lockStatus->is_locked = !$lockStatus->is_locked;
+    $lockStatus->save();
+
+    return response()->json([
+        'success' => true,
+        'message' => 'Section ' . ($lockStatus->is_locked ? 'locked' : 'unlocked') . ' successfully.',
+        'is_locked' => $lockStatus->is_locked,
+    ]);
 }
 
 
@@ -432,7 +610,12 @@ public function getSchedules(Request $request)
     foreach ($schedules as $sectionId => $sectionSchedules) {
         $section = $sectionSchedules->first()->section;
         $enrolledCount = $section->subjectsEnrolled->count(); // Count of enrolled students
-        $isLocked = $section->is_locked;
+
+        // Get the specific lock status for the section and year level
+        $lockStatus = SectionYearLevelLock::where('section_id', $sectionId)
+                                          ->where('year_level_id', $yearLevelId)
+                                          ->first();
+        $isLocked = $lockStatus ? $lockStatus->is_locked : false;
 
         $schedulesData[$sectionId] = [
             'section_name' => $section->name,
@@ -457,25 +640,6 @@ public function getSchedules(Request $request)
     }
 
     return response()->json(['schedules' => $schedulesData]);
-}
-public function lockSection($sectionId)
-{
-    // Lock the section by setting is_locked to true
-    $section = Section::findOrFail($sectionId);
-    $section->is_locked = true;
-    $section->save();
-
-    return response()->json(['message' => 'Section locked successfully.']);
-}
-
-public function unlockSection($sectionId)
-{
-    // Unlock the section by setting is_locked to false
-    $section = Section::findOrFail($sectionId);
-    $section->is_locked = false;
-    $section->save();
-
-    return response()->json(['message' => 'Section unlocked successfully.']);
 }
 
 
@@ -567,15 +731,7 @@ public function unlockSection($sectionId)
      return $yearLevelMapping[$yearLevel] ?? null;
  }
 
- // Method for program heads to toggle the lock/unlock status of a section
- public function toggleSectionLock($sectionId)
- {
-     $section = Section::findOrFail($sectionId);
-     $section->is_unlocked = !$section->is_unlocked;
-     $section->save();
 
-     return response()->json(['success' => 'Section lock status updated.']);
- }
 
 }
 
