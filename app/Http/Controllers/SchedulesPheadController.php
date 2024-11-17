@@ -2,15 +2,16 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Schedule;
-use App\Models\Subject;
-use App\Models\DepartmentSubject;
-use App\Models\Employee;
-use App\Models\YearLevel;
 use App\Models\Section;
+use App\Models\Subject;
+use App\Models\Employee;
+use App\Models\Schedule;
 use App\Models\Semester;
+use App\Models\YearLevel;
 use App\Models\SchoolYear;
 use Illuminate\Http\Request;
+use App\Models\DepartmentSubject;
+use App\Models\SubjectsProspectus;
 use Illuminate\Support\Facades\DB;
 
 class SchedulesPheadController extends Controller
@@ -50,7 +51,7 @@ class SchedulesPheadController extends Controller
         $schedules = $schedulesQuery->orderBy('id', 'desc')->get();
 
         // Fetch subjects, teachers, year levels, and sections for dropdowns
-        $subjects = DepartmentSubject::with('subject')->where('program_id', $programId)->get();
+        $subjects = SubjectsProspectus::with('subject')->where('program_id', $programId)->get();
         $teachers = Employee::where('department_id', $programId)->get();
         $yearLevels = YearLevel::all();
         $sections = Section::all();

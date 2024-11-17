@@ -138,10 +138,7 @@
         transition: all 0.3s ease;
     }
 
-    .hover-shadow:hover {
-        transform: translateY(-5px);
-    }
-
+   
     .transition-all {
         transition: all 0.3s ease;
     }
@@ -162,9 +159,7 @@
         z-index: 1;
         overflow: hidden;
     }
-    .btn-outline-primary:hover {
-        color: #fff;
-    }
+    
     .btn-outline-primary::before {
         content: '';
         position: absolute;
@@ -176,9 +171,7 @@
         transition: left 0.5s;
         z-index: -1;
     }
-    .btn-outline-primary:hover::before {
-        left: 100%;
-    }
+    
 
     .card-header {
         font-weight: 600;
@@ -191,10 +184,7 @@
         background: linear-gradient(135deg, #871616 0%, #224abe 100%);
         transition: all 0.3s ease;
     }
-    .card.bg-primary:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
-    }
+   
     .display-6 {
         font-size: 2.5rem;
     }

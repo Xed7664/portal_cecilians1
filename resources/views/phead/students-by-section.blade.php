@@ -4,55 +4,80 @@
 
 @section('content')
 <main id="main" class="main">
-    <div class="col-md-12 mb-0 d-flex justify-content-start">
-        <a href="{{ route('phead.yearandsection') }}" class="btn btn-outline-primary btn-sm">
-            <i class="bi bi-arrow-left-circle"></i> Back to Students
-        </a>
-    </div>
-    <section class="section py-5">
-        <div class="container">
-            <h2 class="text-center mb-5">
-               Section-{{ $section->name ?? 'N/A' }}  Masterlist
-            </h2>
-
-            @if($students->isEmpty())
-                <p class="text-center">No students enrolled in this section.</p>
-            @else
-                <!-- Export and Search Container -->
-                <div class="d-flex justify-content-between align-items-center mb-2">
-                    <div id="exportButtonContainer"></div>
-                </div>
-
-                <div class="table-responsive">
-                    <table id="studentsTable" class="table table-bordered table-striped">
-                        <thead class="table-dark">
-                            <tr>
-                                <th>Student ID</th>
-                                <th>Full Name</th>
-                                <th>Birthdate</th>
-                                <th>Gender</th>
-                                <th>Address</th>
-                                <th>Contact</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach($students as $student)
-                                <tr>
-                                    <td>{{ $student->StudentID }}</td>
-                                    <td>{{ $student->FullName }}</td>
-                                    <td>{{ $student->Birthday }}</td>
-                                    <td>{{ $student->Gender }}</td>
-                                    <td>{{ $student->Address }}</td>
-                                    <td>{{ $student->contact }}</td>
-                                </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
-                </div>
-            @endif
+    <section class="section">
+        <div class="pagetitle">
+            <h1>Student Masterlist</h1>
+            <nav>
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{{ route('newsfeed') }}">Home</a></li>
+                    <li class="breadcrumb-item active">Section-{{ $section->name ?? 'N/A' }} Masterlist</li>
+                </ol>
+            </nav>
         </div>
+
+        <div class="row mb-3">
+            <div class="col-12">
+                <a href="{{ route('phead.yearandsection') }}" class="btn btn-outline-primary btn-sm">
+                    <i class="bi bi-arrow-left-circle"></i> Back to Students
+                </a>
+            </div>
+        </div>
+
+        @if($students->isEmpty())
+            <div class="alert alert-info" role="alert">
+                No students enrolled in this section.
+            </div>
+        @else
+            <div class="card">
+                <div class="card-body">
+                   
+                    <div class="container mt-4">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="d-flex justify-content-between">
+                                    <div id="exportButtonContainer" class="flex-grow-1">
+                                       
+                                    </div>
+                                    <div id="searchContainer" class="flex-grow-1">
+                                       
+                                
+                                    </div>
+                        </div>
+                    </div>
+                    <div class="table-responsive">
+                        <table id="studentsTable" class="table table-bordered table-striped">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th>Student ID</th>
+                                    <th>Full Name</th>
+                                    <th>Birthdate</th>
+                                    <th>Gender</th>
+                                    <th>Address</th>
+                                    <th>Contact</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach($students as $student)
+                                    <tr>
+                                        <td>{{ $student->StudentID }}</td>
+                                        <td>{{ $student->FullName }}</td>
+                                        <td>{{ $student->Birthday }}</td>
+                                        <td>{{ $student->Gender }}</td>
+                                        <td>{{ $student->Address }}</td>
+                                        <td>{{ $student->contact }}</td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        @endif
     </section>
 </main>
+
+
+</style>
 
 <!-- DataTable Initialization Script -->
 <script>

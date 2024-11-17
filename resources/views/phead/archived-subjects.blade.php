@@ -18,9 +18,9 @@
                         <div class="row mb-3">
                             <div class="col-md-4">
                                 <div class="input-group">
-                                <span class="input-group-text"><i class="bi bi-search"></i></span>
-                                <input type="text" id="subjectSearchInput" class="form-control" placeholder="Search Archived Subjects...">
-                            </div>
+                                    <span class="input-group-text"><i class="bi bi-search"></i></span>
+                                    <input type="text" id="subjectSearchInput" class="form-control" placeholder="Search Archived Subjects...">
+                                </div>
                             </div>
                         </div>
                         <div class="table-responsive">
@@ -55,18 +55,14 @@
                                                     <i class="bx bx-archive-out me-1"></i> Restore
                                                 </button>
                                             </form>
-                                            <form action="{{ route('phead.delete', $subject->id) }}" method="POST" style="display:inline;" onsubmit="return confirm('Are you sure you want to delete this subject? This action cannot be undone.');">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button type="submit" class="btn btn-sm btn-danger ms-2">
-                                                    <i class="bx bx-trash me-1"></i> Delete
-                                                </button>
-                                            </form>
                                         </td>
                                     </tr>
                                     @endforeach
                                 </tbody>
                             </table>
+                            <div id="noSubjectsMessage" class="text-center mt-3 d-none">
+                                <p class="text-muted">No matching records found</p>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -77,12 +73,27 @@
 
 <script>
     $(document).ready(function () {
-        $('#archivedSubjectSearchInput').on('keyup', function () {
-            var searchValue = $(this).val().toLowerCase();
-            $('#archivedSubjects tbody tr').filter(function () {
-                $(this).toggle($(this).text().toLowerCase().indexOf(searchValue) > -1);
+        function updateNoSubjectsMessage() {
+            const visibleRows = $('#archivedSubjects tbody tr:visible').length;
+            if (visibleRows === 0) {
+                $('#noSubjectsMessage').removeClass('d-none');
+            } else {
+                $('#noSubjectsMessage').addClass('d-none');
+            }
+        }
+
+        // Filter table rows based on search input
+        $('#subjectSearchInput').on('keyup', function () {
+            const searchValue = $(this).val().toLowerCase();
+            $('#archivedSubjects tbody tr').each(function () {
+                const rowText = $(this).text().toLowerCase();
+                $(this).toggle(rowText.includes(searchValue));
             });
+            updateNoSubjectsMessage();
         });
+
+        // Initialize message visibility on page load
+        updateNoSubjectsMessage();
     });
 </script>
 @endsection

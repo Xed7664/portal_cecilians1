@@ -11,7 +11,7 @@ class Employee extends Model
 
     protected $table = 'employees';
 
-    protected $fillable = ['EmployeeID', 'FullName'];
+    protected $fillable = ['EmployeeID', 'FullName','Birthday', 'Gender', 'department_id', 'user_id'];
 
     // Define the relationship with User
     public function user()

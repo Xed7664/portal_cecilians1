@@ -45,7 +45,7 @@ class PostController extends Controller
 }
  elseif ($user->type === 'admin') {
             $admin = $user->employee;
-            return view('admin.analytics.login', [
+            return redirect()->route('admin.dashboard')->with([
                 'trendingHashtags' => $trendingHashtags,
                 'admin' => $admin
             ]);

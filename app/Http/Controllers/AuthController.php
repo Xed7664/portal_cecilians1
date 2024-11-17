@@ -29,6 +29,9 @@ class AuthController extends Controller
             if ($user->type === 'program_head') {
                 return redirect()->route('phead.dashboard'); // Adjust the route to the actual route for the dashboard
              }
+             if ($user->type === 'admin') {
+                return redirect()->route('phead.dashboard'); // Adjust the route to the actual route for the dashboard
+             }
 
             // Otherwise, proceed with the normal login flow
             return redirect()->intended($this->redirectTo($user));

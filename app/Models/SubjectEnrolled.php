@@ -44,6 +44,13 @@ class SubjectEnrolled extends Model
         {
             return $this->hasOne(Grade::class, 'subject_enrolled_id');
         }
+        
+
+        //This is used to display grades in Student's Prospectus
+        public function grades()
+        {
+            return $this->hasMany(Grade::class, 'subject_enrolled_id', 'id');
+        }
     
         public function yearLevel()
         {

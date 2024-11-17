@@ -5,8 +5,17 @@
 @section('content')
 <main id="main" class="main">
     <section class="container">
-        <div class="row">
+        <div class="pagetitle">
             <h1>Student Masterlist</h1>
+            <nav>
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{{ route('newsfeed') }}">Home</a></li>
+                    <li class="breadcrumb-item active">Students</li>
+                </ol>
+            </nav>
+        </div>
+        <div class="row">
+           
             <!-- Main Content -->
             <div class="col-lg-12">
                 <div class="card">
@@ -51,6 +60,8 @@
                                 </tbody>
                             </table>
                         </div>
+                        <!-- Pagination (DataTables will handle this) -->
+                        <div class="dataTables_paginate paging_simple_numbers" id="student_paginate"></div>
                     </div>
                 </div>
             </div>
@@ -59,12 +70,14 @@
     </section>
 </main>
 
-<!-- DataTable Initialization Script -->
 <script>
     $(document).ready(function () {
         var table = $('#student').DataTable({
             dom: 'Bfrtip',
             lengthChange: true,
+            paging: true, // Ensure pagination is enabled
+            pageLength: 10, // Set the initial number of rows per page
+            lengthMenu: [5, 10, 25, 50, 100], // Dropdown for changing rows per page
             buttons: [
                 {
                     extend: "collection",
@@ -99,11 +112,16 @@
             },
             language: {
                 search: "",
-                searchPlaceholder: "Search..."
+                searchPlaceholder: "Search...",
+                paginate: {
+                    next: "Next",
+                    previous: "Previous"
+                }
             }
         });
 
         table.buttons().container().appendTo($('.dataTables_filter', table.table().container()));
     });
 </script>
+
 @endsection
