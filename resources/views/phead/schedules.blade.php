@@ -29,17 +29,21 @@
                 <div class="tab-content" id="scheduleTabsContent">
                     <!-- Table View -->
                     <div class="tab-pane fade show active" id="table" role="tabpanel" aria-labelledby="table-tab">
-
                         <div class="row mb-3">
-                            <div class="col-md-4">
-                                <div class="input-group">
-                                    <span class="input-group-text"><i class="bi bi-search"></i></span>
-                                    <input type="text" id="scheduleSearch" class="form-control" placeholder="Search Schedules...">
-                                </div>
+                            <div class="col-md-4 d-flex">
+                                <div class="schedule_year_level w-100"></div>
+                            </div>
+                            <div class="col-md-4 d-flex">
+                                <div class="schedule_section w-100"></div>
+                            </div>
+                            <div class="col-md-4 d-flex">
+                                <div class="schedule_instructor w-100"></div>
                             </div>
                         </div>
+                        
 
-                        <div class="table-responsive">  
+                       
+                        <div class="table-responsive">
                             <table class="table table-striped table-hover" id="schedulesTable">
                                 <thead class="table-light">
                                     <tr>
@@ -486,6 +490,48 @@
  <script>
     
 $(document).ready(function () {
+
+    var schedulesTable = $('#schedulesTable').DataTable({
+    paging: true, 
+    pageLength: 10, 
+    lengthMenu: [10, 25, 50, 100], 
+    dom: '<"row"<"col-sm-12 col-md-6"l><"col-sm-12 col-md-6"f>>' + 
+         '<"row"<"col-sm-12"tr>>' + 
+         '<"row"<"col-sm-12 col-md-5"i><"col-sm-12 col-md-7"p>>', 
+    initComplete: function () {
+        console.log("Schedules table init complete"); // Log when initialization is complete
+        this.api().columns([2, 3, 4]).every(function (colIdx) { // Replace indices as needed for filterable columns
+            var column = this;
+            console.log("Column header:", column.header().innerHTML); // Log the column header
+            var select = $('<select class="form-select"><option value="">Select ' + column.header().innerHTML + '</option>')
+                .appendTo($('.schedule_' + column.header().innerHTML.toLowerCase().replace(/\s/g, '_'))) // Replace with proper filter container classes
+                .on('change', function () {
+                    var val = $.fn.dataTable.util.escapeRegex($(this).val());
+                    console.log("Selected value:", val); // Log selected value
+                    column.search(val ? '^' + val + '$' : '', true, false).draw();
+                });
+
+            var uniqueValues = column.data().unique().sort();
+            console.log("Unique values:", uniqueValues); // Log unique values
+            uniqueValues.each(function (d, j) {
+                if (d.indexOf('>') !== -1) {
+                    d = $(d).text().trim();
+                }
+                console.log("Appending option:", d); // Log the option being appended
+                select.append('<option value="' + d + '">' + d + '</option>');
+            });
+        });
+    },
+    language: {
+        lengthMenu: 'Show _MENU_ entries', 
+        search: "", 
+        searchPlaceholder: "Search Schedules..."
+    }
+});
+
+// Add buttons container setup, if needed
+schedulesTable.buttons().container()
+    .appendTo($('.dataTables_filter', schedulesTable.table().container()));
 
     //Gloabl Variables for global stoarge f Data
     const colorMap = {};
