@@ -62,12 +62,11 @@ class StudentPheadController extends Controller
                     ]);
             
             
-                $enrolledSubjects = SubjectEnrolled::where('student_id', $studentId)
-                    ->with(['subject', 'grades' => function ($query) {
-                        $query->select('subject_enrolled_id', 'final'); 
-                    }])
+                    $enrolledSubjects = SubjectEnrolled::where('student_id', $studentId)
+                    ->with(['subject', 'grades'])
                     ->get()
-                    ->keyBy('subject_id'); 
+                    ->keyBy('subject_id');
+                
             
                 $programName = $program->name;
                 $programDescription = $program->description;

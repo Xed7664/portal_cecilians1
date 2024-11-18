@@ -2,12 +2,13 @@
 use Illuminate\Support\Facades\Route;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use App\Providers\RouteServiceProvider;
+use App\Http\Controllers\Auth\EmployeeVerificationController;
 
 use App\Http\Controllers\{ 
     SearchController, ScheduleController, EventsController, CalendarController, 
     AccountSettingsController, AjaxController, AuthController, PostController, 
     ProfileController, UserController, StudentController, TeacherController, 
-    ProgramHeadController, ProgramHeadPreEnrollmentController, AdminController
+    ProgramHeadController, ProgramHeadPreEnrollmentController, AdminController,
 };
 
 use App\Http\Controllers\Admin\{
@@ -30,6 +31,7 @@ use App\Livewire\Posts\SingleFull;
 use App\Http\Controllers\{
     ChatBotController, SimpleChatBotController, ChatGPTController
 };
+
 
 
 // First Page Route
@@ -370,6 +372,16 @@ Route::get('/teacher/students/{student}/grades', [TeacherController::class, 'vie
         // Admin student upload and check routes
         Route::post('/student/check', [AdminStudentController::class, 'checkFile'])->name('admin.users.student.check');
         Route::post('/student/upload', [AdminStudentController::class, 'upload'])->name('admin.users.student.upload');
+        //import employee details
+        Route::post('/employee/import', [AdminEmployeeController::class, 'import'])->name('employee.import');
+
+        //subject import
+
+        Route::post('/subject/import', [AdminController::class, 'import'])->name('subject.import');
+        
+        
+
+        
 
         //Edit Student Info and Grades- Admin Routes
         Route::prefix('admin/users/student')->name('admin.users.student.')->group(function () {
@@ -380,6 +392,12 @@ Route::get('/teacher/students/{student}/grades', [TeacherController::class, 'vie
             Route::get('/{id}/grades-data', [StudentController::class, 'getGradesData'])->name('grades-data');
             
         });
+
+
+        //dashboard
+        Route::get('/dashboard', [AdminController::class, 'index'])->name('admin.dashboard');
+
+        Route::get('/admin/recent-activity', [AdminController::class, 'recentActivity'])->name('admin.recent-activity');
         
 
         // Admin analytics
@@ -401,6 +419,13 @@ Route::post('/pre-enrollment/store', [PreEnrollmentController::class, 'storeSett
 // Add this inside the routes group for admin or pre-enrollment settings
 
     });
+
+
+    // Reset and update credentials
+    Route::get('reset-credentials/{id}/{hash}', [EmployeeVerificationController::class, 'resetCredentials'])->name('reset.credentials');
+    Route::patch('update-credentials/{id}', [EmployeeVerificationController::class, 'updateCredentials'])->name('update.credentials');
+
+    
 // Admin routes
 Route::prefix('admin/pre-enrollment')->group(function () {
   // Admin routes

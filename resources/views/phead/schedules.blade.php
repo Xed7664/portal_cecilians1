@@ -5,6 +5,15 @@
 @section('content')
 <main id="main" class="main">
     <section class="section">
+        <div class="pagetitle">
+            <h1>Schedules</h1>
+            <nav>
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{{ route('newsfeed') }}">Home</a></li>
+                    <li class="breadcrumb-item active">Schedule Management</li>
+                </ol>
+            </nav>
+        </div>
         <div class="card shadow">
             <div class="card-header bg-white border-bottom">
                 <ul class="nav nav-tabs card-header-tabs" role="tablist">
@@ -583,21 +592,26 @@ $(document).ready(function () {
     }
 
 
-            // Function to clear the specific schedule from the grid
-        function clearScheduleFromGrid(scheduleId) {
-            $('.occupied').each(function () {
-                if ($(this).data('schedule-id') === scheduleId) {
-                    $(this)
-                        .html('') // Clear the content
-                        .css({
-                            'background-color': '',
-                            'border': '1px solid #dee2e6'
-                        })
-                        .removeClass('occupied')
-                        .removeData('schedule-id'); // Remove the schedule ID
-                }
-            });
+          // Function to clear a specific schedule from the grid
+    function clearScheduleFromGrid(scheduleId) {
+        $('.occupied').each(function () {
+            if ($(this).data('schedule-id') === scheduleId) {
+                $(this)
+                    .html('') // Clear the content
+                    .css({
+                        'background-color': '',
+                        'border': '1px solid #dee2e6'
+                    })
+                    .removeClass('occupied')
+                    .removeData('schedule-id'); // Remove the schedule ID
+            }
+        });
+
+        // Remove the schedule from plottedSchedules if it exists
+        if (plottedSchedules[scheduleId]) {
+            delete plottedSchedules[scheduleId];
         }
+    }
 
 
 
@@ -897,23 +911,25 @@ $(document).ready(function () {
         // Handle confirmation
         confirmButton.addEventListener('click', function() {
             $.ajax({
-                url: `/phead/schedules/${selectedScheduleId}`,
-                type: 'DELETE',
-                data: { _token: $('meta[name="csrf-token"]').attr('content') },
-                success: function (response) {
-                    showToast(response.success || 'Schedule deleted successfully.', 'success');
+            url: `/phead/schedules/${selectedScheduleId}`,
+            type: 'DELETE',
+            data: { _token: $('meta[name="csrf-token"]').attr('content') },
+            success: function (response) {
+                showToast(response.success || 'Schedule deleted successfully.', 'success');
 
-                     // Remove deleted schedule from the global `schedules` array
-                    schedules = schedules.filter(s => s.id !== selectedScheduleId);
+                // Remove the specific schedule from the global `schedules` array
+                schedules = schedules.filter(s => s.id !== selectedScheduleId);
 
-                    // Reload the entire schedule grid
-                    clearScheduleGrid();
-                    reloadScheduleGrid();
-                },
-                error: function (xhr) {
-                    showToast('Failed to delete the schedule. Please try again.', 'error');
-                    console.error('AJAX Error:', xhr.status, xhr.statusText, xhr.responseText);
-                }
+                // Clear only the specific schedule from the grid
+                clearScheduleFromGrid(selectedScheduleId);
+
+                // Close the details modal
+                $('#scheduleDetailsModal').modal('hide');
+            },
+            error: function (xhr) {
+                showToast('Failed to delete the schedule. Please try again.', 'error');
+                console.error('AJAX Error:', xhr.status, xhr.statusText, xhr.responseText);
+            }
             });
             toastElement.remove();
         });

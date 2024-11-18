@@ -80,8 +80,148 @@
             </div>
     </section>
 </main>
+
+
+<!-- Modal for Import -->
+<div class="modal fade" id="importStudentModal" tabindex="-1" aria-labelledby="importStudentModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="importStudentModalLabel">Import Employees</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <!-- Dropzone Form for File Upload -->
+                <form action="{{ route('employee.import') }}" method="POST" enctype="multipart/form-data" class="dropzone" id="importDropzone">
+                    @csrf
+                    <div class="dz-message text-center">
+                        <h4>Drag & Drop Files Here</h4>
+                        <p class="text-muted">or click to select a file</p>
+                    </div>
+                </form>
+            </div>
+           
+        </div>
+    </div>
+</div>
+
+<!-- Custom CSS for Dropzone and Modal -->
+<style>
+    /* Customize Dropzone styling */
+    #importDropzone {
+        border: 2px dashed #007bff;
+        border-radius: 10px;
+        background-color: #f8f9fa;
+        min-height: 200px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .dz-message {
+        font-size: 18px;
+        color: #007bff;
+    }
+
+    .dz-message h4 {
+        font-size: 24px;
+        font-weight: bold;
+        color: #007bff;
+    }
+
+    .dz-message p {
+        font-size: 14px;
+        color: #6c757d;
+    }
+
+    /* Modal Customization */
+    .modal-content {
+        border-radius: 15px;
+    }
+
+    .modal-header {
+        border-bottom: 1px solid #ddd;
+        background-color: #007bff;
+    }
+
+    .modal-footer {
+        border-top: 1px solid #ddd;
+    }
+
+    .btn-close {
+        background-color: transparent;
+        border: none;
+        font-size: 1.5rem;
+        color: #fff;
+    }
+
+    .btn-close:hover {
+        color: #ccc;
+    }
+
+    .btn-primary {
+        background-color: #007bff;
+        border-color: #007bff;
+    }
+
+    .btn-primary:hover {
+        background-color: #0056b3;
+        border-color: #0056b3;
+    }
+</style>
+
+
 <script>
-   $(document).ready(function () {
+   Dropzone.autoDiscover = false;
+
+$(document).ready(function () {
+
+
+   function showToast(message, type) {
+    Toastify({
+        text: message,
+        duration: 3000,
+        close: true,
+        gravity: "top", // top or bottom
+        position: "right", // left, center or right
+        backgroundColor: type === 'error' ? "#ff6b6b" : "#51cf66",
+    }).showToast();
+}
+
+var myDropzone = new Dropzone("#importDropzone", {
+    paramName: "file",
+    maxFilesize: 2, // MB
+    acceptedFiles: ".csv, .xls, .xlsx",
+    dictDefaultMessage: "Drop files here or click to upload.",
+    headers: {
+        "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').content
+    },
+    init: function () {
+        this.on("success", function (file, response) {
+            if (response.success) {
+                showToast(response.message, 'success'); // Show success toast
+                setTimeout(function () {
+                    $('#importStudentModal').modal('hide'); // Close modal
+                    location.reload(); // Reload after showing toast
+                }, 2000); // Delay reloading for the toast to display
+            } else {
+                showToast("Error: " + response.message, 'error'); // Show error toast
+            }
+        });
+        this.on("error", function (file, response) {
+            console.error(response); // Log error details
+            if (typeof response === "object" && response.message) {
+                showToast("Error: " + response.message, 'error'); // Show error toast
+            } else {
+                showToast("Error uploading file: " + response, 'error'); // Show generic error toast
+            }
+        });
+    }
+});
+
+
+
+
     var table = $('#employees').DataTable({
         lengthChange: true, // Disable show entries
         buttons: [

@@ -4,9 +4,19 @@
 
 @section('content')
 <main id="main" class="main">
-    <section class="section py-5">
-        <div class="container">
-            <h2 class="text-center mb-2">Year & Section</h2>
+    <section class="section">
+
+       
+            <div class="pagetitle">
+                <h1>Year & Section</h1>
+                <nav>
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="{{ route('newsfeed') }}">Home</a></li>
+                        <li class="breadcrumb-item active">Year and Section </li>
+                    </ol>
+                </nav>
+            </div>
+           
 
             <div class="row g-4">
                 @foreach ($yearLevels as $yearLevel)

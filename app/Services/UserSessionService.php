@@ -2,6 +2,8 @@
 
 namespace App\Services;
 
+use App\Models\Subject;
+use App\Models\Admission;
 use Illuminate\Support\Facades\Session;
 use App\Models\{Employee, Student, SubjectEnrolled,Schedule, SystemSetting, User, Section, SubjectsProspectus};
 
@@ -65,6 +67,20 @@ class UserSessionService
             $employee = Employee::where('EmployeeID', $user->employee_id)->first();
             session()->put('employee', $employee);
             session()->put('panel', 'admin');
+
+            // Count and store the data for the admin's dashboard
+            $studentsCount = Student::count();
+            $teachersCount = Employee::count(); 
+            $subjectsCount = Subject::count();
+            $recentAdmissions = Admission::latest()->take(5)->get();
+            
+
+            session()->put('dashboard_data', [
+                'studentsCount' => $studentsCount,
+                'teachersCount' => $teachersCount,
+                'subjectsCount' => $subjectsCount,
+                'recentAdmissions' => $recentAdmissions,
+            ]);
         }
 
         // Set the initial theme for the user

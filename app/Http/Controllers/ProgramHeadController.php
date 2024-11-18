@@ -39,24 +39,19 @@ class ProgramHeadController extends Controller
             $programId = $employee->department_id;
             session(['program_id' => $programId]);
         }
-
+    
         $subjects = SubjectsProspectus::with(['subject', 'yearLevel', 'program'])
             ->where('program_id', $programId)
             ->where('archive_status', 0)
             ->get()
             ->groupBy(['year_level_id', 'semester_id']);
-
+    
         $yearLevels = YearLevel::orderBy('id')->get();
         $semesters = Semester::orderBy('id')->take(2)->get();
-
-        $departmentSubjects = DepartmentSubject::where('program_id', $programId)
-            ->whereHas('subject', function ($query) {
-                $query->where('archive_status', 0);
-            })
-            ->with('subject')
-            ->get();
-
-        return view('phead.prospectus', compact('subjects', 'yearLevels', 'semesters', 'departmentSubjects'));
+    
+        $allSubjects = Subject::where('archive_status', 0)->orderBy('subject_code')->get();
+    
+        return view('phead.prospectus', compact('subjects', 'yearLevels', 'semesters', 'allSubjects'));
     }
 
     public function store(Request $request)
@@ -68,15 +63,16 @@ class ProgramHeadController extends Controller
         ]);
 
         $programId = session('program_id');
+        $subject = Subject::findOrFail($request->subject_id);
 
         $existingSubject = SubjectsProspectus::where('program_id', $programId)
-            ->where('subject_id', $request->subject_id)
-            ->where('year_level_id', $request->year_level_id)
-            ->where('semester_id', $request->semester_id)
+            ->whereHas('subject', function ($query) use ($subject) {
+                $query->where('subject_code', $subject->subject_code);
+            })
             ->first();
 
         if ($existingSubject) {
-            return redirect()->route('phead.prospectus')->with('error', 'This subject already exists in the prospectus for the selected year level and semester.');
+            return redirect()->route('phead.prospectus')->with('error', 'The subject is already added to the prospectus.');
         }
 
         SubjectsProspectus::create([

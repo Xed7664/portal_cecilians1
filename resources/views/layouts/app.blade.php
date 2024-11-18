@@ -19,8 +19,14 @@ use App\Models\User;
   <meta content="" name="keywords">
   <meta name="csrf-token" content="{{ csrf_token() }}">
 
-  
+ 
 
+
+
+  
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.9.3/dropzone.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.9.3/dropzone.min.js"></script>
+  
 
   <!-- Favicons -->
   <link href="{{ asset('img/favicon.ico') }}" rel="icon">
@@ -48,6 +54,8 @@ use App\Models\User;
 
 <!-- Bootstrap JS -->
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+
+
 
 
 
