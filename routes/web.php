@@ -60,8 +60,8 @@ Route::get('/download-preenrollment-pdf', [PreEnrollmentController::class, 'down
 
     Route::get('/pre-enrollment/dashboard', [PreEnrollmentController::class, 'previewForm'])->name('pre-enrollment.dashboard');
 });
-// Route in web.php
 
+// Route in web.php
 
 Route::get('/get-schedules', [PreEnrollmentController::class, 'getSchedules'])->name('get-schedules');
 Route::get('/enrollment-status', [PreEnrollmentController::class, 'showStatus'])->name('enrollment.enrollment-status');

@@ -79,7 +79,7 @@
                                     </tr>
                                     @empty
                                     <tr>
-                                        <td colspan="9" class="text-center">No Schedules Assigned Yet</td>
+                                        <td colspan="8" class="text-center">No Schedules Assigned Yet</td>
                                     </tr>
                                     @endforelse
                                 </tbody>
