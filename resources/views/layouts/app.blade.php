@@ -153,6 +153,8 @@ use App\Models\User;
   <!-- End Footer -->
 
   
+
+  
   <nav class="navbar bg-body-tertiary fixed-bottom py-0 d-block d-sm-none">
     <div class="container-fluid">
       <div class="d-flex w-100">

@@ -6,13 +6,13 @@ use Livewire\Component;
 use App\Models\{User, Student, Employee, SystemSetting};
 use Livewire\Attributes\Rule;
 use Illuminate\Support\Facades\{Hash, Notification, Auth, Session};
+use Illuminate\Support\Str;
 use App\Notifications\WelcomeEmail; 
 use Illuminate\Auth\Events\Registered;
 use App\Services\UserSessionService;
 
 class RegistrationForm extends Component
 {
-
     #[Rule('required', message: 'School ID is required.')]
     public $school_id;
 
@@ -50,25 +50,25 @@ class RegistrationForm extends Component
         $schoolId = 'SCC-' . $this->school_id;
 
         $isStudent = Student::where('StudentID', $schoolId)->exists();
-        $isEmployee = Employee::where('EmployeeID', $schoolId)->exists();
+        $isProgramHead = Employee::where('EmployeeID', $schoolId)->exists();
         $isTeacher = Employee::where('EmployeeID', $schoolId)->exists();
         $isAdmin = Employee::where('EmployeeID', $schoolId)->exists();
-    
-        if (!$isStudent && !$isEmployee) {
+
+        if (!$isStudent && !$isProgramHead) {
             return back()->with('error', 'School ID not associated.');
         }
 
-      if ($isStudent) {
-    $userType = 'student';
-} elseif ($isTeacher) {
-    $userType = 'teacher';
-} elseif ($isProgramHead) {
-    $userType = 'program_head';
-} elseif ($isAdmin) {
-    $userType = 'admin';
-} else {
-    $userType = 'employee'; // Default or fallback user type if needed
-}
+        if ($isStudent) {
+            $userType = 'student';
+        } elseif ($isTeacher) {
+            $userType = 'teacher';
+        } elseif ($isProgramHead) {
+            $userType = 'program_head';
+        } elseif ($isAdmin) {
+            $userType = 'admin';
+        } else {
+            $userType = 'employee'; // Default or fallback user type if needed
+        }
 
         $userIdField = $isStudent ? 'student_id' : 'employee_id';
 
@@ -79,33 +79,46 @@ class RegistrationForm extends Component
         }
 
         // Check if the provided birthdate matches the system
-        if (($isStudent || $isEmployee) && ($student = Student::where('StudentID', $schoolId)->first() ?? Employee::where('EmployeeID', $schoolId)->first())) {
+        if (($isStudent || $isProgramHead) && ($student = Student::where('StudentID', $schoolId)->first() ?? Employee::where('EmployeeID', $schoolId)->first())) {
             if ($student->Birthday != $this->birthdate) {
                 return back()->with('error', 'The provided birthdate does not match our records.');
             }
         }
 
+        // Generate a unique google_id
+        $googleId = $this->generateUniqueGoogleId();
 
         $user = User::create([
             'username' => $this->username,
             'email' => $this->email,
             'password' => Hash::make($this->password),
-            'type' => $userType, // Set the user type (student or employee)
+            'type' => $userType,
             $userIdField => $schoolId, // Set either "student_id" or "employee_id" based on the type
+            'google_id' => $googleId, // Save the generated Google ID
         ]);
 
         // Send an email
         event(new Registered($user));
 
         Auth::login($user);
-        
+
         UserSessionService::storeUserPreferences($user);
 
-        //return redirect()->route('login')->with('success', 'Registration successful!');
-        //dd('I am still debugging, it should stop here. But you can login anyway. ~James');
         return redirect()->route('verify')->with('success', 'Registration and login successful!');
+    }
 
-        // Redirect or perform any other actions as needed
+    /**
+     * Generate a unique Google ID.
+     *
+     * @return string
+     */
+    protected function generateUniqueGoogleId()
+    {
+        do {
+            $googleId = Str::uuid()->toString(); // Generate a unique UUID
+        } while (User::where('google_id', $googleId)->exists());
+
+        return $googleId;
     }
 
     public function render()

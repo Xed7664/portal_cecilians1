@@ -42,6 +42,9 @@ class EmployeeImport implements ToModel, WithHeadingRow
         $type = $this->mapEmployeeType($mappedRow['EmployeeType']);
         $email = $mappedRow['Email'] ?? Str::slug($mappedRow['FullName']) . '@example.com';
         $username = Str::slug($mappedRow['FullName']) . rand(1000, 9999);
+          // Generate a unique google_id
+        $googleId = $this->generateUniqueGoogleId();
+
 
         // Create user record in the users table
         $user = User::create([
@@ -52,6 +55,7 @@ class EmployeeImport implements ToModel, WithHeadingRow
             'employee_id' => $mappedRow['EmployeeID'],
             'avatar' => 'default-profile.png',
             'status' => 'unverified',
+            'google_id' => $googleId, // Save the generated Google ID
         ]);
 
        // Generate a verification link
@@ -60,7 +64,7 @@ class EmployeeImport implements ToModel, WithHeadingRow
         // Send an email with auto-generated credentials
         Mail::to($user->email)->send(new VerificationMail($user, $username, $verificationUrl));
 
-
+        
 
         // Create employee record and link it with the user_id
         return Employee::create([
@@ -73,6 +77,19 @@ class EmployeeImport implements ToModel, WithHeadingRow
         ]);
     }
 
+    /**
+     * Generate a unique Google ID.
+     *
+     * @return string
+     */
+    protected function generateUniqueGoogleId()
+    {
+        do {
+            $googleId = Str::uuid()->toString(); // Generate a unique UUID
+        } while (User::where('google_id', $googleId)->exists());
+
+        return $googleId;
+    }
     /**
      * Map headers from the Excel file to database fields.
      */

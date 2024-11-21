@@ -5,11 +5,20 @@
 @section('content')
 <main id="main" class="main bg-light py-4">
     <div class="container-fluid">
-        <div class="PageTitle">
-            <h2>Data overview</h2>
-            
+        <!-- Modern Header Design -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card shadow-sm">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h2 class="card-title mb-0" style="color: black;">Data Overview</h2>
+
+                                                    </div>
+                        <p class="text-muted mt-2 mb-0">Last updated: <span id="lastUpdated"></span></p>
+                    </div>
+                </div>
+            </div>
         </div>
-        
 
         <div class="row">
             <div class="col-lg-9">
@@ -66,8 +75,8 @@
                     </div>
                 </div>
 
-                <!-- Recent Admissions -->
-                <div class="card shadow mb-4">
+                 <!-- Recent Admissions -->
+                 <div class="card shadow mb-4">
                     <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
                         <h6 class="m-0 font-weight-bold text-primary">Recent Admissions</h6>
                         <div class="dropdown no-arrow">
@@ -110,6 +119,8 @@
                 </div>
             </div>
 
+            
+
             <!-- Right side column -->
             <div class="col-lg-3">
                 <!-- Recent Activity -->
@@ -146,6 +157,16 @@ $(document).ready(function() {
 
     // Initial fetch
     fetchRecentActivity();
+
+    // Update last updated time
+    function updateLastUpdated() {
+        var now = new Date();
+        var options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' };
+        $('#lastUpdated').text(now.toLocaleDateString('en-US', options));
+    }
+
+    updateLastUpdated();
+    setInterval(updateLastUpdated, 60000); // Update every minute
 });
 </script>
 
@@ -165,6 +186,19 @@ $(document).ready(function() {
 .text-gray-800 {
     color: #5a5c69 !important;
 }
-
+.card-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+}
+.btn-group .btn {
+    font-size: 0.8rem;
+    padding: 0.375rem 0.75rem;
+}
+.text-muted {
+    font-size: 0.9rem;
+}
 </style>
 @endsection
+              
+
+          

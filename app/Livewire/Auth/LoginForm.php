@@ -27,6 +27,21 @@ class LoginForm extends Component
     public $email, $verificationCode, $newPassword, $confirmPassword, $otp_code;
     public $currentForm = 'login';
     public $generatedCode;
+    public $error = null; // Track errors for reset
+    protected $rules = [
+        'username' => 'required',
+        'password' => 'required',
+    ];
+
+    protected $messages = [
+        'username.required' => 'The email or username is required.',
+        'password.required' => 'The password is required.',
+    ];
+
+    public function updated($propertyName)
+    {
+        $this->validateOnly($propertyName);
+    }
     public function showForgotPasswordForm()
     {
         $this->reset(['email', 'verificationCode', 'newPassword', 'confirmPassword']);
@@ -176,6 +191,10 @@ private function restoreAccount($userId)
         'userId' => $userId,
     ]);
 }
+public function resetError()
+{
+    $this->error = null; // Reset error state
+}
 
 
 public function showLoginForm()
@@ -186,10 +205,9 @@ public function showLoginForm()
 
 
     
-
-
     public function login(Request $request)
     {
+        $this->resetError(); // Reset errors on login attempt
         $this->validate();
 
         $loginField = filter_var($this->username, FILTER_VALIDATE_EMAIL) ? 'email' : 'username';
@@ -201,14 +219,16 @@ public function showLoginForm()
             ->orWhere('username', $this->username)
             ->first();
 
+            
+            if (!$user) {
+                return back()->with('error', 'Invalid login credentials.');
+            }
             // Check if the account is locked
         if ($this->isAccountLocked($user->id, $deviceId)) {
             return back()->with('error', 'Too many login attempts. Your account is locked. Check your email to reset your credentials.');
         }
 
-        if (!$user) {
-            return back()->with('error', 'Invalid login credentials.');
-        }
+       
        
         // Check if the device is under temporary lock
         if ($this->isDeviceTemporarilyLocked($user->id, $deviceId)) {

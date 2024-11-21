@@ -3,6 +3,7 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use App\Providers\RouteServiceProvider;
 use App\Http\Controllers\Auth\EmployeeVerificationController;
+use App\Http\Controllers\Auth\GoogleController;
 
 use App\Http\Controllers\{ 
     SearchController, ScheduleController, EventsController, CalendarController, 
@@ -24,8 +25,7 @@ use App\Http\Controllers\{
     GradeController, ProspectusController, EnrollmentController, 
     WelcomeController, AdmissionController, PreEnrollmentController, 
     StudentPheadController, SubjectsPheadController, SchedulesPheadController, 
-    NotificationSendController, Socialite\GoogleController, 
-    Auth\VerificationController
+    NotificationSendController,Auth\VerificationController
 };
 
 use App\Livewire\Posts\SingleFull;
@@ -60,6 +60,10 @@ Route::get('/download-preenrollment-pdf', [PreEnrollmentController::class, 'down
 
     Route::get('/pre-enrollment/dashboard', [PreEnrollmentController::class, 'previewForm'])->name('pre-enrollment.dashboard');
 });
+
+//google
+Route::get('auth/google', [GoogleController::class, 'redirectToGoogle'])->name('google.redirect');
+Route::get('auth/google/callback', [GoogleController::class, 'handleGoogleCallback'])->name('google.callback');
 
 // Route in web.php
 

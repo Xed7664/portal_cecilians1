@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\{Auth, Hash, Session, DB};
 use Laravel\Socialite\Facades\Socialite;
 use App\Services\UserSessionService;
 
-class GoogleController extends Controller
+class OldGoogleController extends Controller
 {
     public function redirectToGoogle()
     {
