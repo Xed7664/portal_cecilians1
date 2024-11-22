@@ -11,7 +11,7 @@
                 <div class="card shadow-sm">
                     <div class="card-body">
                         <div class="d-flex justify-content-between align-items-center">
-                            <h2 class="card-title mb-0" style="color: black;">Data Overview</h2>
+                            <h2 class="card-title mb-1">Data Overview</h2>
 
                                                     </div>
                         <p class="text-muted mt-2 mb-0">Last updated: <span id="lastUpdated"></span></p>

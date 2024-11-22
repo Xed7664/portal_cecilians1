@@ -24,9 +24,10 @@ use App\Models\User;
 
 
   
+  @if(in_array($currentRoute, ['admin.users.employee','phead.subjects.index']))
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.9.3/dropzone.min.css">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.9.3/dropzone.min.js"></script>
-  
+  @endif
 
   <!-- Favicons -->
   <link href="{{ asset('img/favicon.ico') }}" rel="icon">
